@@ -3,61 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bober Witze</title>
+<title>Bober</title>
+<style>
+  .container {
+    text-align: center;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+</style>
 </head>
 <body>
-  <h1>Bober Witze</h1>
-
-  <!-- Anzeige von Witzen -->
-  <div id="jokeDisplay"></div>
-
-  <!-- Button zum Generieren mehrerer Witze -->
-  <button onclick="displayMultipleJokes(5)">Mehr Witze generieren</button>
-
-  <!-- Formular zum Hinzufügen neuer Witze -->
-  <form id="jokeForm">
-    <label for="newJoke">Neuer Witz:</label>
-    <input type="text" id="newJoke" name="newJoke" required>
-    <button type="submit">Witz hinzufügen</button>
-  </form>
-
-  <script>
-    // Array von Witzen
-    let jokes = [
-      "Warum wollte der Teddybär keinen Kuchen essen? Weil er schon gestopft war!",
-      "Was ist ein Biber im Winter? Ein Winter-Biber!",
-      // Weitere Witze hier
-    ];
-
-    // Funktion, um einen zufälligen Witz anzuzeigen
-    function displayRandomJoke() {
-      const randomIndex = Math.floor(Math.random() * jokes.length);
-      const jokeDisplay = document.getElementById('jokeDisplay');
-      jokeDisplay.textContent = jokes[randomIndex];
-    }
-
-    // Funktion, um mehrere Witze gleichzeitig anzuzeigen
-    function displayMultipleJokes(count) {
-      const jokeDisplay = document.getElementById('jokeDisplay');
-      let jokesToDisplay = '';
-      for (let i = 0; i < count; i++) {
-        const randomIndex = Math.floor(Math.random() * jokes.length);
-        jokesToDisplay += '<p>' + jokes[randomIndex] + '</p>';
-      }
-      jokeDisplay.innerHTML = jokesToDisplay;
-    }
-
-    // Funktion, um einen neuen Witz hinzuzufügen
-    document.getElementById('jokeForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-      const newJokeInput = document.getElementById('newJoke');
-      const newJoke = newJokeInput.value;
-      jokes.push(newJoke);
-      newJokeInput.value = ''; // Formular leeren
-    });
-
-    // Zuerst einen Witz anzeigen
-    displayRandomJoke();
-  </script>
+  <div class="container">
+    <h1>Welcome to boberworld</h1>
+    <p>Hier könnte dein Text stehen.</p>
+    <img src="bober1.jpg" alt="Bild">
+  </div>
 </body>
 </html>
