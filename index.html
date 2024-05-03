@@ -11,13 +11,21 @@
   img {
     max-width: 100%;
     height: auto;
+    cursor: pointer; /* Ändere den Mauszeiger, um anzuzeigen, dass das Bild klickbar ist */
   }
 </style>
 </head>
 <body>
   <div class="container">
     <h1>Welcome to boberworld</h1>
-    <img src="bober1.jpg" alt="Bild">
+    <img src="bober1.jpg" alt="Bild" onclick="showPopup()">
   </div>
+
+  <script>
+    // Funktion, um das Popup anzuzeigen
+    function showPopup() {
+      alert("BOBER");
+    }
+  </script>
 </body>
 </html>
