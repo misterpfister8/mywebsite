@@ -5,6 +5,7 @@
     <title>Schlafrechner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        /* Ihr vorhandenes Design bleibt unverändert */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f8ff;
@@ -97,11 +98,27 @@
         <label for="wakeTime">Aufwachzeit (HH:MM):</label>
         <input type="time" id="wakeTime" required>
         <label for="sleepDuration">Schlafdauer in Stunden:</label>
-        <input type="number" id="sleepDuration" step="0.1" required>
+        <input type="number" id="sleepDuration" step="0.1" required value="8">
         <button id="calculateButton">Schlafenszeit berechnen</button>
         <p id="result"></p>
     </div>
     <script>
+        // Standardwerte setzen, wenn die Seite geladen wird
+        window.onload = function() {
+            // Schlafdauer auf 8 Stunden setzen
+            document.getElementById('sleepDuration').value = 8;
+
+            // Aufwachzeit auf 8 Stunden ab jetzt setzen
+            let now = new Date();
+            let wakeUpTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+
+            let hours = wakeUpTime.getHours().toString().padStart(2, '0');
+            let minutes = wakeUpTime.getMinutes().toString().padStart(2, '0');
+
+            // Aufwachzeit-Eingabefeld setzen
+            document.getElementById('wakeTime').value = hours + ':' + minutes;
+        };
+
         document.getElementById('calculateButton').addEventListener('click', calculateBedTime);
 
         function calculateBedTime() {
