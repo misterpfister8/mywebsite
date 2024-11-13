@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Schlafrechner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* Das Design bleibt wie zuvor */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f8ff;
@@ -63,14 +63,23 @@
             color: #333;
             text-align: center;
         }
-        @media (max-width: 500px) {
+        /* Responsives Design */
+        @media (max-width: 600px) {
             .container {
-                padding: 20px;
                 margin: 40px auto;
+                padding: 20px;
             }
             h1 {
-                font-size: 24px;
+                font-size: 28px;
                 margin-bottom: 30px;
+            }
+            label {
+                font-size: 16px;
+            }
+            input[type="time"],
+            input[type="number"] {
+                font-size: 16px;
+                padding: 10px 12px;
             }
             button {
                 font-size: 16px;
@@ -93,7 +102,8 @@
         <p id="result"></p>
     </div>
     <script>
-        // Funktion zur Berechnung der Schlafenszeit
+        document.getElementById('calculateButton').addEventListener('click', calculateBedTime);
+
         function calculateBedTime() {
             let wakeTimeInput = document.getElementById('wakeTime').value;
             let sleepDuration = parseFloat(document.getElementById('sleepDuration').value);
@@ -129,9 +139,6 @@
 
             document.getElementById('result').innerText = 'Sie sollten um ' + hours + ':' + minutes + ' Uhr schlafen gehen.';
         }
-
-        // Event Listener für den Button
-        document.getElementById('calculateButton').addEventListener('click', calculateBedTime);
     </script>
 </body>
 </html>
