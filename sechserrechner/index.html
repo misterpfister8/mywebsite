@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Taschenrechner für Notendurchschnitt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #calculator {
+            max-width: 600px;
+            margin: auto;
+        }
+        .grade-entry {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .grade-entry input {
+            margin-right: 10px;
+            padding: 5px;
+        }
+        #addGradeBtn, #calculateBtn {
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+        #result {
+            font-size: 1.5em;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Taschenrechner für Notendurchschnitt</h1>
+    <div id="calculator">
+        <div id="gradesContainer">
+            <div class="grade-entry">
+                <input type="number" class="grade" placeholder="Note (0-6)" min="0" max="6" step="0.01" required>
+                <input type="number" class="weight" placeholder="Gewichtung (%)" min="0" max="100" step="0.01" required>
+                <button onclick="removeGrade(this)">Entfernen</button>
+            </div>
+        </div>
+        <button id="addGradeBtn" onclick="addGradeEntry()">Weitere Note hinzufügen</button>
+        <br><br>
+        <button id="calculateBtn" onclick="calculateAverage()">Berechne Durchschnitt</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function addGradeEntry() {
+            var container = document.getElementById('gradesContainer');
+            var gradeEntry = document.createElement('div');
+            gradeEntry.className = 'grade-entry';
+
+            var gradeInput = document.createElement('input');
+            gradeInput.type = 'number';
+            gradeInput.className = 'grade';
+            gradeInput.placeholder = 'Note (0-6)';
+            gradeInput.min = '0';
+            gradeInput.max = '6';
+            gradeInput.step = '0.01';
+            gradeInput.required = true;
+
+            var weightInput = document.createElement('input');
+            weightInput.type = 'number';
+            weightInput.className = 'weight';
+            weightInput.placeholder = 'Gewichtung (%)';
+            weightInput.min = '0';
+            weightInput.max = '100';
+            weightInput.step = '0.01';
+            weightInput.required = true;
+
+            var removeBtn = document.createElement('button');
+            removeBtn.textContent = 'Entfernen';
+            removeBtn.onclick = function() {
+                removeGrade(removeBtn);
+            };
+
+            gradeEntry.appendChild(gradeInput);
+            gradeEntry.appendChild(weightInput);
+            gradeEntry.appendChild(removeBtn);
+            container.appendChild(gradeEntry);
+        }
+
+        function removeGrade(button) {
+            var gradeEntry = button.parentNode;
+            gradeEntry.parentNode.removeChild(gradeEntry);
+        }
+
+        function calculateAverage() {
+            var grades = document.getElementsByClassName('grade');
+            var weights = document.getElementsByClassName('weight');
+
+            var totalWeight = 0;
+            var weightedSum = 0;
+
+            for (var i = 0; i < grades.length; i++) {
+                var grade = parseFloat(grades[i].value);
+                var weight = parseFloat(weights[i].value);
+
+                if (isNaN(grade) || grade < 0 || grade > 6) {
+                    alert('Bitte gib eine gültige Note zwischen 0 und 6 ein.');
+                    return;
+                }
+
+                if (isNaN(weight) || weight < 0 || weight > 100) {
+                    alert('Bitte gib eine gültige Gewichtung zwischen 0% und 100% ein.');
+                    return;
+                }
+
+                weightedSum += grade * weight;
+                totalWeight += weight;
+            }
+
+            if (totalWeight === 0) {
+                alert('Die Summe der Gewichtungen darf nicht 0% sein.');
+                return;
+            }
+
+            var average = weightedSum / totalWeight;
+            average = Math.round(average * 100) / 100; // Auf zwei Nachkommastellen runden
+
+            document.getElementById('result').innerText = 'Dein Durchschnitt ist: ' + average.toFixed(2);
+        }
+    </script>
+</body>
+</html>
