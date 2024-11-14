@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Taschenrechner für Notendurchschnitt</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Viewport-Meta-Tag -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        /* Grundlegendes Styling */
         body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
             padding: 20px;
-            margin: 0; /* Entfernt Standardabstand */
+            margin: 0;
+            padding-bottom: 80px; /* Platz für fixierten Button */
         }
         h1 {
             text-align: center;
@@ -18,9 +20,15 @@
             max-width: 600px;
             margin: auto;
         }
+        /* Noteneingaben */
+        #gradesContainer {
+            max-height: 400px; /* Begrenze die Höhe */
+            overflow-y: auto;  /* Scrollbar bei Bedarf */
+            margin-bottom: 20px;
+        }
         .grade-entry {
             display: flex;
-            flex-wrap: wrap; /* Ermöglicht Zeilenumbruch auf kleinen Bildschirmen */
+            flex-wrap: wrap;
             margin-bottom: 10px;
         }
         .grade-entry input {
@@ -39,7 +47,8 @@
             margin-top: 5px;
             font-size: 1em;
         }
-        #addGradeBtn, #calculateBtn {
+        /* Buttons */
+        #addGradeBtn {
             padding: 15px;
             width: 100%;
             background-color: #4CAF50;
@@ -49,15 +58,32 @@
             font-size: 1em;
             margin-top: 10px;
         }
-        #addGradeBtn:hover, #calculateBtn:hover, .grade-entry button:hover {
+        #calculateBtn {
+            position: fixed;  /* Fixiere den Button */
+            bottom: 20px;     /* Abstand vom unteren Bildschirmrand */
+            left: 50%;        /* Zentriere horizontal */
+            transform: translateX(-50%);
+            width: calc(100% - 40px); /* Passe Breite an */
+            max-width: 600px;
+            z-index: 1000;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        /* Hover-Effekte */
+        #addGradeBtn:hover, .grade-entry button:hover, #calculateBtn:hover {
             background-color: #45a049;
         }
+        /* Ergebnis-Anzeige */
         #result {
             font-size: 1.5em;
             margin-top: 20px;
             text-align: center;
         }
-        /* Media Queries für größere Bildschirme */
+        /* Anpassungen für größere Bildschirme */
         @media (min-width: 600px) {
             .grade-entry {
                 flex-wrap: nowrap;
@@ -71,7 +97,7 @@
                 margin-top: 0;
                 width: auto;
             }
-            #addGradeBtn, #calculateBtn {
+            #addGradeBtn {
                 width: auto;
                 margin-right: 10px;
                 display: inline-block;
@@ -90,9 +116,11 @@
             </div>
         </div>
         <button id="addGradeBtn" onclick="addGradeEntry()">Weitere Note hinzufügen</button>
-        <button id="calculateBtn" onclick="calculateAverage()">Berechne Durchschnitt</button>
         <div id="result"></div>
     </div>
+
+    <!-- Fixierter "Berechne Durchschnitt"-Button -->
+    <button id="calculateBtn" onclick="calculateAverage()">Berechne Durchschnitt</button>
 
     <script>
         function addGradeEntry() {
@@ -166,7 +194,7 @@
             }
 
             var average = weightedSum / totalWeight;
-            average = Math.round(average * 100) / 100; // Auf zwei Nachkommastellen runden
+            average = Math.round(average * 100) / 100;
 
             document.getElementById('result').innerText = 'Dein Durchschnitt ist: ' + average.toFixed(2);
         }
