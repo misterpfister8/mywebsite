@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
+    <meta charset="UTF-8">
     <title>Taschenrechner für Notendurchschnitt</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Viewport-Meta-Tag -->
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f2f2f2;
             padding: 20px;
+            margin: 0; /* Entfernt Standardabstand */
         }
         h1 {
             text-align: center;
@@ -17,20 +20,62 @@
         }
         .grade-entry {
             display: flex;
+            flex-wrap: wrap; /* Ermöglicht Zeilenumbruch auf kleinen Bildschirmen */
             margin-bottom: 10px;
         }
         .grade-entry input {
-            margin-right: 10px;
-            padding: 5px;
+            flex: 1 1 100%;
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 1em;
+        }
+        .grade-entry button {
+            flex: 1 1 100%;
+            padding: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 5px;
+            font-size: 1em;
         }
         #addGradeBtn, #calculateBtn {
-            padding: 10px 20px;
+            padding: 15px;
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
             margin-top: 10px;
+        }
+        #addGradeBtn:hover, #calculateBtn:hover, .grade-entry button:hover {
+            background-color: #45a049;
         }
         #result {
             font-size: 1.5em;
             margin-top: 20px;
             text-align: center;
+        }
+        /* Media Queries für größere Bildschirme */
+        @media (min-width: 600px) {
+            .grade-entry {
+                flex-wrap: nowrap;
+            }
+            .grade-entry input {
+                flex: 1;
+                margin-right: 10px;
+            }
+            .grade-entry button {
+                flex: 0 0 auto;
+                margin-top: 0;
+                width: auto;
+            }
+            #addGradeBtn, #calculateBtn {
+                width: auto;
+                margin-right: 10px;
+                display: inline-block;
+            }
         }
     </style>
 </head>
@@ -45,7 +90,6 @@
             </div>
         </div>
         <button id="addGradeBtn" onclick="addGradeEntry()">Weitere Note hinzufügen</button>
-        <br><br>
         <button id="calculateBtn" onclick="calculateAverage()">Berechne Durchschnitt</button>
         <div id="result"></div>
     </div>
