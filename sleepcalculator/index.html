@@ -1,161 +1,160 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Schlafrechner</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* Ihr vorhandenes Design bleibt unverändert */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f8ff;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 90%;
-            max-width: 500px;
-            margin: 80px auto;
-            background-color: #fff;
-            padding: 40px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 40px;
-        }
-        label {
-            display: block;
-            margin-top: 20px;
-            font-weight: bold;
-            color: #555;
-        }
-        input[type="time"],
-        input[type="number"] {
-            width: 100%;
-            padding: 12px 15px;
-            margin-top: 5px;
-            box-sizing: border-box;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            display: block;
-            width: 100%;
-            background-color: #28a745;
-            color: #fff;
-            padding: 15px;
-            border: none;
-            margin-top: 30px;
-            font-size: 18px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        #result {
-            margin-top: 30px;
-            font-size: 20px;
-            color: #333;
-            text-align: center;
-        }
-        /* Responsives Design */
-        @media (max-width: 600px) {
-            .container {
-                margin: 40px auto;
-                padding: 20px;
-            }
-            h1 {
-                font-size: 28px;
-                margin-bottom: 30px;
-            }
-            label {
-                font-size: 16px;
-            }
-            input[type="time"],
-            input[type="number"] {
-                font-size: 16px;
-                padding: 10px 12px;
-            }
-            button {
-                font-size: 16px;
-                padding: 12px;
-            }
-            #result {
-                font-size: 18px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Schlafrechner – misterpfister.net</title>
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+      --bg-start: #2b5876;
+      --bg-end: #4e4376;
+      --card-bg: rgba(255,255,255,0.15);
+      --card-shadow: rgba(0,0,0,0.2);
+      --accent: #4e90fe;
+      --error: #ff4d4f;
+      --success: #4caf50;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+      font-family: var(--font-sans);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .container {
+      width: 90%; max-width: 600px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px var(--card-shadow);
+      padding: 2rem;
+      color: #1d1d1f;
+    }
+    h1 {
+      font-size: 2.25rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .field {
+      margin-top: 1.5rem;
+    }
+    .field label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #fff;
+      font-size: 1rem;
+    }
+    .field input {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      background: rgba(255,255,255,0.8);
+      color: #1d1d1f;
+      transition: box-shadow 0.2s;
+    }
+    .field input:focus {
+      box-shadow: 0 0 0 3px rgba(78,144,254,0.3);
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    #calculateBtn {
+      flex: 1;
+      max-width: 300px;
+      padding: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    #calculateBtn:hover {
+      background: #3a7ce5;
+      transform: translateY(-2px);
+    }
+    #message {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      min-height: 1.2rem;
+      color: var(--error);
+      text-align: center;
+    }
+    #result {
+      margin-top: 0.5rem;
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--success);
+      text-align: center;
+    }
+    @media (max-width: 600px) {
+      html, body {
+        overflow-y: auto;
+        padding-bottom: env(safe-area-inset-bottom,16px);
+        align-items: flex-start;
+        padding-top: 16px;
+      }
+      .container { margin-bottom: 16px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Schlafrechner</h1>
-        <label for="wakeTime">Aufwachzeit (HH:MM):</label>
-        <input type="time" id="wakeTime" required>
-        <label for="sleepDuration">Schlafdauer in Stunden:</label>
-        <input type="number" id="sleepDuration" step="0.1" required value="8">
-        <button id="calculateButton">Schlafenszeit berechnen</button>
-        <p id="result"></p>
+  <div class="container" role="main">
+    <h1>Schlafrechner</h1>
+    <div class="field">
+      <label for="wakeTime">Aufwachzeit</label>
+      <input type="time" id="wakeTime" required />
     </div>
-    <script>
-        // Standardwerte setzen, wenn die Seite geladen wird
-        window.onload = function() {
-            // Schlafdauer auf 8 Stunden setzen
-            document.getElementById('sleepDuration').value = 8;
-
-            // Aufwachzeit auf 8 Stunden ab jetzt setzen
-            let now = new Date();
-            let wakeUpTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
-
-            let hours = wakeUpTime.getHours().toString().padStart(2, '0');
-            let minutes = wakeUpTime.getMinutes().toString().padStart(2, '0');
-
-            // Aufwachzeit-Eingabefeld setzen
-            document.getElementById('wakeTime').value = hours + ':' + minutes;
-        };
-
-        document.getElementById('calculateButton').addEventListener('click', calculateBedTime);
-
-        function calculateBedTime() {
-            let wakeTimeInput = document.getElementById('wakeTime').value;
-            let sleepDuration = parseFloat(document.getElementById('sleepDuration').value);
-
-            if (!wakeTimeInput || isNaN(sleepDuration)) {
-                alert('Bitte geben Sie sowohl die Aufwachzeit als auch die Schlafdauer ein.');
-                return;
-            }
-
-            // Aufwachzeit in Minuten umrechnen
-            let wakeTimeParts = wakeTimeInput.split(':');
-            let wakeHours = parseInt(wakeTimeParts[0]);
-            let wakeMinutes = parseInt(wakeTimeParts[1]);
-            let totalWakeMinutes = wakeHours * 60 + wakeMinutes;
-
-            // Schlafdauer und Einschlafzeit in Minuten umrechnen
-            let totalSleepMinutes = sleepDuration * 60 + 10; // +10 Minuten Einschlafzeit
-
-            // Schlafenszeit berechnen
-            let bedTimeMinutes = totalWakeMinutes - totalSleepMinutes;
-
-            // Falls die Zeit negativ ist, zum Vortag wechseln
-            if (bedTimeMinutes < 0) {
-                bedTimeMinutes += 24 * 60;
-            }
-
-            let bedHours = Math.floor(bedTimeMinutes / 60);
-            let bedMinutes = bedTimeMinutes % 60;
-
-            // Stunden und Minuten auf zwei Ziffern formatieren
-            let hours = bedHours.toString().padStart(2, '0');
-            let minutes = bedMinutes.toString().padStart(2, '0');
-
-            document.getElementById('result').innerText = 'Sie sollten um ' + hours + ':' + minutes + ' Uhr schlafen gehen.';
-        }
-    </script>
+    <div class="field">
+      <label for="sleepHours">Schlafdauer (Std.)</label>
+      <input type="number" id="sleepHours" min="1" max="24" step="0.1" value="8" required />
+    </div>
+    <div class="actions">
+      <button id="calculateBtn">Berechnen</button>
+    </div>
+    <div id="message" aria-live="assertive"></div>
+    <div id="result" aria-live="polite"></div>
+  </div>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const now = new Date();
+      const wake = new Date(now.getTime() + 8*60*60*1000);
+      document.getElementById('wakeTime').value = wake.toTimeString().slice(0,5);
+    });
+    document.getElementById('calculateBtn').addEventListener('click', () => {
+      const msg = document.getElementById('message');
+      const res = document.getElementById('result');
+      msg.textContent = '';
+      res.textContent = '';
+      const wakeVal = document.getElementById('wakeTime').value;
+      const sleepVal = parseFloat(document.getElementById('sleepHours').value);
+      if (!wakeVal || isNaN(sleepVal) || sleepVal<=0) {
+        msg.textContent = 'Bitte gültige Werte eingeben.';
+        return;
+      }
+      const [h,m] = wakeVal.split(':').map(Number);
+      let total = h*60 + m - (sleepVal*60 + 10);
+      if (total<0) total += 1440;
+      const bh = String(Math.floor(total/60)).padStart(2,'0');
+      const bm = String(total%60).padStart(2,'0');
+      res.textContent = `Schlafenszeit: ${bh}:${bm} Uhr`;
+    });
+    document.addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); document.getElementById('calculateBtn').click(); }});
+  </script>
 </body>
 </html>
