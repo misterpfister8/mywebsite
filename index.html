@@ -86,9 +86,18 @@
       animation: fadeInUp 1s ease 0.4s forwards;
       box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
     }
+
     @keyframes fadeInUp {
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
+
     .links {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -132,7 +141,15 @@
       body { align-items: flex-start; padding-top: 16px; }
       .card { margin-bottom: 16px; }
     }
-    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+
+    /* Sichtbarkeit garantieren bei reduziertem Motion Setting */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; }
+      h1, .subtitle, #clock {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -148,9 +165,24 @@
     </div>
   </div>
   <script>
-    function updateClock() { const now = new Date(); const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }; document.getElementById('clock').textContent = now.toLocaleDateString('de-CH', opts); }
-    updateClock(); setInterval(updateClock, 1000);
-    document.querySelectorAll('.link').forEach(link => { link.addEventListener('mouseenter', e => { const rect = link.getBoundingClientRect(); link.style.setProperty('--ripple-x', (e.clientX - rect.left) + 'px'); link.style.setProperty('--ripple-y', (e.clientY - rect.top) + 'px'); }); });
+    function updateClock() {
+      const now = new Date();
+      const opts = {
+        weekday: 'long', year: 'numeric', month: 'long',
+        day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+      };
+      document.getElementById('clock').textContent =
+        now.toLocaleDateString('de-CH', opts);
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+    document.querySelectorAll('.link').forEach(link => {
+      link.addEventListener('mouseenter', e => {
+        const rect = link.getBoundingClientRect();
+        link.style.setProperty('--ripple-x', (e.clientX - rect.left) + 'px');
+        link.style.setProperty('--ripple-y', (e.clientY - rect.top) + 'px');
+      });
+    });
   </script>
 </body>
 </html>
