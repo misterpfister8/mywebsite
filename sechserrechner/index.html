@@ -1,203 +1,196 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Taschenrechner für Notendurchschnitt</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        /* Grundlegendes Styling */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            padding: 20px;
-            margin: 0;
-            padding-bottom: 80px; /* Platz für fixierten Button */
-        }
-        h1 {
-            text-align: center;
-        }
-        #calculator {
-            max-width: 600px;
-            margin: auto;
-        }
-        /* Noteneingaben */
-        #gradesContainer {
-            max-height: 400px; /* Begrenze die Höhe */
-            overflow-y: auto;  /* Scrollbar bei Bedarf */
-            margin-bottom: 20px;
-        }
-        .grade-entry {
-            display: flex;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
-        .grade-entry input {
-            flex: 1 1 100%;
-            margin: 5px 0;
-            padding: 10px;
-            font-size: 1em;
-        }
-        .grade-entry button {
-            flex: 1 1 100%;
-            padding: 10px;
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-top: 5px;
-            font-size: 1em;
-        }
-        /* Buttons */
-        #addGradeBtn {
-            padding: 15px;
-            width: 100%;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-            margin-top: 10px;
-        }
-        #calculateBtn {
-            position: fixed;  /* Fixiere den Button */
-            bottom: 20px;     /* Abstand vom unteren Bildschirmrand */
-            left: 50%;        /* Zentriere horizontal */
-            transform: translateX(-50%);
-            width: calc(100% - 40px); /* Passe Breite an */
-            max-width: 600px;
-            z-index: 1000;
-            padding: 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        /* Hover-Effekte */
-        #addGradeBtn:hover, .grade-entry button:hover, #calculateBtn:hover {
-            background-color: #45a049;
-        }
-        /* Ergebnis-Anzeige */
-        #result {
-            font-size: 1.5em;
-            margin-top: 20px;
-            text-align: center;
-        }
-        /* Anpassungen für größere Bildschirme */
-        @media (min-width: 600px) {
-            .grade-entry {
-                flex-wrap: nowrap;
-            }
-            .grade-entry input {
-                flex: 1;
-                margin-right: 10px;
-            }
-            .grade-entry button {
-                flex: 0 0 auto;
-                margin-top: 0;
-                width: auto;
-            }
-            #addGradeBtn {
-                width: auto;
-                margin-right: 10px;
-                display: inline-block;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notendurchschnitt Rechner</title>
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+      --bg-start: #2b5876;
+      --bg-end: #4e4376;
+      --card-bg: rgba(255, 255, 255, 0.15);
+      --card-shadow: rgba(0, 0, 0, 0.2);
+      --accent: #4e90fe;
+      --error: #ff4d4f;
+      --success: #4caf50;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body, html {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      font-family: var(--font-sans);
+      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+      display: flex; align-items: center; justify-content: center;
+    }
+    .container {
+      width: 90%; max-width: 600px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px var(--card-shadow);
+      padding: 2rem;
+      color: #1d1d1f;
+    }
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 2rem;
+      text-align: center;
+      font-weight: 600;
+      color: #fff;
+    }
+    .entries {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: 400px;
+      overflow-y: auto;
+      margin-bottom: 1.5rem;
+    }
+    .entry {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .entry input[type="number"] {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.4);
+      background: rgba(255,255,255,0.8);
+      font-size: 1rem;
+    }
+    .entry button {
+      background: var(--error);
+      border: none;
+      color: #fff;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .entry button:hover { background: #d2383b; }
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .actions button {
+      flex: 1;
+      padding: 0.75rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #addBtn { background: var(--accent); color: #fff; }
+    #addBtn:hover { background: #3a7ce5; }
+    #calcBtn { background: var(--success); color: #fff; }
+    #calcBtn:hover { background: #409b48; }
+    #message {
+      text-align: center;
+      font-size: 1rem;
+      min-height: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+    #result {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    @media (max-width: 480px) {
+      .entry { grid-template-columns: 1fr auto; }
+      .entry input[type="number"]:nth-child(1) { grid-column: 1 / -1; }
+      .entry input[type="number"]:nth-child(2) { grid-column: 1 / -1; }
+    }
+  </style>
 </head>
 <body>
-    <h1>Taschenrechner für Notendurchschnitt</h1>
-    <div id="calculator">
-        <div id="gradesContainer">
-            <div class="grade-entry">
-                <input type="number" class="grade" placeholder="Note (0-6)" min="0" max="6" step="0.01" required>
-                <input type="number" class="weight" placeholder="Gewichtung (%)" value="100" min="0" max="100" step="0.01" required>
-                <button onclick="removeGrade(this)">Entfernen</button>
-            </div>
-        </div>
-        <button id="addGradeBtn" onclick="addGradeEntry()">Weitere Note hinzufügen</button>
-        <div id="result"></div>
+  <div class="container" role="main">
+    <h1>Notendurchschnitt Rechner</h1>
+    <div id="message"></div>
+    <div class="entries" id="entries"></div>
+    <div class="actions">
+      <button id="addBtn">+ Note hinzufügen</button>
+      <button id="calcBtn">Durchschnitt berechnen</button>
     </div>
+    <div id="result"></div>
+  </div>
 
-    <!-- Fixierter "Berechne Durchschnitt"-Button -->
-    <button id="calculateBtn" onclick="calculateAverage()">Berechne Durchschnitt</button>
+  <script>
+    const entriesEl = document.getElementById('entries');
+    const messageEl = document.getElementById('message');
+    const resultEl = document.getElementById('result');
+    document.getElementById('addBtn').addEventListener('click', addEntry);
+    document.getElementById('calcBtn').addEventListener('click', calculate);
 
-    <script>
-        function addGradeEntry() {
-            var container = document.getElementById('gradesContainer');
-            var gradeEntry = document.createElement('div');
-            gradeEntry.className = 'grade-entry';
+    // Start mit zwei Einträgen
+    addEntry(); addEntry();
 
-            var gradeInput = document.createElement('input');
-            gradeInput.type = 'number';
-            gradeInput.className = 'grade';
-            gradeInput.placeholder = 'Note (0-6)';
-            gradeInput.min = '0';
-            gradeInput.max = '6';
-            gradeInput.step = '0.01';
-            gradeInput.required = true;
+    function addEntry() {
+      const div = document.createElement('div');
+      div.className = 'entry';
+      div.innerHTML = `
+        <input type="number" placeholder="Note (0-6)" min="0" max="6" step="0.01" />
+        <input type="number" placeholder="Gewichtung (%)" min="0" max="100" step="0.01" />
+        <button aria-label="Eintrag entfernen">×</button>
+      `;
+      const removeBtn = div.querySelector('button');
+      removeBtn.addEventListener('click', () => { div.remove(); updateMessage(); });
+      entriesEl.appendChild(div);
+      updateMessage();
+    }
 
-            var weightInput = document.createElement('input');
-            weightInput.type = 'number';
-            weightInput.className = 'weight';
-            weightInput.placeholder = 'Gewichtung (%)';
-            weightInput.min = '0';
-            weightInput.max = '100';
-            weightInput.step = '0.01';
-            weightInput.required = true;
+    function updateMessage() {
+      const count = entriesEl.children.length;
+      messageEl.textContent = `${count} ${count === 1 ? 'Eintrag' : 'Einträge'}`;
+      resultEl.textContent = '';
+    }
 
-            var removeBtn = document.createElement('button');
-            removeBtn.textContent = 'Entfernen';
-            removeBtn.onclick = function() {
-                removeGrade(removeBtn);
-            };
-
-            gradeEntry.appendChild(gradeInput);
-            gradeEntry.appendChild(weightInput);
-            gradeEntry.appendChild(removeBtn);
-            container.appendChild(gradeEntry);
+    function calculate() {
+      const entryEls = Array.from(entriesEl.children);
+      let totalWeight = 0, sum = 0;
+      for (const el of entryEls) {
+        const [gradeInput, weightInput] = el.querySelectorAll('input');
+        const grade = parseFloat(gradeInput.value);
+        const weight = parseFloat(weightInput.value);
+        if (isNaN(grade) || grade < 0 || grade > 6) {
+          showMessage('Ungültige Note! Bitte 0–6 eingeben.', true);
+          return;
         }
-
-        function removeGrade(button) {
-            var gradeEntry = button.parentNode;
-            gradeEntry.parentNode.removeChild(gradeEntry);
+        if (isNaN(weight) || weight <= 0) {
+          showMessage('Ungültige Gewichtung! Bitte >0.', true);
+          return;
         }
+        sum += grade * weight;
+        totalWeight += weight;
+      }
+      if (totalWeight === 0) {
+        showMessage('Gesamtgewicht darf nicht 0 sein.', true);
+        return;
+      }
+      const avg = (sum / totalWeight).toFixed(2);
+      resultEl.textContent = `Dein Durchschnitt: ${avg}`;
+      showMessage('', false);
+    }
 
-        function calculateAverage() {
-            var grades = document.getElementsByClassName('grade');
-            var weights = document.getElementsByClassName('weight');
+    function showMessage(text, isError = false) {
+      messageEl.textContent = text;
+      messageEl.style.color = isError ? 'var(--error)' : '#fff';
+    }
 
-            var totalWeight = 0;
-            var weightedSum = 0;
-
-            for (var i = 0; i < grades.length; i++) {
-                var grade = parseFloat(grades[i].value);
-                var weight = parseFloat(weights[i].value);
-
-                if (isNaN(grade) || grade < 0 || grade > 6) {
-                    alert('Bitte gib eine gültige Note zwischen 0 und 6 ein.');
-                    return;
-                }
-
-                if (isNaN(weight) || weight < 0 || weight > 100) {
-                    alert('Bitte gib eine gültige Gewichtung zwischen 0% und 100% ein.');
-                    return;
-                }
-
-                weightedSum += grade * weight;
-                totalWeight += weight;
-            }
-
-            if (totalWeight === 0) {
-                alert('Die Summe der Gewichtungen darf nicht 0% sein.');
-                return;
-            }
-
-            var average = weightedSum / totalWeight;
-            average = Math.round(average * 100) / 100;
-
-            document.getElementById('result').innerText = 'Dein Durchschnitt ist: ' + average.toFixed(2);
-        }
-    </script>
+    // Enter berechnet
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') e.preventDefault(), calculate();
+    });
+  </script>
 </body>
 </html>
