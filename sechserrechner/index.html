@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Notendurchschnitt Rechner</title>
   <!-- Inter Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -18,13 +18,16 @@
       --success: #4caf50;
     }
     *, *::before, *::after { box-sizing: border-box; }
-    body, html {
+
+    html, body {
       margin: 0; padding: 0;
       width: 100%; height: 100%;
-      font-family: var(--font-sans);
+      overflow: hidden; /* Desktop: no scroll */
       background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+      font-family: var(--font-sans);
       display: flex; align-items: center; justify-content: center;
     }
+
     .container {
       width: 90%; max-width: 600px;
       background: var(--card-bg);
@@ -106,11 +109,23 @@
       font-weight: 600;
       color: #fff;
     }
+
+    /* Mobile adjustments */
     @media (max-width: 480px) {
+      html, body {
+        overflow-y: auto;
+        padding-bottom: env(safe-area-inset-bottom, 16px);
+        align-items: flex-start;
+        padding-top: 16px;
+      }
+      .container { margin-bottom: 16px; }
       .entry { grid-template-columns: 1fr auto; }
-      .entry input[type="number"]:nth-child(1) { grid-column: 1 / -1; }
-      .entry input[type="number"]:nth-child(2) { grid-column: 1 / -1; }
+      .entry input[type="number"]:nth-child(1),
+      .entry input[type="number"]:nth-child(2) {
+        grid-column: 1 / -1;
+      }
     }
+
   </style>
 </head>
 <body>
@@ -132,7 +147,7 @@
     document.getElementById('addBtn').addEventListener('click', addEntry);
     document.getElementById('calcBtn').addEventListener('click', calculate);
 
-    // Start mit zwei Einträgen
+    // Start with two entries
     addEntry(); addEntry();
 
     function addEntry() {
@@ -187,9 +202,12 @@
       messageEl.style.color = isError ? 'var(--error)' : '#fff';
     }
 
-    // Enter berechnet
+    // Enter key triggers calculation
     document.addEventListener('keydown', e => {
-      if (e.key === 'Enter') e.preventDefault(), calculate();
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        calculate();
+      }
     });
   </script>
 </body>
