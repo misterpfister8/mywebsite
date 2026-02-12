@@ -11,13 +11,14 @@
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
       --color-text-primary: #f8f9fa;
       --color-text-secondary: #adb5bd;
-      --color-accent: #4dabf7;
+      --color-accent: #7c3aed;
+      --color-accent-hover: #8b5cf6;
       --bg-primary: #0f172a;
       --bg-secondary: #1e293b;
       --card-bg: #1e293b;
       --card-border: #334155;
       --card-shadow: rgba(0, 0, 0, 0.5);
-      --focus-ring: rgba(77, 171, 247, 0.5);
+      --focus-ring: rgba(124, 58, 237, 0.5);
       --link-hover-bg: #334155;
     }
     *, *::before, *::after { box-sizing: border-box; }
@@ -60,47 +61,75 @@
       margin: 0 0 2rem 0;
       font-weight: 400;
     }
-    #clock {
-      display: inline-block;
-      font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-      font-size: 0.875rem;
-      background: var(--bg-secondary);
-      border: 1px solid var(--card-border);
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      color: var(--color-text-secondary);
-      margin-bottom: 2.5rem;
-    }
-
     .links {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
+      margin-bottom: 2rem;
     }
     .link {
       position: relative;
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
       justify-content: center;
-      padding: 1.25rem 1.5rem;
-      border-radius: 10px;
+      padding: 1.5rem;
+      border-radius: 12px;
       background: var(--bg-secondary);
       border: 1px solid var(--card-border);
       color: var(--color-text-primary);
-      font-size: 1rem;
-      font-weight: 500;
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .link:last-child {
+      grid-column: 1 / -1;
+      max-width: 50%;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .link-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      opacity: 0.9;
+    }
+    .link-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: var(--color-text-primary);
+    }
+    .link-description {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      line-height: 1.4;
     }
     .link:hover {
       background: var(--link-hover-bg);
       border-color: var(--color-accent);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(124, 58, 237, 0.15), 0 0 0 1px var(--color-accent);
+    }
+    .link:hover .link-icon {
+      transform: scale(1.1);
+      opacity: 1;
     }
     .link:focus {
       outline: 2px solid var(--focus-ring);
       outline-offset: 2px;
+    }
+
+    footer {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--card-border);
+      text-align: center;
+    }
+    #clock {
+      display: inline-block;
+      font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      opacity: 0.7;
     }
 
     /* Mobile Anpassung */
@@ -138,13 +167,33 @@
   <div class="card" role="main">
     <h1>Willkommen auf meiner Webseite</h1>
     <p class="subtitle">Startseite für all meine Projekte</p>
-    <div id="clock" aria-live="off"></div>
+
     <div class="links">
-      <a href="https://misterpfister.net/sechserrechner/" class="link">Sechserrechner</a>
-      <a href="https://misterpfister.net/sleepcalculator/" class="link">Sleep Calculator</a>
-      <a href="https://mealie.misterpfister.net" class="link">Mealie</a>
-      <a href="https://github.com/misterpfister8/spasstocsv" class="link">spasstocsv</a>
+      <a href="https://misterpfister.net/sechserrechner/" class="link">
+        <div class="link-icon">📊</div>
+        <div class="link-title">Sechserrechner</div>
+        <div class="link-description">Notendurchschnitt berechnen</div>
+      </a>
+      <a href="https://misterpfister.net/sleepcalculator/" class="link">
+        <div class="link-icon">😴</div>
+        <div class="link-title">Sleep Calculator</div>
+        <div class="link-description">Optimale Schlafenszeit ermitteln</div>
+      </a>
+      <a href="https://mealie.misterpfister.net" class="link">
+        <div class="link-icon">🍳</div>
+        <div class="link-title">Mealie</div>
+        <div class="link-description">Rezeptverwaltung & Meal Planning</div>
+      </a>
+      <a href="https://github.com/misterpfister8/spasstocsv" class="link">
+        <div class="link-icon">🔄</div>
+        <div class="link-title">SpasstoCSV</div>
+        <div class="link-description">Daten-Konverter für SPASS-Format</div>
+      </a>
     </div>
+
+    <footer>
+      <div id="clock" aria-live="off"></div>
+    </footer>
   </div>
   <script>
     function updateClock() {
