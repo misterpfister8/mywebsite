@@ -9,38 +9,42 @@
   <style>
     :root {
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-      --bg-start: #2b5876;
-      --bg-end: #4e4376;
-      --card-bg: rgba(255,255,255,0.15);
-      --card-shadow: rgba(0,0,0,0.2);
-      --accent: #4e90fe;
-      --error: #ff4d4f;
-      --success: #4caf50;
+      --color-text-primary: #f8f9fa;
+      --color-text-secondary: #adb5bd;
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --card-shadow: rgba(0, 0, 0, 0.5);
+      --accent: #4dabf7;
+      --error: #ff6b6b;
+      --success: #51cf66;
+      --focus-ring: rgba(77, 171, 247, 0.5);
     }
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
       margin: 0; padding: 0;
-      width: 100%; height: 100%;
-      overflow: hidden;
-      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+      width: 100%; min-height: 100vh;
+      background: var(--bg-primary);
       font-family: var(--font-sans);
       display: flex; align-items: center; justify-content: center;
+      padding: 2rem 1rem;
     }
     .container {
-      width: 90%; max-width: 600px;
+      width: 100%; max-width: 600px;
       background: var(--card-bg);
-      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
       border-radius: 16px;
-      box-shadow: 0 8px 32px var(--card-shadow);
-      padding: 2rem;
-      color: #1d1d1f;
+      box-shadow: 0 4px 6px -1px var(--card-shadow), 0 2px 4px -2px var(--card-shadow);
+      padding: 2.5rem 2rem;
     }
     h1 {
-      font-size: 2.25rem;
+      font-size: 2rem;
       text-align: center;
-      margin-bottom: 1rem;
-      font-weight: 600;
-      color: #fff;
+      margin: 0 0 2rem 0;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      letter-spacing: -0.025em;
     }
     .field {
       margin-top: 1.5rem;
@@ -49,22 +53,23 @@
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 500;
-      color: #fff;
-      font-size: 1rem;
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
     }
     .field input {
       width: 100%;
       padding: 0.75rem;
       font-size: 1rem;
-      border: none;
+      border: 1px solid var(--card-border);
       border-radius: 8px;
       outline: none;
-      background: rgba(255,255,255,0.8);
-      color: #1d1d1f;
-      transition: box-shadow 0.2s;
+      background: var(--bg-secondary);
+      color: var(--color-text-primary);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
     .field input:focus {
-      box-shadow: 0 0 0 3px rgba(78,144,254,0.3);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--focus-ring);
     }
     .actions {
       display: flex;
@@ -74,42 +79,46 @@
     #calculateBtn {
       flex: 1;
       max-width: 300px;
-      padding: 0.75rem;
+      padding: 0.875rem 1.5rem;
       font-size: 1rem;
       font-weight: 600;
       background: var(--accent);
-      color: #fff;
+      color: var(--bg-primary);
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s, transform 0.2s;
+      transition: all 0.2s;
     }
     #calculateBtn:hover {
-      background: #3a7ce5;
+      background: #3a9ce5;
       transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
     }
     #message {
       margin-top: 1rem;
-      font-size: 0.95rem;
+      font-size: 0.875rem;
       min-height: 1.2rem;
       color: var(--error);
       text-align: center;
     }
     #result {
-      margin-top: 0.5rem;
+      margin-top: 0.75rem;
       font-size: 1.25rem;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--success);
       text-align: center;
     }
-    @media (max-width: 600px) {
-      html, body {
-        overflow-y: auto;
-        padding-bottom: env(safe-area-inset-bottom,16px);
+    @media (max-width: 640px) {
+      body {
+        padding: 1rem;
         align-items: flex-start;
-        padding-top: 16px;
       }
-      .container { margin-bottom: 16px; }
+      .container {
+        padding: 2rem 1.5rem;
+      }
+      h1 {
+        font-size: 1.75rem;
+      }
     }
   </style>
 </head>
