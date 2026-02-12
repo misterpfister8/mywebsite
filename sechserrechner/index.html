@@ -138,7 +138,13 @@
       font-size: 1.5rem;
       font-weight: 600;
       color: var(--color-text-primary);
+      transition: color 0.3s;
     }
+    #result.grade-excellent { color: #51cf66; }
+    #result.grade-good { color: #4dabf7; }
+    #result.grade-average { color: #ffd43b; }
+    #result.grade-poor { color: #ff8787; }
+    #result.grade-fail { color: #ff6b6b; }
 
     /* Mobile adjustments */
     @media (max-width: 640px) {
@@ -189,12 +195,18 @@
       const div = document.createElement('div');
       div.className = 'entry';
       div.innerHTML = `
-        <input type="number" placeholder="Note (0-6)" min="0" max="6" step="0.01" />
-        <input type="number" placeholder="Gewichtung (%)" min="0" max="100" step="0.01" />
+        <input type="number" placeholder="Note (z.B. 5.5)" min="0" max="6" step="0.01" class="grade-input" />
+        <input type="number" placeholder="Gewicht (z.B. 50)" min="0" max="100" step="0.01" class="weight-input" />
         <button aria-label="Eintrag entfernen">×</button>
       `;
       const removeBtn = div.querySelector('button');
-      removeBtn.addEventListener('click', () => { div.remove(); updateMessage(); });
+      removeBtn.addEventListener('click', () => { div.remove(); updateMessage(); autoCalculate(); });
+
+      // Auto-calculate on input
+      div.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', autoCalculate);
+      });
+
       entriesEl.appendChild(div);
       updateMessage();
     }
@@ -228,8 +240,33 @@
         return;
       }
       const avg = (sum / totalWeight).toFixed(2);
-      resultEl.textContent = `Dein Durchschnitt: ${avg}`;
+      const percentage = ((avg / 6) * 100).toFixed(0);
+
+      // Apply color class based on grade
+      resultEl.className = '';
+      if (avg >= 5.5) resultEl.classList.add('grade-excellent');
+      else if (avg >= 5.0) resultEl.classList.add('grade-good');
+      else if (avg >= 4.0) resultEl.classList.add('grade-average');
+      else if (avg >= 3.0) resultEl.classList.add('grade-poor');
+      else resultEl.classList.add('grade-fail');
+
+      resultEl.textContent = `Durchschnitt: ${avg} (${percentage}%)`;
       showMessage('', false);
+    }
+
+    function autoCalculate() {
+      const entryEls = Array.from(entriesEl.children);
+      let allFilled = true;
+      for (const el of entryEls) {
+        const [gradeInput, weightInput] = el.querySelectorAll('input');
+        if (!gradeInput.value || !weightInput.value) {
+          allFilled = false;
+          break;
+        }
+      }
+      if (allFilled && entryEls.length > 0) {
+        calculate();
+      }
     }
 
     function showMessage(text, isError = false) {
