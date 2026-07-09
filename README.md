@@ -1,6 +1,6 @@
 # misterpfister.net
 
-Personal website and project index. Hosted on GitHub Pages with a custom domain.
+Personal project index for Kilian Pfister. Hosted on GitHub Pages with a custom domain.
 
 **Live:** [misterpfister.net](https://misterpfister.net)
 
@@ -10,9 +10,9 @@ Personal website and project index. Hosted on GitHub Pages with a custom domain.
 
 | Project | Description | Type |
 |---|---|---|
+| [SpasstoCSV](https://github.com/misterpfister8/spasstocsv) | Local Samsung Pass `.spass` converter for CSV and Bitwarden JSON | Open Source |
 | [Notenrechner](https://misterpfister.net/sechserrechner/) | Weighted calculator for the Swiss 1–6 grade scale | Tool |
 | [Schlafrechner](https://misterpfister.net/sleepcalculator/) | Bedtime and wake-time planner with configurable sleep latency | Tool |
-| [SpasstoCSV](https://github.com/misterpfister8/spasstocsv) | Local Samsung Pass `.spass` converter for CSV and Bitwarden JSON | Open Source |
 
 ---
 

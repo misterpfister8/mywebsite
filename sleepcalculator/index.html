@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f4f5f7" />
+    <meta name="theme-color" content="#fbfaf6" />
     <meta name="description" content="Schlafens- oder Aufwachzeit aus Schlafdauer und Einschlafzeit berechnen." />
 
     <title>Schlafrechner – misterpfister.net</title>
@@ -12,118 +12,71 @@
     <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../assets/site.css" />
   </head>
-  <body class="site-page tool-page">
+  <body>
     <a class="skip-link" href="#main">Zum Rechner springen</a>
 
-    <header class="site-header">
-      <div class="header-inner container">
-        <a class="brand" href="../" aria-label="Zurück zu misterpfister.net">
-          <span class="brand-mark" aria-hidden="true"></span>
-          <span>misterpfister</span>
-        </a>
-        <a class="back-link" href="../"><span aria-hidden="true">←</span>&nbsp; Übersicht</a>
+    <header class="tool-header">
+      <div class="tool-nav-inner">
+        <a class="back-link" href="../">← misterpfister.net</a>
       </div>
     </header>
 
     <main id="main" class="tool-main">
-      <section class="tool-hero" aria-labelledby="tool-title">
-        <p class="eyebrow">02 · Web-App</p>
-        <h1 id="tool-title">Schlafrechner</h1>
-        <p class="tool-summary">Plane eine Schlafens- oder Aufwachzeit anhand deiner gewünschten Schlafdauer und einer transparenten Einschlafzeit.</p>
-        <div class="tool-chips" aria-label="Eigenschaften">
-          <span class="chip">Zwei Modi</span>
-          <span class="chip">Einschlafzeit wählbar</span>
-          <span class="chip">Lokal berechnet</span>
-        </div>
-      </section>
+      <header class="tool-heading">
+        <h1>Schlafrechner</h1>
+        <p>Schlafens- oder Aufwachzeit mit eigener Schlaf- und Einschlafdauer berechnen.</p>
+      </header>
 
-      <div class="tool-layout">
-        <section class="panel" aria-labelledby="sleep-form-title">
-          <form id="sleepForm" novalidate>
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Zeitplanung</p>
-                <h2 id="sleep-form-title" class="panel-title">Was möchtest du berechnen?</h2>
-                <p class="panel-note">Die Rechnung verwendet deine Dauer plus die gewählte Einschlafzeit — keine versteckten Annahmen.</p>
-              </div>
-            </div>
+      <section class="tool-surface" aria-label="Schlafzeit berechnen">
+        <form id="sleepForm" novalidate>
+          <fieldset class="mode-list">
+            <legend class="sr-only">Berechnungsmodus</legend>
+            <label class="mode-choice">
+              <input type="radio" name="mode" value="bedtime" checked />
+              <span>Ich möchte um eine bestimmte Zeit aufstehen</span>
+            </label>
+            <label class="mode-choice">
+              <input type="radio" name="mode" value="now" />
+              <span>Ich gehe jetzt schlafen</span>
+            </label>
+          </fieldset>
 
-            <fieldset class="mode-fieldset">
-              <legend class="sr-only">Berechnungsmodus</legend>
-              <div class="mode-switch">
-                <label class="mode-option">
-                  <input type="radio" name="mode" value="bedtime" checked />
-                  <span>Aufstehen um</span>
-                </label>
-                <label class="mode-option">
-                  <input type="radio" name="mode" value="now" />
-                  <span>Jetzt schlafen</span>
-                </label>
-              </div>
-            </fieldset>
-
-            <div id="wakeField" class="form-field">
-              <label class="form-label" for="wakeTime">Gewünschte Aufwachzeit</label>
+          <div class="sleep-fields">
+            <div id="wakeField" class="field-row">
+              <label class="form-label" for="wakeTime">Aufwachzeit</label>
               <input id="wakeTime" class="form-control" type="time" value="07:00" required />
             </div>
 
-            <div class="field-grid">
-              <div class="form-field">
-                <label class="form-label" for="sleepHours">Schlafdauer</label>
-                <input id="sleepHours" class="form-control" type="number" min="1" max="16" step="0.5" value="8" inputmode="decimal" required />
-              </div>
-              <div class="form-field">
-                <label class="form-label" for="fallAsleepMinutes">Einschlafzeit</label>
-                <select id="fallAsleepMinutes" class="form-control">
-                  <option value="0">0 Minuten</option>
-                  <option value="15" selected>15 Minuten</option>
-                  <option value="30">30 Minuten</option>
-                </select>
-              </div>
+            <div class="field-row">
+              <label class="form-label" for="sleepHours">Schlafdauer in Stunden</label>
+              <input id="sleepHours" class="form-control" type="number" min="1" max="16" step="0.5" value="8" inputmode="decimal" required />
             </div>
 
-            <div class="preset-list" aria-label="Schlafdauer auswählen">
-              <button class="preset-button" type="button" data-hours="7" aria-pressed="false">7 h</button>
-              <button class="preset-button" type="button" data-hours="7.5" aria-pressed="false">7.5 h</button>
-              <button class="preset-button" type="button" data-hours="8" aria-pressed="true">8 h</button>
-              <button class="preset-button" type="button" data-hours="9" aria-pressed="false">9 h</button>
+            <div class="field-row">
+              <label class="form-label" for="fallAsleepMinutes">Einschlafzeit</label>
+              <select id="fallAsleepMinutes" class="form-control">
+                <option value="0">0 Minuten</option>
+                <option value="15" selected>15 Minuten</option>
+                <option value="30">30 Minuten</option>
+              </select>
             </div>
+          </div>
 
-            <div class="submit-row">
-              <button id="calculateBtn" class="button button--primary" type="submit">Schlafenszeit berechnen</button>
-            </div>
-            <p id="message" class="message" role="status" aria-live="polite"></p>
-          </form>
+          <div class="submit-row">
+            <button id="calculateBtn" class="button" type="submit">Schlafenszeit berechnen</button>
+          </div>
+          <p id="message" class="message" role="status" aria-live="polite"></p>
+        </form>
+
+        <section id="sleepResult" class="inline-result" aria-label="Berechnungsergebnis" aria-live="polite" hidden>
+          <p id="resultTitle" class="result-caption"></p>
+          <output id="resultTime" class="result-time"></output>
+          <p id="resultLabel" class="result-summary"></p>
         </section>
+      </section>
 
-        <aside class="panel result-panel" aria-label="Berechnungsergebnis" aria-live="polite">
-          <p class="eyebrow">Ergebnis</p>
-          <output id="resultTime" class="result-time">…</output>
-          <p id="resultLabel" class="result-copy">Einstellungen wählen und Zeit berechnen.</p>
-          <span id="dayContext" class="status-badge">Wartet auf Eingabe</span>
-
-          <dl class="result-meta">
-            <div>
-              <dt>Schlafdauer</dt>
-              <dd id="durationMeta">—</dd>
-            </div>
-            <div>
-              <dt>Einschlafzeit</dt>
-              <dd id="latencyMeta">—</dd>
-            </div>
-          </dl>
-
-          <p class="notice">Die Zeit ist eine Planungshilfe, keine medizinische Empfehlung. Individuelle Schlafbedürfnisse unterscheiden sich.</p>
-        </aside>
-      </div>
+      <p class="disclaimer">Nur eine Planungshilfe; Schlafbedarf ist individuell.</p>
     </main>
-
-    <footer class="site-footer">
-      <div class="footer-inner container">
-        <span>Schlafrechner</span>
-        <span>Berechnung lokal · Keine Eingaben übertragen</span>
-      </div>
-    </footer>
 
     <script>
       const form = document.getElementById('sleepForm');
@@ -133,12 +86,10 @@
       const fallAsleepMinutesEl = document.getElementById('fallAsleepMinutes');
       const calculateBtn = document.getElementById('calculateBtn');
       const messageEl = document.getElementById('message');
+      const sleepResultEl = document.getElementById('sleepResult');
+      const resultTitleEl = document.getElementById('resultTitle');
       const resultTimeEl = document.getElementById('resultTime');
       const resultLabelEl = document.getElementById('resultLabel');
-      const dayContextEl = document.getElementById('dayContext');
-      const durationMetaEl = document.getElementById('durationMeta');
-      const latencyMetaEl = document.getElementById('latencyMeta');
-      const presetButtons = Array.from(document.querySelectorAll('.preset-button'));
 
       function selectedMode() {
         return document.querySelector('input[name="mode"]:checked').value;
@@ -165,24 +116,15 @@
 
       function clearResult() {
         messageEl.textContent = '';
-        resultTimeEl.textContent = '…';
-        resultLabelEl.textContent = 'Einstellungen wählen und Zeit berechnen.';
-        dayContextEl.textContent = 'Wartet auf Eingabe';
-        dayContextEl.removeAttribute('data-tone');
-        durationMetaEl.textContent = '—';
-        latencyMetaEl.textContent = '—';
+        sleepResultEl.hidden = true;
+        resultTitleEl.textContent = '';
+        resultTimeEl.textContent = '';
+        resultLabelEl.textContent = '';
       }
 
       function setError(text) {
         clearResult();
         messageEl.textContent = text;
-      }
-
-      function syncPresetState() {
-        const value = Number(sleepHoursEl.value);
-        presetButtons.forEach((button) => {
-          button.setAttribute('aria-pressed', String(Number(button.dataset.hours) === value));
-        });
       }
 
       function updateMode() {
@@ -209,6 +151,7 @@
 
         messageEl.textContent = '';
         const durationMinutes = Math.round(duration * 60);
+        const durationLabel = formatDuration(duration);
 
         if (mode === 'bedtime') {
           const wakeValue = wakeTimeEl.value;
@@ -222,43 +165,33 @@
             setError('Bitte eine gültige Aufwachzeit eingeben.');
             return;
           }
+
           const wakeMinutes = wakeHours * 60 + wakeMinutesPart;
           const rawBedtime = wakeMinutes - durationMinutes - latency;
+          const dayLabel = rawBedtime < 0 ? 'Am Vorabend' : 'Am selben Tag';
 
+          resultTitleEl.textContent = 'Schlafenszeit';
           resultTimeEl.textContent = formatClock(rawBedtime);
-          resultLabelEl.textContent = `Schlafen gehen, damit du um ${wakeValue} Uhr aufstehst.`;
-          dayContextEl.textContent = rawBedtime < 0 ? 'Am Vorabend' : 'Am selben Tag';
+          resultLabelEl.textContent = `${dayLabel} · ${durationLabel} Schlaf + ${latency} min Einschlafzeit`;
         } else {
           const now = new Date();
           const wakeDate = new Date(now.getTime() + (durationMinutes + latency) * 60 * 1000);
           const wakeMinutes = wakeDate.getHours() * 60 + wakeDate.getMinutes();
+          const dayLabel = sameLocalDate(now, wakeDate) ? 'Heute' : 'Morgen';
 
+          resultTitleEl.textContent = 'Aufwachzeit';
           resultTimeEl.textContent = formatClock(wakeMinutes);
-          resultLabelEl.textContent = 'Aufwachen, wenn du jetzt ins Bett gehst.';
-          dayContextEl.textContent = sameLocalDate(now, wakeDate) ? 'Heute' : 'Morgen';
+          resultLabelEl.textContent = `${dayLabel} · ${durationLabel} Schlaf + ${latency} min Einschlafzeit`;
         }
 
-        dayContextEl.dataset.tone = 'success';
-        durationMetaEl.textContent = formatDuration(duration);
-        latencyMetaEl.textContent = `${latency} min`;
+        sleepResultEl.hidden = false;
       }
-
-      presetButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-          sleepHoursEl.value = button.dataset.hours;
-          syncPresetState();
-          clearResult();
-        });
-      });
 
       document.querySelectorAll('input[name="mode"]').forEach((input) => {
         input.addEventListener('change', updateMode);
       });
 
-      sleepHoursEl.addEventListener('input', () => {
-        syncPresetState();
-        clearResult();
-      });
+      sleepHoursEl.addEventListener('input', clearResult);
       wakeTimeEl.addEventListener('input', clearResult);
       fallAsleepMinutesEl.addEventListener('change', clearResult);
       form.addEventListener('submit', (event) => {
@@ -266,7 +199,6 @@
         calculateTime();
       });
 
-      syncPresetState();
       updateMode();
     </script>
   </body>

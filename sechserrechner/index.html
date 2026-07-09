@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f4f5f7" />
+    <meta name="theme-color" content="#fbfaf6" />
     <meta name="description" content="Gewichtete Noten auf der Schweizer Skala von 1 bis 6 berechnen." />
 
     <title>Notenrechner – misterpfister.net</title>
@@ -12,113 +12,72 @@
     <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../assets/site.css" />
   </head>
-  <body class="site-page tool-page">
+  <body>
     <a class="skip-link" href="#main">Zum Rechner springen</a>
 
-    <header class="site-header">
-      <div class="header-inner container">
-        <a class="brand" href="../" aria-label="Zurück zu misterpfister.net">
-          <span class="brand-mark" aria-hidden="true"></span>
-          <span>misterpfister</span>
-        </a>
-        <a class="back-link" href="../"><span aria-hidden="true">←</span>&nbsp; Übersicht</a>
+    <header class="tool-header">
+      <div class="tool-nav-inner">
+        <a class="back-link" href="../">← misterpfister.net</a>
       </div>
     </header>
 
     <main id="main" class="tool-main">
-      <section class="tool-hero" aria-labelledby="tool-title">
-        <p class="eyebrow">01 · Web-App</p>
-        <h1 id="tool-title">Notenrechner</h1>
-        <p class="tool-summary">Gewichtete Noten auf der Schweizer Skala von 1 bis 6. Die Berechnung läuft vollständig lokal in deinem Browser.</p>
-        <div class="tool-chips" aria-label="Eigenschaften">
-          <span class="chip">Skala 1–6</span>
-          <span class="chip">Bestanden ab 4.00</span>
-          <span class="chip">Live-Berechnung</span>
-        </div>
+      <header class="tool-heading">
+        <h1>Notenrechner</h1>
+        <p>Gewichteten Durchschnitt auf der Schweizer Skala von 1 bis 6 berechnen.</p>
+      </header>
+
+      <section class="tool-surface" aria-label="Noten berechnen">
+        <form id="gradeForm" novalidate>
+          <div class="grade-column-heads" aria-hidden="true">
+            <span>Note</span>
+            <span>Gewicht</span>
+            <span></span>
+          </div>
+          <div id="entries" class="grade-rows"></div>
+
+          <p class="form-hint">Gewicht: 1 = normal, 2 = doppelt.</p>
+
+          <div class="form-actions">
+            <button id="addBtn" class="button button--secondary" type="button">+ Note hinzufügen</button>
+            <button id="resetBtn" class="button button--text" type="button">Zurücksetzen</button>
+          </div>
+
+          <p id="message" class="message" role="status" aria-live="polite"></p>
+
+          <section id="resultArea" class="inline-result" aria-label="Berechnungsergebnis" aria-live="polite" hidden>
+            <div class="result-line">
+              <output id="average" class="result-value"></output>
+              <span id="passStatus" class="result-status"></span>
+            </div>
+            <p id="resultLabel" class="result-summary"></p>
+          </section>
+
+          <details class="planner">
+            <summary>Welche Note brauche ich als Nächstes?</summary>
+            <div class="planner-grid">
+              <label>
+                <span class="form-label">Zielschnitt</span>
+                <input id="targetAverage" class="form-control" type="number" min="1" max="6" step="0.01" value="4" inputmode="decimal" />
+              </label>
+              <label>
+                <span class="form-label">Nächstes Gewicht</span>
+                <input id="nextWeight" class="form-control" type="number" min="0.01" max="100" step="0.01" value="1" inputmode="decimal" />
+              </label>
+            </div>
+            <output id="planningResult" class="planner-output" aria-live="polite">Zuerst mindestens eine Note eingeben.</output>
+          </details>
+        </form>
       </section>
-
-      <div class="tool-layout">
-        <section class="panel" aria-labelledby="grades-title">
-          <form id="gradeForm" novalidate>
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Eingabe</p>
-                <h2 id="grades-title" class="panel-title">Noten &amp; Gewichtung</h2>
-                <p class="panel-note">Gewichte sind relative Werte. 1 / 1 ist gleich gewichtet, 2 / 1 gewichtet die erste Note doppelt.</p>
-              </div>
-              <button id="resetBtn" class="button button--quiet" type="button">Zurücksetzen</button>
-            </div>
-
-            <div class="grade-column-heads" aria-hidden="true">
-              <span>Note</span>
-              <span>Gewicht</span>
-              <span></span>
-            </div>
-            <div id="entries" class="grade-rows"></div>
-
-            <div class="tool-actions">
-              <button id="addBtn" class="button button--secondary" type="button">+ Zeile hinzufügen</button>
-              <span class="helper-text">Das Resultat aktualisiert sich automatisch.</span>
-            </div>
-
-            <p id="message" class="message" role="status" aria-live="polite"></p>
-
-            <details class="planner">
-              <summary>Nächste Note planen</summary>
-              <p class="panel-note">Berechnet, welche Note du bei der nächsten Prüfung für einen gewünschten Schnitt brauchst.</p>
-              <div class="planner-grid">
-                <label>
-                  <span class="form-label">Zielschnitt</span>
-                  <input id="targetAverage" class="form-control" type="number" min="1" max="6" step="0.01" value="4" inputmode="decimal" />
-                </label>
-                <label>
-                  <span class="form-label">Nächstes Gewicht</span>
-                  <input id="nextWeight" class="form-control" type="number" min="0.01" step="0.01" value="1" inputmode="decimal" />
-                </label>
-              </div>
-              <output id="planningResult" class="planner-output" aria-live="polite">Zuerst mindestens eine Note eingeben.</output>
-            </details>
-          </form>
-        </section>
-
-        <aside id="resultPanel" class="panel result-panel" aria-label="Berechnungsergebnis" aria-live="polite">
-          <p class="eyebrow">Ergebnis</p>
-          <output id="average" class="result-value">…</output>
-          <p id="resultLabel" class="result-copy">Noten eingeben, um den gewichteten Schnitt zu sehen.</p>
-          <span id="passStatus" class="status-badge">Wartet auf Eingabe</span>
-
-          <dl class="result-meta">
-            <div>
-              <dt>Gesamtgewicht</dt>
-              <dd id="totalWeight">—</dd>
-            </div>
-            <div>
-              <dt>Noten</dt>
-              <dd id="entryCount">0</dd>
-            </div>
-          </dl>
-
-          <p class="notice">Die Prozentanzeige wurde entfernt: Schweizer Noten lassen sich nicht sinnvoll mit „Note ÷ 6“ in Prozent umrechnen.</p>
-        </aside>
-      </div>
     </main>
-
-    <footer class="site-footer">
-      <div class="footer-inner container">
-        <span>Notenrechner</span>
-        <span>Berechnung lokal · Keine Eingaben übertragen</span>
-      </div>
-    </footer>
 
     <script>
       const entriesEl = document.getElementById('entries');
-      const form = document.getElementById('gradeForm');
       const messageEl = document.getElementById('message');
+      const resultAreaEl = document.getElementById('resultArea');
       const averageEl = document.getElementById('average');
       const resultLabelEl = document.getElementById('resultLabel');
       const passStatusEl = document.getElementById('passStatus');
-      const totalWeightEl = document.getElementById('totalWeight');
-      const entryCountEl = document.getElementById('entryCount');
       const targetAverageEl = document.getElementById('targetAverage');
       const nextWeightEl = document.getElementById('nextWeight');
       const planningResultEl = document.getElementById('planningResult');
@@ -126,7 +85,15 @@
       let nextEntryId = 1;
       let currentState = null;
 
-      function addEntry(values = {}) {
+      function hasHundredthPrecision(value) {
+        return Math.abs(value * 100 - Math.round(value * 100)) < 0.0000001;
+      }
+
+      function roundToHundredth(value) {
+        return Math.round((value + 0.0000000001) * 100) / 100;
+      }
+
+      function addEntry(values = {}, shouldFocus = false) {
         const id = nextEntryId++;
         const row = document.createElement('div');
         row.className = 'grade-row';
@@ -137,7 +104,7 @@
           </label>
           <label>
             <span class="sr-only">Gewicht der Note ${id}</span>
-            <input class="form-control weight-input" type="number" min="0.01" step="0.01" inputmode="decimal" value="${values.weight ?? '1'}" />
+            <input class="form-control weight-input" type="number" min="0.01" max="100" step="0.01" inputmode="decimal" value="${values.weight ?? '1'}" />
           </label>
           <button class="icon-button remove-button" type="button" aria-label="Notenzeile ${id} entfernen" title="Zeile entfernen">×</button>
         `;
@@ -147,23 +114,29 @@
         });
 
         row.querySelector('.remove-button').addEventListener('click', () => {
+          const focusRow = row.nextElementSibling || row.previousElementSibling;
           row.remove();
-          if (!entriesEl.children.length) addEntry();
+          if (!entriesEl.children.length) {
+            addEntry({}, true);
+            return;
+          }
           calculateGrades();
+          focusRow.querySelector('.grade-input').focus();
         });
 
         entriesEl.appendChild(row);
         calculateGrades();
+        if (shouldFocus) row.querySelector('.grade-input').focus();
+        return row;
       }
 
       function clearResult() {
         currentState = null;
-        averageEl.textContent = '…';
-        resultLabelEl.textContent = 'Noten eingeben, um den gewichteten Schnitt zu sehen.';
-        passStatusEl.textContent = 'Wartet auf Eingabe';
+        resultAreaEl.hidden = true;
+        averageEl.textContent = '';
+        resultLabelEl.textContent = '';
+        passStatusEl.textContent = '';
         passStatusEl.removeAttribute('data-tone');
-        totalWeightEl.textContent = '—';
-        entryCountEl.textContent = '0';
         updatePlanner();
       }
 
@@ -191,13 +164,13 @@
           const grade = Number(gradeText);
           const weight = Number(weightText);
 
-          if (!Number.isFinite(grade) || grade < 1 || grade > 6) {
-            setError('Noten müssen zwischen 1.00 und 6.00 liegen.');
+          if (!Number.isFinite(grade) || grade < 1 || grade > 6 || !hasHundredthPrecision(grade)) {
+            setError('Noten müssen zwischen 1.00 und 6.00 liegen und dürfen höchstens zwei Dezimalstellen haben.');
             return;
           }
 
-          if (!weightText || !Number.isFinite(weight) || weight <= 0) {
-            setError('Jede verwendete Note braucht ein positives Gewicht.');
+          if (!weightText || !Number.isFinite(weight) || weight < 0.01 || weight > 100 || !hasHundredthPrecision(weight)) {
+            setError('Gewichte müssen zwischen 0.01 und 100 liegen und dürfen höchstens zwei Dezimalstellen haben.');
             return;
           }
 
@@ -212,16 +185,16 @@
         }
 
         const average = weightedSum / totalWeight;
-        const roundedAverage = Math.round((average + Number.EPSILON) * 100) / 100;
+        const roundedAverage = roundToHundredth(average);
         const passed = roundedAverage >= 4;
+        const formattedWeight = new Intl.NumberFormat('de-CH', { maximumFractionDigits: 2 }).format(totalWeight);
 
         currentState = { weightedSum, totalWeight, count, average };
+        resultAreaEl.hidden = false;
         averageEl.textContent = roundedAverage.toFixed(2);
-        resultLabelEl.textContent = `Gewichteter Schnitt aus ${count} ${count === 1 ? 'Note' : 'Noten'}.`;
         passStatusEl.textContent = passed ? 'Bestanden' : 'Noch nicht bestanden';
         passStatusEl.dataset.tone = passed ? 'success' : 'danger';
-        totalWeightEl.textContent = new Intl.NumberFormat('de-CH', { maximumFractionDigits: 2 }).format(totalWeight);
-        entryCountEl.textContent = String(count);
+        resultLabelEl.textContent = `${count} ${count === 1 ? 'Note' : 'Noten'} · Gesamtgewicht ${formattedWeight}`;
         updatePlanner();
       }
 
@@ -236,8 +209,9 @@
         const target = Number(targetAverageEl.value);
         const nextWeight = Number(nextWeightEl.value);
 
-        if (!Number.isFinite(target) || target < 1 || target > 6 || !Number.isFinite(nextWeight) || nextWeight <= 0) {
-          planningResultEl.textContent = 'Zielschnitt und Gewicht müssen gültig sein.';
+        if (!Number.isFinite(target) || target < 1 || target > 6 || !hasHundredthPrecision(target)
+          || !Number.isFinite(nextWeight) || nextWeight < 0.01 || nextWeight > 100 || !hasHundredthPrecision(nextWeight)) {
+          planningResultEl.textContent = 'Zielschnitt und Gewicht müssen gültig sein und dürfen höchstens zwei Dezimalstellen haben.';
           planningResultEl.dataset.tone = 'danger';
           return;
         }
@@ -259,6 +233,7 @@
 
       function resetCalculator() {
         entriesEl.replaceChildren();
+        nextEntryId = 1;
         targetAverageEl.value = '4';
         nextWeightEl.value = '1';
         addEntry();
@@ -267,14 +242,10 @@
         clearResult();
       }
 
-      document.getElementById('addBtn').addEventListener('click', () => addEntry());
+      document.getElementById('addBtn').addEventListener('click', () => addEntry({}, true));
       document.getElementById('resetBtn').addEventListener('click', resetCalculator);
       targetAverageEl.addEventListener('input', updatePlanner);
       nextWeightEl.addEventListener('input', updatePlanner);
-      form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        calculateGrades();
-      });
 
       resetCalculator();
     </script>

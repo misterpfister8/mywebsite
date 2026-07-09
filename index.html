@@ -3,18 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f4f5f7" />
-    <meta name="description" content="Praktische Web-Tools und Automatisierungen von misterpfister aus der Schweiz." />
+    <meta name="theme-color" content="#fbfaf6" />
+    <meta name="description" content="Web-Tools und Open-Source-Projekte von Kilian Pfister: SpasstoCSV, Notenrechner und Schlafrechner." />
     <meta name="robots" content="index, follow" />
 
-    <title>misterpfister — System Engineering &amp; Automation</title>
+    <title>Kilian Pfister — Projekte &amp; Tools</title>
 
     <link rel="canonical" href="https://misterpfister.net/" />
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./assets/site.css" />
 
-    <meta property="og:title" content="misterpfister — System Engineering &amp; Automation" />
-    <meta property="og:description" content="Kleine Tools. Sauber gelöst. Praktische Web-Werkzeuge und Automatisierungen aus der Schweiz." />
+    <meta property="og:title" content="Kilian Pfister — Projekte &amp; Tools" />
+    <meta property="og:description" content="Web-Tools und Open-Source-Projekte von Kilian Pfister: SpasstoCSV, Notenrechner und Schlafrechner." />
     <meta property="og:url" content="https://misterpfister.net/" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="de_CH" />
@@ -24,154 +24,63 @@
 
     <header class="site-header">
       <div class="header-inner container">
-        <a class="brand" href="./" aria-label="misterpfister Startseite">
-          <span class="brand-mark" aria-hidden="true"></span>
-          <span>misterpfister</span>
-        </a>
-
-        <nav class="main-nav" aria-label="Hauptnavigation">
-          <a class="nav-link nav-link--quiet" href="#projekte">Projekte</a>
-          <a class="nav-link nav-link--primary" href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">
-            GitHub <span aria-hidden="true">↗</span>
-          </a>
+        <a class="site-name" href="./">misterpfister.net</a>
+        <nav class="site-nav" aria-label="Hauptnavigation">
+          <a class="projects-nav-link" href="#projekte">Projekte</a>
+          <a href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
         </nav>
       </div>
     </header>
 
-    <main id="main" class="site-main container">
-      <section class="hero" aria-labelledby="hero-title">
-        <div>
-          <p class="eyebrow">System Engineering · Automation · Schweiz</p>
-          <h1 id="hero-title">Kleine Tools.<br /><span class="accent-text">Sauber gelöst.</span></h1>
-          <p class="hero-copy">
-            Ich baue praktische Web-Werkzeuge und Automatisierungen rund um System Engineering — direkt, verständlich und ohne unnötige Komplexität.
-          </p>
-          <div class="hero-actions">
-            <a class="button button--primary" href="#projekte">Projekte ansehen <span aria-hidden="true">↓</span></a>
-            <a class="button button--secondary" href="https://github.com/misterpfister8/spasstocsv" target="_blank" rel="noopener noreferrer">
-              Open Source <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-        </div>
-
-        <aside class="profile-panel" aria-label="Profil und technischer Fokus">
-          <dl>
-            <div class="profile-row">
-              <dt>Fokus</dt>
-              <dd>System Engineering</dd>
-            </div>
-            <div class="profile-row">
-              <dt>Baue</dt>
-              <dd>Web-Tools &amp; Automationen</dd>
-            </div>
-            <div class="profile-row">
-              <dt>Stack</dt>
-              <dd>HTML · CSS · JS · Python</dd>
-            </div>
-            <div class="profile-row">
-              <dt>Standort</dt>
-              <dd>Schweiz</dd>
-            </div>
-          </dl>
-        </aside>
+    <main id="main" class="home-main container">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="intro-label">Projekte &amp; Tools</p>
+        <h1 id="page-title">Kilian Pfister</h1>
+        <p class="intro-copy">
+          Ich beschäftige mich mit System Engineering und baue kleine Web-Tools und Automatisierungen, wenn ich sie selbst brauche. Diese Seite ist die Übersicht; Quellcode und weitere Projekte liegen auf GitHub.
+        </p>
       </section>
 
-      <section id="projekte" class="projects-section" aria-labelledby="projects-title">
-        <header class="section-heading">
-          <div>
-            <p class="eyebrow">Ausgewählte Projekte</p>
-            <h2 id="projects-title">Direkt öffnen.</h2>
-          </div>
-          <span class="section-count">03 Projekte</span>
-        </header>
+      <section id="projekte" class="projects" aria-labelledby="projects-title">
+        <h2 id="projects-title">Projekte</h2>
 
-        <ul class="project-list">
-          <li class="project-card">
-            <a class="project-link" href="./sechserrechner/">
-              <div class="project-top">
-                <span class="project-index">01</span>
-                <span class="badge">Web-App</span>
-              </div>
-              <h3 class="project-title">Notenrechner</h3>
-              <p class="project-description">Gewichtete Noten auf der Schweizer Skala von 1 bis 6 berechnen und die nächste Zielnote planen.</p>
-              <div class="project-tags">
-                <span class="sr-only">Technologien: </span>
-                <span class="chip">Vanilla JS</span>
-                <span class="chip">Lokal</span>
-              </div>
-              <span class="project-action">
-                Rechner öffnen
-                <span class="project-arrow" aria-hidden="true">→</span>
-              </span>
-            </a>
-          </li>
-
-          <li class="project-card">
-            <a class="project-link" href="./sleepcalculator/">
-              <div class="project-top">
-                <span class="project-index">02</span>
-                <span class="badge">Web-App</span>
-              </div>
-              <h3 class="project-title">Schlafrechner</h3>
-              <p class="project-description">Schlafens- oder Aufwachzeit aus gewünschter Dauer und geschätzter Einschlafzeit planen.</p>
-              <div class="project-tags">
-                <span class="sr-only">Technologien: </span>
-                <span class="chip">Vanilla JS</span>
-                <span class="chip">Lokal</span>
-              </div>
-              <span class="project-action">
-                Rechner öffnen
-                <span class="project-arrow" aria-hidden="true">→</span>
-              </span>
-            </a>
-          </li>
-
-          <li class="project-card">
+        <ol class="project-list">
+          <li class="project-item">
             <a class="project-link" href="https://github.com/misterpfister8/spasstocsv" target="_blank" rel="noopener noreferrer">
-              <div class="project-top">
-                <span class="project-index">03</span>
-                <span class="badge">Open Source</span>
-              </div>
-              <h3 class="project-title">SpasstoCSV</h3>
-              <p class="project-description">Samsung-Pass-Exporte lokal entschlüsseln und in CSV oder Bitwarden JSON konvertieren.</p>
-              <div class="project-tags">
-                <span class="sr-only">Technologien: </span>
-                <span class="chip">Python</span>
-                <span class="chip">Privacy-first</span>
-              </div>
-              <span class="project-action">
-                Auf GitHub ansehen
-                <span class="project-arrow" aria-hidden="true">↗</span>
-              </span>
+              <h3 class="project-name">SpasstoCSV</h3>
+              <p class="project-description">Samsung-Pass-Exporte lokal entschlüsseln und in CSV oder Bitwarden JSON umwandeln.</p>
+              <p class="project-meta">Python · MIT · GitHub</p>
+              <span class="project-arrow" aria-hidden="true">↗</span>
             </a>
           </li>
-        </ul>
-      </section>
 
-      <dl class="stack-band" aria-label="Arbeitsweise und Stack">
-        <div class="stack-item">
-          <dt>Prinzip</dt>
-          <dd>Einfach vor clever</dd>
-        </div>
-        <div class="stack-item">
-          <dt>Frontend</dt>
-          <dd>HTML / CSS / JavaScript</dd>
-        </div>
-        <div class="stack-item">
-          <dt>Automation</dt>
-          <dd>Python</dd>
-        </div>
-        <div class="stack-item">
-          <dt>Hosting</dt>
-          <dd>GitHub Pages</dd>
-        </div>
-      </dl>
+          <li class="project-item">
+            <a class="project-link" href="./sechserrechner/">
+              <h3 class="project-name">Notenrechner</h3>
+              <p class="project-description">Gewichteten Notendurchschnitt berechnen und die benötigte nächste Note planen.</p>
+              <p class="project-meta">JavaScript · Browser</p>
+              <span class="project-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+
+          <li class="project-item">
+            <a class="project-link" href="./sleepcalculator/">
+              <h3 class="project-name">Schlafrechner</h3>
+              <p class="project-description">Schlafens- oder Aufwachzeit mit wählbarer Schlaf- und Einschlafdauer berechnen.</p>
+              <p class="project-meta">JavaScript · Browser</p>
+              <span class="project-arrow" aria-hidden="true">→</span>
+            </a>
+          </li>
+        </ol>
+
+        <p class="privacy-note">Die beiden Rechner laufen vollständig im Browser; Eingaben werden nicht übertragen.</p>
+      </section>
     </main>
 
     <footer class="site-footer">
       <div class="footer-inner container">
-        <span>© 2026 misterpfister</span>
-        <span>Ohne Framework · Ohne Tracking-Skripte</span>
+        <span>© 2026 Kilian Pfister</span>
+        <a class="footer-link" href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
     </footer>
   </body>
