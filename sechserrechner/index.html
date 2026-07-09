@@ -1,286 +1,282 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Notendurchschnitt Rechner</title>
-  <!-- Inter Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-      --color-text-primary: #f8f9fa;
-      --color-text-secondary: #adb5bd;
-      --bg-primary: #0f172a;
-      --bg-secondary: #1e293b;
-      --card-bg: #1e293b;
-      --card-border: #334155;
-      --card-shadow: rgba(0, 0, 0, 0.5);
-      --accent: #4dabf7;
-      --error: #ff6b6b;
-      --success: #51cf66;
-      --focus-ring: rgba(77, 171, 247, 0.5);
-    }
-    *, *::before, *::after { box-sizing: border-box; }
+<!doctype html>
+<html lang="de-CH">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f4f5f7" />
+    <meta name="description" content="Gewichtete Noten auf der Schweizer Skala von 1 bis 6 berechnen." />
 
-    html, body {
-      margin: 0; padding: 0;
-      width: 100%; min-height: 100vh;
-      background: var(--bg-primary);
-      font-family: var(--font-sans);
-      display: flex; align-items: center; justify-content: center;
-      padding: 2rem 1rem;
-    }
+    <title>Notenrechner – misterpfister.net</title>
 
-    .container {
-      width: 100%; max-width: 600px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      box-shadow: 0 4px 6px -1px var(--card-shadow), 0 2px 4px -2px var(--card-shadow);
-      padding: 2.5rem 2rem;
-    }
-    h1 {
-      margin: 0 0 2rem 0;
-      font-size: 2rem;
-      text-align: center;
-      font-weight: 700;
-      color: var(--color-text-primary);
-      letter-spacing: -0.025em;
-    }
-    .entries {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      max-height: 400px;
-      overflow-y: auto;
-      margin-bottom: 1.5rem;
-    }
-    .entry {
-      display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 0.5rem;
-      align-items: center;
-    }
-    .entry input[type="number"] {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 8px;
-      border: 1px solid var(--card-border);
-      background: var(--bg-secondary);
-      color: var(--color-text-primary);
-      font-size: 1rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .entry input[type="number"]:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--focus-ring);
-    }
-    .entry button {
-      background: var(--error);
-      border: none;
-      color: var(--color-text-primary);
-      padding: 0.75rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 1.25rem;
-      line-height: 1;
-    }
-    .entry button:hover {
-      background: #ff5252;
-      transform: scale(1.05);
-    }
-    .actions {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .actions button {
-      flex: 1;
-      padding: 0.875rem 1.5rem;
-      font-size: 1rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    #addBtn {
-      background: var(--accent);
-      color: var(--bg-primary);
-    }
-    #addBtn:hover {
-      background: #3a9ce5;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
-    }
-    #calcBtn {
-      background: var(--success);
-      color: var(--bg-primary);
-    }
-    #calcBtn:hover {
-      background: #40c653;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(81, 207, 102, 0.3);
-    }
-    #message {
-      text-align: center;
-      font-size: 0.875rem;
-      min-height: 1.2rem;
-      margin-bottom: 0.5rem;
-      color: var(--color-text-secondary);
-    }
-    #result {
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--color-text-primary);
-      transition: color 0.3s;
-    }
-    #result.grade-excellent { color: #51cf66; }
-    #result.grade-good { color: #4dabf7; }
-    #result.grade-average { color: #ffd43b; }
-    #result.grade-poor { color: #ff8787; }
-    #result.grade-fail { color: #ff6b6b; }
+    <link rel="canonical" href="https://misterpfister.net/sechserrechner/" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/site.css" />
+  </head>
+  <body class="site-page tool-page">
+    <a class="skip-link" href="#main">Zum Rechner springen</a>
 
-    /* Mobile adjustments */
-    @media (max-width: 640px) {
-      body {
-        padding: 1rem;
-        align-items: flex-start;
+    <header class="site-header">
+      <div class="header-inner container">
+        <a class="brand" href="../" aria-label="Zurück zu misterpfister.net">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>misterpfister</span>
+        </a>
+        <a class="back-link" href="../"><span aria-hidden="true">←</span>&nbsp; Übersicht</a>
+      </div>
+    </header>
+
+    <main id="main" class="tool-main">
+      <section class="tool-hero" aria-labelledby="tool-title">
+        <p class="eyebrow">01 · Web-App</p>
+        <h1 id="tool-title">Notenrechner</h1>
+        <p class="tool-summary">Gewichtete Noten auf der Schweizer Skala von 1 bis 6. Die Berechnung läuft vollständig lokal in deinem Browser.</p>
+        <div class="tool-chips" aria-label="Eigenschaften">
+          <span class="chip">Skala 1–6</span>
+          <span class="chip">Bestanden ab 4.00</span>
+          <span class="chip">Live-Berechnung</span>
+        </div>
+      </section>
+
+      <div class="tool-layout">
+        <section class="panel" aria-labelledby="grades-title">
+          <form id="gradeForm" novalidate>
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Eingabe</p>
+                <h2 id="grades-title" class="panel-title">Noten &amp; Gewichtung</h2>
+                <p class="panel-note">Gewichte sind relative Werte. 1 / 1 ist gleich gewichtet, 2 / 1 gewichtet die erste Note doppelt.</p>
+              </div>
+              <button id="resetBtn" class="button button--quiet" type="button">Zurücksetzen</button>
+            </div>
+
+            <div class="grade-column-heads" aria-hidden="true">
+              <span>Note</span>
+              <span>Gewicht</span>
+              <span></span>
+            </div>
+            <div id="entries" class="grade-rows"></div>
+
+            <div class="tool-actions">
+              <button id="addBtn" class="button button--secondary" type="button">+ Zeile hinzufügen</button>
+              <span class="helper-text">Das Resultat aktualisiert sich automatisch.</span>
+            </div>
+
+            <p id="message" class="message" role="status" aria-live="polite"></p>
+
+            <details class="planner">
+              <summary>Nächste Note planen</summary>
+              <p class="panel-note">Berechnet, welche Note du bei der nächsten Prüfung für einen gewünschten Schnitt brauchst.</p>
+              <div class="planner-grid">
+                <label>
+                  <span class="form-label">Zielschnitt</span>
+                  <input id="targetAverage" class="form-control" type="number" min="1" max="6" step="0.01" value="4" inputmode="decimal" />
+                </label>
+                <label>
+                  <span class="form-label">Nächstes Gewicht</span>
+                  <input id="nextWeight" class="form-control" type="number" min="0.01" step="0.01" value="1" inputmode="decimal" />
+                </label>
+              </div>
+              <output id="planningResult" class="planner-output" aria-live="polite">Zuerst mindestens eine Note eingeben.</output>
+            </details>
+          </form>
+        </section>
+
+        <aside id="resultPanel" class="panel result-panel" aria-label="Berechnungsergebnis" aria-live="polite">
+          <p class="eyebrow">Ergebnis</p>
+          <output id="average" class="result-value">…</output>
+          <p id="resultLabel" class="result-copy">Noten eingeben, um den gewichteten Schnitt zu sehen.</p>
+          <span id="passStatus" class="status-badge">Wartet auf Eingabe</span>
+
+          <dl class="result-meta">
+            <div>
+              <dt>Gesamtgewicht</dt>
+              <dd id="totalWeight">—</dd>
+            </div>
+            <div>
+              <dt>Noten</dt>
+              <dd id="entryCount">0</dd>
+            </div>
+          </dl>
+
+          <p class="notice">Die Prozentanzeige wurde entfernt: Schweizer Noten lassen sich nicht sinnvoll mit „Note ÷ 6“ in Prozent umrechnen.</p>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner container">
+        <span>Notenrechner</span>
+        <span>Berechnung lokal · Keine Eingaben übertragen</span>
+      </div>
+    </footer>
+
+    <script>
+      const entriesEl = document.getElementById('entries');
+      const form = document.getElementById('gradeForm');
+      const messageEl = document.getElementById('message');
+      const averageEl = document.getElementById('average');
+      const resultLabelEl = document.getElementById('resultLabel');
+      const passStatusEl = document.getElementById('passStatus');
+      const totalWeightEl = document.getElementById('totalWeight');
+      const entryCountEl = document.getElementById('entryCount');
+      const targetAverageEl = document.getElementById('targetAverage');
+      const nextWeightEl = document.getElementById('nextWeight');
+      const planningResultEl = document.getElementById('planningResult');
+
+      let nextEntryId = 1;
+      let currentState = null;
+
+      function addEntry(values = {}) {
+        const id = nextEntryId++;
+        const row = document.createElement('div');
+        row.className = 'grade-row';
+        row.innerHTML = `
+          <label>
+            <span class="sr-only">Note ${id}</span>
+            <input class="form-control grade-input" type="number" min="1" max="6" step="0.01" inputmode="decimal" placeholder="z. B. 5.25" value="${values.grade ?? ''}" />
+          </label>
+          <label>
+            <span class="sr-only">Gewicht der Note ${id}</span>
+            <input class="form-control weight-input" type="number" min="0.01" step="0.01" inputmode="decimal" value="${values.weight ?? '1'}" />
+          </label>
+          <button class="icon-button remove-button" type="button" aria-label="Notenzeile ${id} entfernen" title="Zeile entfernen">×</button>
+        `;
+
+        row.querySelectorAll('input').forEach((input) => {
+          input.addEventListener('input', calculateGrades);
+        });
+
+        row.querySelector('.remove-button').addEventListener('click', () => {
+          row.remove();
+          if (!entriesEl.children.length) addEntry();
+          calculateGrades();
+        });
+
+        entriesEl.appendChild(row);
+        calculateGrades();
       }
-      .container {
-        padding: 2rem 1.5rem;
+
+      function clearResult() {
+        currentState = null;
+        averageEl.textContent = '…';
+        resultLabelEl.textContent = 'Noten eingeben, um den gewichteten Schnitt zu sehen.';
+        passStatusEl.textContent = 'Wartet auf Eingabe';
+        passStatusEl.removeAttribute('data-tone');
+        totalWeightEl.textContent = '—';
+        entryCountEl.textContent = '0';
+        updatePlanner();
       }
-      h1 {
-        font-size: 1.75rem;
+
+      function setError(text) {
+        messageEl.textContent = text;
+        clearResult();
       }
-      .entry {
-        grid-template-columns: 1fr auto;
+
+      function calculateGrades() {
+        const rows = Array.from(entriesEl.querySelectorAll('.grade-row'));
+        let weightedSum = 0;
+        let totalWeight = 0;
+        let count = 0;
+
+        messageEl.textContent = '';
+
+        for (const row of rows) {
+          const gradeInput = row.querySelector('.grade-input');
+          const weightInput = row.querySelector('.weight-input');
+          const gradeText = gradeInput.value.trim();
+          const weightText = weightInput.value.trim();
+
+          if (!gradeText) continue;
+
+          const grade = Number(gradeText);
+          const weight = Number(weightText);
+
+          if (!Number.isFinite(grade) || grade < 1 || grade > 6) {
+            setError('Noten müssen zwischen 1.00 und 6.00 liegen.');
+            return;
+          }
+
+          if (!weightText || !Number.isFinite(weight) || weight <= 0) {
+            setError('Jede verwendete Note braucht ein positives Gewicht.');
+            return;
+          }
+
+          weightedSum += grade * weight;
+          totalWeight += weight;
+          count += 1;
+        }
+
+        if (!count) {
+          clearResult();
+          return;
+        }
+
+        const average = weightedSum / totalWeight;
+        const roundedAverage = Math.round((average + Number.EPSILON) * 100) / 100;
+        const passed = roundedAverage >= 4;
+
+        currentState = { weightedSum, totalWeight, count, average };
+        averageEl.textContent = roundedAverage.toFixed(2);
+        resultLabelEl.textContent = `Gewichteter Schnitt aus ${count} ${count === 1 ? 'Note' : 'Noten'}.`;
+        passStatusEl.textContent = passed ? 'Bestanden' : 'Noch nicht bestanden';
+        passStatusEl.dataset.tone = passed ? 'success' : 'danger';
+        totalWeightEl.textContent = new Intl.NumberFormat('de-CH', { maximumFractionDigits: 2 }).format(totalWeight);
+        entryCountEl.textContent = String(count);
+        updatePlanner();
       }
-      .entry input[type="number"]:nth-child(1),
-      .entry input[type="number"]:nth-child(2) {
-        grid-column: 1 / -1;
+
+      function updatePlanner() {
+        planningResultEl.removeAttribute('data-tone');
+
+        if (!currentState) {
+          planningResultEl.textContent = 'Zuerst mindestens eine Note eingeben.';
+          return;
+        }
+
+        const target = Number(targetAverageEl.value);
+        const nextWeight = Number(nextWeightEl.value);
+
+        if (!Number.isFinite(target) || target < 1 || target > 6 || !Number.isFinite(nextWeight) || nextWeight <= 0) {
+          planningResultEl.textContent = 'Zielschnitt und Gewicht müssen gültig sein.';
+          planningResultEl.dataset.tone = 'danger';
+          return;
+        }
+
+        const required = (target * (currentState.totalWeight + nextWeight) - currentState.weightedSum) / nextWeight;
+        const requiredToHundredth = Math.ceil((required - 0.0000000001) * 100) / 100;
+
+        if (required <= 1) {
+          planningResultEl.textContent = `Ziel ${target.toFixed(2)} ist bereits gesichert — auch mit einer 1.00.`;
+          planningResultEl.dataset.tone = 'success';
+        } else if (requiredToHundredth > 6) {
+          planningResultEl.textContent = `Nicht erreichbar: Benötigt würde eine ${requiredToHundredth.toFixed(2)}.`;
+          planningResultEl.dataset.tone = 'danger';
+        } else {
+          planningResultEl.textContent = `Benötigte nächste Note: ${requiredToHundredth.toFixed(2)}.`;
+          planningResultEl.dataset.tone = 'success';
+        }
       }
-    }
 
-  </style>
-</head>
-<body>
-  <div class="container" role="main">
-    <h1>Notendurchschnitt Rechner</h1>
-    <div id="message"></div>
-    <div class="entries" id="entries"></div>
-    <div class="actions">
-      <button id="addBtn">+ Note hinzufügen</button>
-      <button id="calcBtn">Durchschnitt berechnen</button>
-    </div>
-    <div id="result"></div>
-  </div>
+      function resetCalculator() {
+        entriesEl.replaceChildren();
+        targetAverageEl.value = '4';
+        nextWeightEl.value = '1';
+        addEntry();
+        addEntry();
+        messageEl.textContent = '';
+        clearResult();
+      }
 
-  <script>
-    const entriesEl = document.getElementById('entries');
-    const messageEl = document.getElementById('message');
-    const resultEl = document.getElementById('result');
-    document.getElementById('addBtn').addEventListener('click', addEntry);
-    document.getElementById('calcBtn').addEventListener('click', calculate);
-
-    // Start with two entries
-    addEntry(); addEntry();
-
-    function addEntry() {
-      const div = document.createElement('div');
-      div.className = 'entry';
-      div.innerHTML = `
-        <input type="number" placeholder="Note (z.B. 5.5)" min="0" max="6" step="0.01" class="grade-input" />
-        <input type="number" placeholder="Gewicht (z.B. 50)" min="0" max="100" step="0.01" class="weight-input" />
-        <button aria-label="Eintrag entfernen">×</button>
-      `;
-      const removeBtn = div.querySelector('button');
-      removeBtn.addEventListener('click', () => { div.remove(); updateMessage(); autoCalculate(); });
-
-      // Auto-calculate on input
-      div.querySelectorAll('input').forEach(input => {
-        input.addEventListener('input', autoCalculate);
+      document.getElementById('addBtn').addEventListener('click', () => addEntry());
+      document.getElementById('resetBtn').addEventListener('click', resetCalculator);
+      targetAverageEl.addEventListener('input', updatePlanner);
+      nextWeightEl.addEventListener('input', updatePlanner);
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        calculateGrades();
       });
 
-      entriesEl.appendChild(div);
-      updateMessage();
-    }
-
-    function updateMessage() {
-      const count = entriesEl.children.length;
-      messageEl.textContent = `${count} ${count === 1 ? 'Eintrag' : 'Einträge'}`;
-      resultEl.textContent = '';
-    }
-
-    function calculate() {
-      const entryEls = Array.from(entriesEl.children);
-      let totalWeight = 0, sum = 0;
-      for (const el of entryEls) {
-        const [gradeInput, weightInput] = el.querySelectorAll('input');
-        const grade = parseFloat(gradeInput.value);
-        const weight = parseFloat(weightInput.value);
-        if (isNaN(grade) || grade < 0 || grade > 6) {
-          showMessage('Ungültige Note! Bitte 0–6 eingeben.', true);
-          return;
-        }
-        if (isNaN(weight) || weight <= 0) {
-          showMessage('Ungültige Gewichtung! Bitte >0.', true);
-          return;
-        }
-        sum += grade * weight;
-        totalWeight += weight;
-      }
-      if (totalWeight === 0) {
-        showMessage('Gesamtgewicht darf nicht 0 sein.', true);
-        return;
-      }
-      const avg = (sum / totalWeight).toFixed(2);
-      const percentage = ((avg / 6) * 100).toFixed(0);
-
-      // Apply color class based on grade
-      resultEl.className = '';
-      if (avg >= 5.5) resultEl.classList.add('grade-excellent');
-      else if (avg >= 5.0) resultEl.classList.add('grade-good');
-      else if (avg >= 4.0) resultEl.classList.add('grade-average');
-      else if (avg >= 3.0) resultEl.classList.add('grade-poor');
-      else resultEl.classList.add('grade-fail');
-
-      resultEl.textContent = `Durchschnitt: ${avg} (${percentage}%)`;
-      showMessage('', false);
-    }
-
-    function autoCalculate() {
-      const entryEls = Array.from(entriesEl.children);
-      let allFilled = true;
-      for (const el of entryEls) {
-        const [gradeInput, weightInput] = el.querySelectorAll('input');
-        if (!gradeInput.value || !weightInput.value) {
-          allFilled = false;
-          break;
-        }
-      }
-      if (allFilled && entryEls.length > 0) {
-        calculate();
-      }
-    }
-
-    function showMessage(text, isError = false) {
-      messageEl.textContent = text;
-      messageEl.style.color = isError ? 'var(--error)' : '#fff';
-    }
-
-    // Enter key triggers calculation
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        calculate();
-      }
-    });
-  </script>
-</body>
+      resetCalculator();
+    </script>
+  </body>
 </html>

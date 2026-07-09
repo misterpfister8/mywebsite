@@ -10,19 +10,19 @@ Personal website and project index. Hosted on GitHub Pages with a custom domain.
 
 | Project | Description | Type |
 |---|---|---|
-| [Sechserrechner](https://misterpfister.net/sechserrechner/) | Weighted grade average calculator | Tool |
-| [Sleep Calculator](https://misterpfister.net/sleepcalculator/) | Sleep cycle-based bedtime calculator | Tool |
-| [SpasstoCSV](https://github.com/misterpfister8/spasstocsv) | SPSS data format converter | Open Source |
+| [Notenrechner](https://misterpfister.net/sechserrechner/) | Weighted calculator for the Swiss 1–6 grade scale | Tool |
+| [Schlafrechner](https://misterpfister.net/sleepcalculator/) | Bedtime and wake-time planner with configurable sleep latency | Tool |
+| [SpasstoCSV](https://github.com/misterpfister8/spasstocsv) | Local Samsung Pass `.spass` converter for CSV and Bitwarden JSON | Open Source |
 
 ---
 
 ## Stack
 
-Pure HTML, CSS, JavaScript — no frameworks, no build step.
+Pure HTML, CSS, JavaScript — no frameworks, tracking scripts, or build step.
 
-- [Cormorant Garamond](https://fonts.google.com/specimen/Cormorant+Garamond) + [DM Sans](https://fonts.google.com/specimen/DM+Sans) via Google Fonts
-- CSS custom properties for theming
-- CSS Grid for layout
+- Shared design system in `assets/site.css`
+- System fonts only; no external font requests
+- Semantic HTML and responsive CSS Grid layouts
 - Deployed via GitHub Pages with custom domain (CNAME)
 
 ---
@@ -43,6 +43,9 @@ Open [localhost:8000](http://localhost:8000).
 
 ```
 mywebsite/
+├── assets/
+│   ├── favicon.svg
+│   └── site.css
 ├── index.html
 ├── sechserrechner/
 │   └── index.html
