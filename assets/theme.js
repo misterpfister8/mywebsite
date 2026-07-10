@@ -6,6 +6,16 @@
     light: '#f3eee3',
   };
 
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  if (isIOS) {
+    const viewportMeta = document.querySelector('meta[name="viewport"]');
+    if (viewportMeta && !viewportMeta.content.includes('maximum-scale')) {
+      viewportMeta.content += ', maximum-scale=1';
+    }
+  }
+
   let storedTheme = null;
   try {
     storedTheme = window.localStorage.getItem(storageKey);

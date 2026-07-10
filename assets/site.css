@@ -446,6 +446,7 @@ summary:focus-visible {
   border-radius: 1px;
   background: var(--field);
   color: var(--ink);
+  font-size: 16px;
   transition: background-color 160ms ease, border-color 130ms ease, box-shadow 130ms ease, color 160ms ease;
 }
 
