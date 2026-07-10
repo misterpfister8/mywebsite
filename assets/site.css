@@ -392,7 +392,7 @@ summary:focus-visible {
 .tool-heading h1 {
   margin: 0;
   font-family: var(--font-serif);
-  font-size: clamp(2.8rem, 6vw, 3.8rem);
+  font-size: clamp(2.8rem, 5vw, 3.2rem);
   font-weight: 400;
   letter-spacing: -0.05em;
   line-height: 0.98;
