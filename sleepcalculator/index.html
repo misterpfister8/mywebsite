@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0f1110" />
-    <meta name="description" content="Schlafens- oder Aufwachzeit aus Schlafdauer und Einschlafzeit berechnen." />
+    <meta name="description" content="Schlafens- oder Aufwachzeit aus Schlafdauer und Einschlafdauer berechnen." />
 
     <title>Schlafrechner – misterpfister.net</title>
 
@@ -42,7 +42,7 @@
             </label>
             <label class="mode-choice">
               <input type="radio" name="mode" value="now" />
-              <span>Ich gehe jetzt schlafen</span>
+              <span>Ich gehe jetzt ins Bett</span>
             </label>
           </fieldset>
 
@@ -58,7 +58,7 @@
             </div>
 
             <div class="field-row">
-              <label class="form-label" for="fallAsleepMinutes">Einschlafzeit in Minuten</label>
+              <label class="form-label" for="fallAsleepMinutes">Einschlafdauer in Minuten</label>
               <input id="fallAsleepMinutes" class="form-control" type="number" min="0" max="180" step="1" value="15" inputmode="numeric" enterkeyhint="done" required />
             </div>
           </div>
@@ -146,7 +146,7 @@
         }
 
         if (!Number.isInteger(latency) || latency < 0 || latency > 180) {
-          setError('Einschlafzeit: 0 bis 180 Minuten in ganzen Minuten.');
+          setError('Einschlafdauer: 0 bis 180 Minuten in ganzen Minuten.');
           return;
         }
 
@@ -173,7 +173,7 @@
 
           resultTitleEl.textContent = 'Schlafenszeit';
           resultTimeEl.textContent = formatClock(rawBedtime);
-          resultLabelEl.textContent = `${dayLabel} · ${durationLabel} Schlaf + ${latency} min Einschlafzeit`;
+          resultLabelEl.textContent = `${dayLabel} · ${durationLabel} Schlaf + ${latency} min Einschlafdauer`;
         } else {
           const now = new Date();
           const wakeDate = new Date(now.getTime() + (durationMinutes + latency) * 60 * 1000);
@@ -182,7 +182,7 @@
 
           resultTitleEl.textContent = 'Aufwachzeit';
           resultTimeEl.textContent = formatClock(wakeMinutes);
-          resultLabelEl.textContent = `${dayLabel} · ${durationLabel} Schlaf + ${latency} min Einschlafzeit`;
+          resultLabelEl.textContent = `${dayLabel} · ${durationLabel} Schlaf + ${latency} min Einschlafdauer`;
         }
 
         sleepResultEl.hidden = false;
