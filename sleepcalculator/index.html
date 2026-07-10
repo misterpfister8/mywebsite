@@ -58,22 +58,8 @@
             </div>
 
             <div class="field-row">
-              <label class="form-label" for="fallAsleepMinutes">Einschlafzeit</label>
-              <select id="fallAsleepMinutes" class="form-control">
-                <option value="0">0 Minuten</option>
-                <option value="5">5 Minuten</option>
-                <option value="10">10 Minuten</option>
-                <option value="15" selected>15 Minuten</option>
-                <option value="20">20 Minuten</option>
-                <option value="25">25 Minuten</option>
-                <option value="30">30 Minuten</option>
-                <option value="35">35 Minuten</option>
-                <option value="40">40 Minuten</option>
-                <option value="45">45 Minuten</option>
-                <option value="50">50 Minuten</option>
-                <option value="55">55 Minuten</option>
-                <option value="60">60 Minuten</option>
-              </select>
+              <label class="form-label" for="fallAsleepMinutes">Einschlafzeit in Minuten</label>
+              <input id="fallAsleepMinutes" class="form-control" type="number" min="0" max="180" step="1" value="15" inputmode="numeric" enterkeyhint="done" required />
             </div>
           </div>
 
@@ -159,8 +145,8 @@
           return;
         }
 
-        if (!Number.isInteger(latency) || latency < 0 || latency > 60 || latency % 5 !== 0) {
-          setError('Bitte eine gültige Einschlafzeit wählen.');
+        if (!Number.isInteger(latency) || latency < 0 || latency > 180) {
+          setError('Einschlafzeit: 0 bis 180 Minuten in ganzen Minuten.');
           return;
         }
 
@@ -208,7 +194,7 @@
 
       sleepHoursEl.addEventListener('input', clearResult);
       wakeTimeEl.addEventListener('input', clearResult);
-      fallAsleepMinutesEl.addEventListener('change', clearResult);
+      fallAsleepMinutesEl.addEventListener('input', clearResult);
       form.addEventListener('submit', (event) => {
         event.preventDefault();
         calculateTime();
