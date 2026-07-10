@@ -459,6 +459,16 @@ summary:focus-visible {
   box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
+input[type="time"].form-control {
+  max-width: 100%;
+}
+
+@supports (-webkit-touch-callout: none) {
+  input[type="time"].form-control {
+    padding-inline: 0;
+  }
+}
+
 .icon-button {
   display: inline-flex;
   width: 42px;
