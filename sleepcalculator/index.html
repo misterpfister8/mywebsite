@@ -61,8 +61,18 @@
               <label class="form-label" for="fallAsleepMinutes">Einschlafzeit</label>
               <select id="fallAsleepMinutes" class="form-control">
                 <option value="0">0 Minuten</option>
+                <option value="5">5 Minuten</option>
+                <option value="10">10 Minuten</option>
                 <option value="15" selected>15 Minuten</option>
+                <option value="20">20 Minuten</option>
+                <option value="25">25 Minuten</option>
                 <option value="30">30 Minuten</option>
+                <option value="35">35 Minuten</option>
+                <option value="40">40 Minuten</option>
+                <option value="45">45 Minuten</option>
+                <option value="50">50 Minuten</option>
+                <option value="55">55 Minuten</option>
+                <option value="60">60 Minuten</option>
               </select>
             </div>
           </div>
@@ -149,7 +159,7 @@
           return;
         }
 
-        if (![0, 15, 30].includes(latency)) {
+        if (!Number.isInteger(latency) || latency < 0 || latency > 60 || latency % 5 !== 0) {
           setError('Bitte eine gültige Einschlafzeit wählen.');
           return;
         }
