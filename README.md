@@ -21,6 +21,7 @@ Personal project index for Kilian Pfister. Hosted on GitHub Pages with a custom 
 Pure HTML, CSS, JavaScript — no frameworks, tracking scripts, or build step.
 
 - Shared design system in `assets/site.css`
+- Persistent dark/light theme handling in `assets/theme.js`
 - System fonts only; no external font requests
 - Semantic HTML and responsive CSS Grid layouts
 - Deployed via GitHub Pages with custom domain (CNAME)
@@ -45,7 +46,8 @@ Open [localhost:8000](http://localhost:8000).
 mywebsite/
 ├── assets/
 │   ├── favicon.svg
-│   └── site.css
+│   ├── site.css
+│   └── theme.js
 ├── index.html
 ├── sechserrechner/
 │   └── index.html
