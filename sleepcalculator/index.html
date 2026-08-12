@@ -55,12 +55,12 @@
 
             <div class="field-row">
               <label class="form-label" for="sleepHours">Schlafdauer in Stunden</label>
-              <input id="sleepHours" class="form-control" type="number" min="1" max="16" step="0.5" value="8" inputmode="decimal" required />
+              <input id="sleepHours" class="form-control" type="text" inputmode="decimal" autocomplete="off" value="8" required />
             </div>
 
             <div class="field-row">
               <label class="form-label" for="fallAsleepMinutes">Einschlafdauer in Minuten</label>
-              <input id="fallAsleepMinutes" class="form-control" type="number" min="0" max="180" step="1" value="15" inputmode="numeric" enterkeyhint="done" required />
+              <input id="fallAsleepMinutes" class="form-control" type="text" inputmode="numeric" autocomplete="off" value="15" enterkeyhint="done" required />
             </div>
           </div>
 
@@ -70,7 +70,7 @@
           <p id="message" class="message" role="status" aria-live="polite"></p>
         </form>
 
-        <section id="sleepResult" class="inline-result" aria-label="Berechnungsergebnis" aria-live="polite" hidden>
+        <section id="sleepResult" class="inline-result" aria-label="Berechnungsergebnis" hidden>
           <p id="resultTitle" class="result-caption"></p>
           <output id="resultTime" class="result-time"></output>
           <p id="resultLabel" class="result-summary"></p>
@@ -102,6 +102,13 @@
 
       function selectedMode() {
         return document.querySelector('input[name="mode"]:checked').value;
+      }
+
+      // Accepts the Swiss comma as well as the dot; NaN for anything else, including empty.
+      function parseDecimal(text) {
+        const normalized = text.trim().replace(',', '.');
+        if (!/^(\d+(\.\d*)?|\.\d+)$/.test(normalized)) return NaN;
+        return Number(normalized);
       }
 
       function formatClock(totalMinutes) {
@@ -145,8 +152,8 @@
 
       function calculateTime() {
         const mode = selectedMode();
-        const duration = Number(sleepHoursEl.value);
-        const latency = Number(fallAsleepMinutesEl.value);
+        const duration = parseDecimal(sleepHoursEl.value);
+        const latency = parseDecimal(fallAsleepMinutesEl.value);
 
         if (!Number.isFinite(duration) || duration < 1 || duration > 16 || Math.abs(duration * 2 - Math.round(duration * 2)) > 0.000001) {
           setError('Schlafdauer: 1 bis 16 Stunden in Schritten von 30 Minuten.');
@@ -187,10 +194,11 @@
           const wakeDate = new Date(now.getTime() + (durationMinutes + latency) * 60 * 1000);
           const wakeMinutes = wakeDate.getHours() * 60 + wakeDate.getMinutes();
           const dayLabel = sameLocalDate(now, wakeDate) ? 'Heute' : 'Morgen';
+          const startLabel = formatClock(now.getHours() * 60 + now.getMinutes());
 
           resultTitleEl.textContent = 'Aufwachzeit';
           resultTimeEl.textContent = formatClock(wakeMinutes);
-          resultLabelEl.textContent = `${dayLabel} · ${durationLabel} Schlaf + ${latency} min Einschlafdauer`;
+          resultLabelEl.textContent = `${dayLabel} · ab ${startLabel} · ${durationLabel} Schlaf + ${latency} min Einschlafdauer`;
         }
 
         sleepResultEl.hidden = false;

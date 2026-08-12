@@ -51,7 +51,7 @@
 
           <p id="message" class="message" role="status" aria-live="polite"></p>
 
-          <section id="resultArea" class="inline-result" aria-label="Berechnungsergebnis" aria-live="polite" hidden>
+          <section id="resultArea" class="inline-result" aria-label="Berechnungsergebnis" hidden>
             <div class="result-line">
               <output id="average" class="result-value"></output>
               <span id="passStatus" class="result-status"></span>
@@ -63,12 +63,12 @@
             <summary>Welche Note brauche ich als Nächstes?</summary>
             <div class="planner-grid">
               <label>
-                <span class="form-label">Exakter Zielschnitt</span>
-                <input id="targetAverage" class="form-control" type="number" min="1" max="6" step="0.01" value="4" inputmode="decimal" />
+                <span class="form-label">Zielschnitt</span>
+                <input id="targetAverage" class="form-control" type="text" inputmode="decimal" autocomplete="off" value="4" />
               </label>
               <label>
                 <span class="form-label">Nächstes Gewicht</span>
-                <input id="nextWeight" class="form-control" type="number" min="0.01" max="100" step="0.01" value="1" inputmode="decimal" />
+                <input id="nextWeight" class="form-control" type="text" inputmode="decimal" autocomplete="off" value="1" />
               </label>
             </div>
             <output id="planningResult" class="planner-output" aria-live="polite">Zuerst mindestens eine Note eingeben.</output>
@@ -76,7 +76,7 @@
         </form>
       </section>
 
-      <p class="disclaimer">Der Durchschnitt wird auf zwei Dezimalstellen gerundet. Der Status bezieht sich auf diesen Wert; massgebend sind die Regeln deiner Schule.</p>
+      <p class="disclaimer">Der Durchschnitt wird auf zwei Dezimalstellen gerundet. Status und benötigte Note beziehen sich auf diesen gerundeten Wert; massgebend sind die Regeln deiner Schule.</p>
     </main>
 
     <footer class="site-footer">
@@ -100,6 +100,13 @@
       let nextEntryId = 1;
       let currentState = null;
 
+      // Accepts the Swiss comma as well as the dot; NaN for anything else, including empty.
+      function parseDecimal(text) {
+        const normalized = text.trim().replace(',', '.');
+        if (!/^(\d+(\.\d*)?|\.\d+)$/.test(normalized)) return NaN;
+        return Number(normalized);
+      }
+
       function hasHundredthPrecision(value) {
         return Math.abs(value * 100 - Math.round(value * 100)) < 0.0000001;
       }
@@ -115,11 +122,11 @@
         row.innerHTML = `
           <label>
             <span class="sr-only">Note ${id}</span>
-            <input class="form-control grade-input" type="number" min="1" max="6" step="0.01" inputmode="decimal" placeholder="z. B. 5.25" value="${values.grade ?? ''}" />
+            <input class="form-control grade-input" type="text" inputmode="decimal" autocomplete="off" placeholder="z. B. 5,25" value="${values.grade ?? ''}" />
           </label>
           <label>
             <span class="sr-only">Gewicht der Note ${id}</span>
-            <input class="form-control weight-input" type="number" min="0.01" max="100" step="0.01" inputmode="decimal" value="${values.weight ?? '1'}" />
+            <input class="form-control weight-input" type="text" inputmode="decimal" autocomplete="off" value="${values.weight ?? '1'}" />
           </label>
           <button class="icon-button remove-button" type="button" aria-label="Notenzeile ${id} entfernen" title="Zeile entfernen">×</button>
         `;
@@ -176,15 +183,15 @@
 
           if (!gradeText) continue;
 
-          const grade = Number(gradeText);
-          const weight = Number(weightText);
+          const grade = parseDecimal(gradeText);
+          const weight = parseDecimal(weightText);
 
           if (!Number.isFinite(grade) || grade < 1 || grade > 6 || !hasHundredthPrecision(grade)) {
             setError('Noten müssen zwischen 1.00 und 6.00 liegen und dürfen höchstens zwei Dezimalstellen haben.');
             return;
           }
 
-          if (!weightText || !Number.isFinite(weight) || weight < 0.01 || weight > 100 || !hasHundredthPrecision(weight)) {
+          if (!Number.isFinite(weight) || weight < 0.01 || weight > 100 || !hasHundredthPrecision(weight)) {
             setError('Gewichte müssen zwischen 0.01 und 100 liegen und dürfen höchstens zwei Dezimalstellen haben.');
             return;
           }
@@ -221,8 +228,8 @@
           return;
         }
 
-        const target = Number(targetAverageEl.value);
-        const nextWeight = Number(nextWeightEl.value);
+        const target = parseDecimal(targetAverageEl.value);
+        const nextWeight = parseDecimal(nextWeightEl.value);
 
         if (!Number.isFinite(target) || target < 1 || target > 6 || !hasHundredthPrecision(target)
           || !Number.isFinite(nextWeight) || nextWeight < 0.01 || nextWeight > 100 || !hasHundredthPrecision(nextWeight)) {
@@ -231,14 +238,18 @@
           return;
         }
 
-        const required = (target * (currentState.totalWeight + nextWeight) - currentState.weightedSum) / nextWeight;
+        // The displayed average is rounded to two decimals, so the target counts as
+        // reached from half a hundredth below it. Planning against the exact target
+        // would demand a higher grade than the status line already accepts.
+        const thresholdAverage = target - 0.005;
+        const required = (thresholdAverage * (currentState.totalWeight + nextWeight) - currentState.weightedSum) / nextWeight;
         const requiredToHundredth = Math.ceil((required - 0.0000000001) * 100) / 100;
 
-        if (required <= 1) {
+        if (requiredToHundredth <= 1) {
           planningResultEl.textContent = `Ziel ${target.toFixed(2)} ist bereits gesichert — auch mit einer 1.00.`;
           planningResultEl.dataset.tone = 'success';
         } else if (requiredToHundredth > 6) {
-          planningResultEl.textContent = `Nicht erreichbar: Benötigt würde eine ${requiredToHundredth.toFixed(2)}.`;
+          planningResultEl.textContent = `Nicht erreichbar: selbst eine 6.00 genügt für den Zielschnitt ${target.toFixed(2)} nicht.`;
           planningResultEl.dataset.tone = 'danger';
         } else {
           planningResultEl.textContent = `Benötigte nächste Note: ${requiredToHundredth.toFixed(2)}.`;
