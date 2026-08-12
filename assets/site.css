@@ -168,8 +168,7 @@ summary:focus-visible {
 
 .site-nav a,
 .footer-link,
-.back-link,
-.theme-toggle {
+.back-link {
   color: var(--muted);
   font-size: 0.82rem;
   text-underline-offset: 0.22em;
@@ -178,18 +177,24 @@ summary:focus-visible {
 
 .theme-toggle {
   display: none;
-  min-width: 44px;
-  min-height: 44px;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  padding: 0 0.15rem;
-  border: 0;
-  border-bottom: 1px solid var(--control);
+  padding: 0;
+  border: 1px solid var(--control);
+  border-radius: 1px;
   background: transparent;
+  color: var(--muted);
   cursor: pointer;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  transition: border-color 130ms ease, color 130ms ease;
+}
+
+.theme-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
 }
 
 .theme-enabled .theme-toggle {
@@ -201,7 +206,7 @@ summary:focus-visible {
 }
 
 .intro {
-  padding: 5.2rem 0 4.2rem;
+  padding: 5.6rem 0 4.6rem;
   border-bottom: 1px solid var(--rule);
 }
 
@@ -246,7 +251,7 @@ summary:focus-visible {
 }
 
 .projects {
-  padding: 3.2rem 0 4.5rem;
+  padding: 3.6rem 0 5.5rem;
 }
 
 .projects h2 {
@@ -271,12 +276,12 @@ summary:focus-visible {
 
 .project-link {
   display: grid;
-  min-height: 112px;
+  min-height: 124px;
   align-items: center;
   padding: 1.45rem 0.55rem;
   margin-inline: -0.55rem;
   text-decoration: none;
-  grid-template-columns: 54px minmax(175px, 0.72fr) minmax(0, 1.55fr) 145px 24px;
+  grid-template-columns: 54px minmax(160px, 0.72fr) minmax(0, 1.55fr) auto 24px;
   gap: 1.2rem;
   transition: background-color 140ms ease, color 140ms ease;
 }
@@ -313,6 +318,7 @@ summary:focus-visible {
   font-size: 0.76rem;
   line-height: 1.55;
   text-align: right;
+  white-space: nowrap;
 }
 
 .project-arrow {
@@ -359,7 +365,8 @@ summary:focus-visible {
 }
 
 /* Tool pages */
-.tool-nav-inner {
+.tool-nav-inner,
+.tool-page .footer-inner {
   width: min(calc(100% - 4rem), var(--tool-width));
   margin-inline: auto;
 }
@@ -377,8 +384,8 @@ summary:focus-visible {
   margin-inline: auto;
   padding: 4.5rem 0 5rem;
   align-items: start;
-  grid-template-columns: 250px minmax(0, 1fr);
-  gap: 3.5rem;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 3rem;
 }
 
 .tool-heading {
@@ -391,6 +398,7 @@ summary:focus-visible {
 
 .tool-heading h1 {
   margin: 0;
+  overflow-wrap: break-word;
   font-family: var(--font-serif);
   font-size: clamp(2.8rem, 5vw, 3.2rem);
   font-weight: 400;
@@ -477,13 +485,14 @@ input[type="time"].form-control {
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid var(--rule);
+  border: 1px solid var(--control);
   border-radius: 1px;
   background: transparent;
   color: var(--muted);
   cursor: pointer;
   font-size: 1.2rem;
   line-height: 1;
+  transition: border-color 130ms ease, color 130ms ease;
 }
 
 .form-hint {
@@ -724,8 +733,7 @@ input[type="time"].form-control {
   .site-name:hover,
   .site-nav a:hover,
   .footer-link:hover,
-  .back-link:hover,
-  .theme-toggle:hover {
+  .back-link:hover {
     color: var(--accent);
   }
 
@@ -754,7 +762,8 @@ input[type="time"].form-control {
     color: var(--accent);
   }
 
-  .icon-button:hover {
+  .icon-button:hover,
+  .theme-toggle:hover {
     border-color: var(--accent);
     color: var(--accent);
   }
@@ -767,7 +776,8 @@ input[type="time"].form-control {
     padding: 3rem 0 4rem;
   }
 
-  .tool-nav-inner {
+  .tool-nav-inner,
+  .tool-page .footer-inner {
     width: min(calc(100% - 3rem), 700px);
   }
 
@@ -846,6 +856,7 @@ input[type="time"].form-control {
     grid-row: 3;
     margin-top: 0.2rem;
     text-align: left;
+    white-space: normal;
   }
 
   .project-arrow {
@@ -874,7 +885,8 @@ input[type="time"].form-control {
 @media (max-width: 480px) {
   .container,
   .tool-main,
-  .tool-nav-inner {
+  .tool-nav-inner,
+  .tool-page .footer-inner {
     width: min(calc(100% - 2rem), var(--page-width));
   }
 
@@ -920,8 +932,7 @@ input[type="time"].form-control {
     gap: 0.6rem;
   }
 
-  .site-nav a,
-  .theme-toggle {
+  .site-nav a {
     font-size: 0.75rem;
   }
 }
