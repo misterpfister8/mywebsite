@@ -3,17 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0f1110" />
+    <meta name="theme-color" content="#111310" />
     <meta name="description" content="Schlafens- oder Aufwachzeit aus Schlafdauer und Einschlafdauer berechnen." />
 
     <title>Schlafrechner – misterpfister.net</title>
 
     <link rel="canonical" href="https://misterpfister.net/sleepcalculator/" />
-    <link rel="icon" href="../assets/favicon.svg?v=4e8e133" type="image/svg+xml" />
-    <script src="../assets/theme.js?v=night-ledger-3"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=night-ledger-6" />
+    <link rel="icon" href="../assets/favicon.svg?v=workplace-1" type="image/svg+xml" />
+    <script src="../assets/theme.js?v=workplace-1"></script>
+    <link rel="stylesheet" href="../assets/site.css?v=workplace-1" />
   </head>
-  <body class="tool-page">
+  <body class="tool-page sleep-page">
     <a class="skip-link" href="#main">Zum Rechner springen</a>
 
     <header class="tool-header">
@@ -28,12 +28,16 @@
 
     <main id="main" class="tool-main">
       <header class="tool-heading">
-        <p class="tool-label">Werkzeug</p>
-        <h1>Schlafrechner</h1>
+        <p class="tool-label">02 / Alltag</p>
+        <h1>Guter Tag.<br><span>Gute Nacht.</span></h1>
+        <p class="tool-subtitle">Der Schlafrechner</p>
         <p>Schlafens- oder Aufwachzeit mit eigener Schlaf- und Einschlafdauer berechnen.</p>
+        <div class="tool-decoration night-decoration" aria-hidden="true"><div class="moon"></div></div>
+        <a class="text-link tool-crosslink" href="../sechserrechner/">Noch wach? Noten berechnen ↗</a>
       </header>
 
       <section class="tool-surface" aria-label="Schlafzeit berechnen">
+        <div class="surface-heading"><span>SCHLAFRECHNER</span><span>24H-FORMAT</span></div>
         <form id="sleepForm" novalidate>
           <fieldset class="mode-list">
             <legend class="sr-only">Berechnungsmodus</legend>
@@ -77,7 +81,7 @@
         </section>
       </section>
 
-      <p class="disclaimer">Nur eine Planungshilfe; Schlafbedarf ist individuell.</p>
+      <p class="disclaimer">Nur eine Planungshilfe; Schlafbedarf ist individuell. Die Planung nach Aufwachzeit rechnet mit Uhrzeiten ohne Datum und berücksichtigt keine Zeitumstellung.</p>
     </main>
 
     <footer class="site-footer">
@@ -217,6 +221,7 @@
       });
 
       updateMode();
+      calculateTime();
     </script>
   </body>
 </html>

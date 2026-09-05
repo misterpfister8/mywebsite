@@ -2,8 +2,8 @@
   const root = document.documentElement;
   const storageKey = 'misterpfister-theme';
   const themeColors = {
-    dark: '#0f1110',
-    light: '#f3eee3',
+    dark: '#111310',
+    light: '#f0f0e8',
   };
 
   // Keyed by the theme the button switches to: sun means "go light", moon means "go dark".
@@ -11,16 +11,6 @@
     light: '<circle cx="12" cy="12" r="4.1"/><path d="M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/>',
     dark: '<path d="M20.1 13.6A8.1 8.1 0 1 1 10.4 3.9a6.5 6.5 0 0 0 9.7 9.7Z"/>',
   };
-
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-  if (isIOS) {
-    const viewportMeta = document.querySelector('meta[name="viewport"]');
-    if (viewportMeta && !viewportMeta.content.includes('maximum-scale')) {
-      viewportMeta.content += ', maximum-scale=1';
-    }
-  }
 
   let storedTheme = null;
   try {

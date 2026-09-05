@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#0f1110" />
+    <meta name="theme-color" content="#111310" />
     <meta name="description" content="Gewichtete Noten auf der Schweizer Skala von 1 bis 6 berechnen." />
 
     <title>Notenrechner – misterpfister.net</title>
 
     <link rel="canonical" href="https://misterpfister.net/sechserrechner/" />
-    <link rel="icon" href="../assets/favicon.svg?v=4e8e133" type="image/svg+xml" />
-    <script src="../assets/theme.js?v=night-ledger-3"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=night-ledger-6" />
+    <link rel="icon" href="../assets/favicon.svg?v=workplace-1" type="image/svg+xml" />
+    <script src="../assets/theme.js?v=workplace-1"></script>
+    <link rel="stylesheet" href="../assets/site.css?v=workplace-1" />
   </head>
   <body class="tool-page">
     <a class="skip-link" href="#main">Zum Rechner springen</a>
@@ -28,12 +28,16 @@
 
     <main id="main" class="tool-main">
       <header class="tool-heading">
-        <p class="tool-label">Werkzeug</p>
-        <h1>Notenrechner</h1>
+        <p class="tool-label">01 / Lernen</p>
+        <h1>Auf Kurs<br>zur <span>Sechs.</span></h1>
+        <p class="tool-subtitle">Der Sechser-Rechner</p>
         <p>Gewichteten Durchschnitt auf der Schweizer Skala von 1 bis 6 berechnen.</p>
+        <div class="tool-decoration grade-decoration" aria-hidden="true">6<span>.0</span></div>
+        <a class="text-link tool-crosslink" href="../sleepcalculator/">Danach: Schlaf planen ↗</a>
       </header>
 
       <section class="tool-surface" aria-label="Noten berechnen">
+        <div class="surface-heading"><span>NOTENRECHNER</span><span>LIVE-BERECHNUNG</span></div>
         <form id="gradeForm" novalidate>
           <div class="grade-column-heads" aria-hidden="true">
             <span>Note</span>
@@ -52,6 +56,7 @@
           <p id="message" class="message" role="status" aria-live="polite"></p>
 
           <section id="resultArea" class="inline-result" aria-label="Berechnungsergebnis" hidden>
+            <p class="result-caption">Dein gewichteter Schnitt</p>
             <div class="result-line">
               <output id="average" class="result-value"></output>
               <span id="passStatus" class="result-status"></span>
@@ -59,7 +64,7 @@
             <p id="resultLabel" class="result-summary"></p>
           </section>
 
-          <details class="planner">
+          <details class="planner" open>
             <summary>Welche Note brauche ich als Nächstes?</summary>
             <div class="planner-grid">
               <label>
@@ -273,6 +278,10 @@
       targetAverageEl.addEventListener('input', updatePlanner);
       nextWeightEl.addEventListener('input', updatePlanner);
 
+      document.getElementById('gradeForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+        calculateGrades();
+      });
       resetCalculator();
     </script>
   </body>
