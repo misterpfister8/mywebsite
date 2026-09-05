@@ -53,7 +53,10 @@
 
   function toggleTheme() {
     const nextTheme = root.dataset.theme === 'light' ? 'dark' : 'light';
+    root.classList.add('changing-theme');
     root.dataset.theme = nextTheme;
+    // Commit the palette together so foreground/background never cross-fade apart.
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('changing-theme')));
 
     try {
       window.localStorage.setItem(storageKey, nextTheme);

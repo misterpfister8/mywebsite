@@ -25,9 +25,10 @@ jobs:
           python -m http.server 8000 > /tmp/workshop-http.log 2>&1 &
           for i in $(seq 1 20); do curl -sf http://127.0.0.1:8000/ >/dev/null && break; sleep 1; done
           python tests/browser_review.py
+          python tests/persistence_review.py
       - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: workshop-browser-report
-          path: test-results/
+          path: output/playwright/
           retention-days: 7

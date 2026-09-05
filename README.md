@@ -1,72 +1,92 @@
-# misterpfister.net — Werkplatz 02
+# misterpfister.net
 
-Personal digital workshop for Kilian Pfister. Static HTML, CSS and JavaScript,
-served from the root of `main` by GitHub Pages. Preserve `CNAME` and existing URLs.
-No build step, framework, CDN, external font, tracking script or runtime package.
+Digitaler Werkplatz von Kilian Pfister: [Startseite](https://misterpfister.net/),
+[Notenrechner](https://misterpfister.net/sechserrechner/) und
+[Schlafrechner](https://misterpfister.net/sleepcalculator/).
 
-## What changed
+Statisches HTML, CSS und JavaScript. Keine Laufzeitpakete, externen Schriftdateien,
+Konten oder Tracking-Skripte. GitHub Pages veröffentlicht `main` aus dem Repository-
+Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
 
-- Selectable CSS-3D tool modules replace the unrelated cube. Pointer motion is
-  smoothed with a short-lived animation frame loop; nothing rotates endlessly.
-  Touch/keyboard selection, explicit pause and reduced motion are supported.
-- Normal links remain available immediately. Cross-document View Transitions
-  progressively connect project cards with the corresponding calculator panel.
-- Grades: weighted mean, raw/rounded values, configurable grade steps and target
-  basis, next-grade scenario, subjects, optional local saving, JSON backup/import,
-  undo for destructive actions, and configurable linear points-to-grade conversion.
-- Sleep: reactive 24-hour dial, wake/bedtime modes, arbitrary bedtime, Now action,
-  minute-precise duration, latency, custom presets and optional local saving.
-  Clock times only: no date/DST handling, alarms or sleep-stage predictions.
-- SpasstoCSV project explanation uses fictional examples only. No password upload.
+## Funktionen
 
-## Files
+- Auswählbare räumliche Werkzeugkarten mit Tastatur, Touch, Pause und Reduced
+  Motion. Die direkten Toollinks funktionieren unabhängig von der Szene.
+- Native Cross-Document View Transitions verbinden die sichtbare Vorschau mit
+  dem Rechner. Bei fehlender Unterstützung bleiben es normale Links.
+- Noten: gewichteter Schnitt, Anzeige-Rundung, unabhängig gewichtete Simulation,
+  Zielplanung, Fächer, Prüfungsnamen, lokale Entwürfe, Undo, JSON-Export/Import
+  und lineare Punkteumrechnung.
+- Schlaf: 24-Stunden-Uhr, frei wählbare Bett-/Aufstehzeit, minutengenaue Dauer,
+  Einschlafzeit, «Jetzt ins Bett», eigene Presets mit Undo und lokale Speicherung.
+- SpasstoCSV: Formatillustration mit erfundenen Daten und Verweis auf das
+  [lokale Python-Projekt](https://github.com/misterpfister8/spasstocsv).
+  Unterstützte Formate laut dessen öffentlicher README: Raw-, Chrome- und
+  Proton-CSV sowie Bitwarden JSON. Die Website nimmt keine Passwortdateien an.
 
-- `index.html`, `sechserrechner/index.html`, `sleepcalculator/index.html`
-- `assets/site.css`: responsive shared design, CSS 3D, SVG styling, transitions
-- `assets/theme.js`: existing persistent theme control
-- `assets/workbench.js`: home interactions, no navigation interception
-- `assets/tool-math.js`: pure calculator functions, also importable from Node
-- `assets/grades.js`, `assets/sleep.js`: local UI/state logic
-- `tests/math.test.js`, `tests/browser_review.py`: regression tests
-- `docs/REDESIGN_QA.md`: actual checks and explicit verification limits
+## Rechenregeln und Datensicherung
 
-## Local development
+Noten liegen zwischen 1 und 6, Gewichte zwischen 0.01 und 100; maximal zwei
+Dezimalstellen, mit Punkt oder Komma. Höchstens 30 Fächer mit je 100 Zeilen.
+Die Anzeige wird kaufmännisch auf 0.01, 0.1, 0.5 oder 1 gerundet. Der zusätzlich
+angezeigte Rechenwert ist auf vier Dezimalstellen angenähert. Die Zielplanung
+vergleicht intern ganzzahlige Kreuzprodukte; sie sucht die kleinste erreichbare
+Note in Schritten von 0.01, 0.1, 0.25, 0.5 oder 1. Historische Noten bleiben
+unverändert. Die Markierung bei 4 ist keine allgemeine Bestehensgarantie.
 
-```sh
-python3 -m http.server 8000
+Schlafdauer: 1–16 Stunden; Einschlafdauer: 0–180 ganze Minuten. Uhrzeiten ohne
+Datum, Alarm oder medizinisches Zyklusmodell. Zeitumstellungen werden nicht
+berücksichtigt. Die Punkteformel ist linear, keine universelle Schulregel;
+Maximum grösser null und höchstens 1 000 000, Notenskala innerhalb von 1–6.
+
+Die Speicherung ist für beide Tools einzeln abschaltbar. Abschalten entfernt
+nur deren gespeicherte Daten, die Sitzung bleibt benutzbar. Notenentwürfe werden
+auch mit unvollständigen Eingaben bewahrt; beim Schlafrechner bleiben die letzten
+gültigen Zeiten erhalten. Unlesbare Sicherungen werden nicht automatisch
+überschrieben. Speicherfehler werden angezeigt. Browserdaten sind kein dauerhaftes
+Backup: wichtige Noten als JSON exportieren. Importdateien werden auf Grösse
+(maximal 512 KiB), Schema, Typen und Werte geprüft. Ersetzen erfordert Bestätigung
+und lässt sich rückgängig machen. Auch verzögertes Undo überschreibt neuere
+Noteneingaben nur nach ausdrücklicher Bestätigung.
+
+## Lokal starten und testen
+
+```bash
+python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
-Open `http://127.0.0.1:8000/` in a browser. No production compilation is required.
+Danach [localhost:8000](http://127.0.0.1:8000/) öffnen. Kein Build nötig.
 
-## Tests
-
-```sh
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r tests/requirements.txt
+.venv/bin/playwright install chromium webkit
 node tests/math.test.js
-python3 -m pip install playwright
-python3 -m playwright install chromium
-# In a second terminal, with the HTTP server running:
-python3 tests/browser_review.py --base-url http://127.0.0.1:8000/
+.venv/bin/python tests/browser_review.py
+.venv/bin/python tests/browser_review.py --browser webkit --output output/playwright/webkit
+.venv/bin/python tests/persistence_review.py
+.venv/bin/python tests/persistence_review.py --browser webkit
+.venv/bin/python tests/interaction_review.py --headed
+.venv/bin/python tests/contrast_review.py
 ```
 
-For restricted environments only, the browser runner also supports
-`--offline-fixture`. This requires `beautifulsoup4` and embeds the same local
-assets with a simulated Storage object. It is NOT a real navigation or native
-localStorage test. `--chromium /path/to/chromium` selects an existing executable.
-Reports/screenshots go to ignored `test-results/` or an explicit `--output` path.
+Die Browserprüfungen benötigen den laufenden HTTP-Server. Sie laden die echten
+externen Dateien und verwenden nativen Browser-Speicher. Speicherfehler-Injektion
+ist ein separater Testfall. `persistence_review.py` prüft echte Browser-Neustarts
+und in Chromium zusätzlich nativ deaktivierten Speicher. `interaction_review.py`
+prüft Touch und laufende Übergänge; optional `--axe /pfad/zu/axe.min.js` für einen
+lokal bereitgestellten axe-core-Scan. Testausgaben unter `output/playwright/`
+bleiben ausserhalb von Git. Das [Prüfprotokoll](docs/REDESIGN_QA.md) trennt
+beobachtete Ergebnisse und offene Geräteprüfungen.
 
-## Data and safety
+## Dateien und Veröffentlichung
 
-Inputs are not sent to a server. Local saving can be switched off independently
-for each tool, which removes its saved data. Browser storage is not a durable
-backup: export important grades. Import validates format, size and bounds before
-replacement and supports undo. Imported text is not inserted as HTML.
-Theme preferences keep the existing storage key.
+Die drei HTML-Seiten verwenden `assets/site.css` und `assets/theme.js`.
+`tool-math.js` enthält reine Rechenfunktionen, `tool-storage.js` kapselt den
+Browser-Speicher, `grades.js` und `sleep.js` steuern die Rechner. `workbench.js`
+steuert die Vorschauen, `transitions.js` erweitert die native Navigation.
 
-The grade target can explicitly apply to either the exact average or its rounded
-appearance. Grade-step settings constrain planned future grades, not historical
-entries. School-specific grading policies remain authoritative.
-
-## Deployment
-
-Stage related files together, test, then fast-forward `main`. GitHub Pages handles
-publication. Do not force-push or change the hosting/domain configuration.
+Der bestehende Workflow `Workshop regression tests` prüft Rechenlogik, HTTP-
+Bedienung und Browser-Neustarts. Vor dem Push Remote-Änderungen abgleichen, den
+geprüften Stand ohne Force-Push nach `main` übernehmen und anschliessend den
+separaten Workflow `pages build and deployment` sowie die Live-Seiten prüfen.

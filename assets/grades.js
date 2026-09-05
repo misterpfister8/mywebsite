@@ -9,9 +9,9 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const clone = object => JSON.parse(JSON.stringify(object));
   const emptyRow = () => ({ name: '', grade: '', weight: '1' });
-  const newSubject = (name = 'Allgemein') => ({ name, entries: [emptyRow(), emptyRow()], rounding: '0.01', gradeStep: '0.01', target: '4.00', nextWeight: '1', scenario: '5.00', basis: 'exact' });
+  const newSubject = (name = 'Allgemein') => ({ name, entries: [emptyRow(), emptyRow()], rounding: '0.01', gradeStep: '0.01', target: '4.00', nextWeight: '1', scenario: '5.00', scenarioWeight: '1', basis: 'exact' });
   let model = { type: 'misterpfister-grades', version: 1, active: 0, subjects: [newSubject()] };
-  let current = null, undo = null, persistent = true;
+  let current = null, undo = null, undoAfter = null, persistent = true;
   function validateImport(data, drafts = false) {
     if (!data || data.type !== 'misterpfister-grades' || data.version !== 1 || !Array.isArray(data.subjects) || !data.subjects.length || data.subjects.length > MAX_SUBJECTS) throw new Error('Keine gültige Noten-Sicherungsdatei.');
     const subjects = data.subjects.map(s => {
@@ -25,52 +25,37 @@
         return { name: row.name, grade: row.grade, weight: row.weight };
       });
       if (!['0.01', '0.1', '0.5', '1'].includes(s.rounding) || !['0.01', '0.1', '0.25', '0.5', '1'].includes(s.gradeStep) || !['exact', 'display'].includes(s.basis)) throw new Error('Ungültige Rundungsregel.');
-      for (const [key, max] of [['target', 6], ['nextWeight', 100], ['scenario', 6]]) {
-        const value = M.decimal(s[key]);
-        if (typeof s[key] !== 'string' || s[key].length > 20 || (!drafts && (!Number.isFinite(value) || value < (key === 'nextWeight' ? .01 : 1) || value > max))) throw new Error('Ungültige Planungseinstellung.');
-        result[key] = String(s[key]);
+      for (const [key, max] of [['target', 6], ['nextWeight', 100], ['scenario', 6], ['scenarioWeight', 100]]) {
+        const input = key === 'scenarioWeight' ? (s[key] ?? s.nextWeight) : s[key];
+        const value = M.decimal(input);
+        if (typeof input !== 'string' || input.length > 20 || (!drafts && (!Number.isFinite(value) || value < (key.endsWith('Weight') ? .01 : 1) || value > max))) throw new Error('Ungültige Planungseinstellung.');
+        result[key] = input;
       }
       result.rounding = s.rounding; result.gradeStep = s.gradeStep; result.basis = s.basis;
       return result;
     });
     return { type: 'misterpfister-grades', version: 1, active: Number.isInteger(data.active) && data.active >= 0 && data.active < subjects.length ? data.active : 0, subjects };
   }
-  try {
-    persistent = localStorage.getItem(PREF) !== 'false';
-    if (persistent) {
-      const stored = localStorage.getItem(KEY);
-      if (stored) model = validateImport(JSON.parse(stored), true);
-    }
-  } catch {
-    // Do not claim a broken or inaccessible storage was restored.
-    $('saveStatus').textContent = 'Sicherung nicht lesbar';
-    $('saveStatus').dataset.error = 'true';
-  }
+  const storage = globalThis.WorkshopStorage(KEY, PREF, data => validateImport(data, true));
+  const restored = storage.load();
+  persistent = restored.enabled;
+  if (restored.data) model = restored.data;
   $('saveGrades').checked = persistent;
   const active = () => model.subjects[model.active];
   function persist() {
-    try {
-      localStorage.setItem(PREF, String(persistent));
-      if (persistent) localStorage.setItem(KEY, JSON.stringify(model));
-      else localStorage.removeItem(KEY);
-      $('saveStatus').textContent = persistent ? 'Lokal gespeichert' : 'Nur für diese Sitzung';
-      $('saveStatus').dataset.error = 'false';
-    } catch {
-      $('saveStatus').textContent = 'Speichern nicht möglich';
-      $('saveStatus').dataset.error = 'true';
-    }
+    const result = storage.save(persistent, model);
+    $('saveStatus').textContent = result.text;
+    $('saveStatus').dataset.error = String(result.error);
   }
-  function text(id, value, animate = false) {
-    const el = $(id), changed = el.textContent !== value;
+  function text(id, value) {
+    const el = $(id);
     el.textContent = value;
-    if (changed && animate && !reduced.matches && el.animate) {
-      el.getAnimations().forEach(animation => animation.cancel());
-      el.animate([{ opacity: .4, transform: 'translateY(4px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 180, easing: 'ease-out' });
-    }
+    // Results stay fully opaque and stable while typing; only the scale moves.
   }
   function toast(message, canUndo = false) {
     $('toastMessage').textContent = message;
     $('undoAction').hidden = !canUndo;
+    if (canUndo) undoAfter = JSON.stringify(model);
     $('gradeToast').hidden = false;
   }
   function checkpoint() { undo = clone(model); }
@@ -109,7 +94,7 @@
   function populate() {
     renderSubjects(); renderRows();
     const s = active();
-    for (const [id, key] of [['rounding', 'rounding'], ['gradeStep', 'gradeStep'], ['targetAverage', 'target'], ['nextWeight', 'nextWeight'], ['scenarioGrade', 'scenario'], ['targetBasis', 'basis']]) $(id).value = s[key];
+    for (const [id, key] of [['rounding', 'rounding'], ['gradeStep', 'gradeStep'], ['targetAverage', 'target'], ['nextWeight', 'nextWeight'], ['scenarioGrade', 'scenario'], ['scenarioWeight', 'scenarioWeight'], ['targetBasis', 'basis']]) $(id).value = s[key];
     $('scenarioSlider').step = s.gradeStep; $('scenarioSlider').value = s.scenario;
     compute();
   }
@@ -133,31 +118,35 @@
       $('scaleFill').style.width = '0%';
       $('gradeScale').setAttribute('aria-label', 'Notenskala von 1 bis 6. Noch kein gültiges Ergebnis.');
     } else {
-      text('average', M.round(current.average, Number(s.rounding)).toFixed(2), true);
+      text('average', M.round(current.average, Number(s.rounding)).toFixed(2));
       text('averageDetail', `Gewicht ${new Intl.NumberFormat('de-CH', { maximumFractionDigits: 2 }).format(current.weight)} · Rundung ${s.rounding}`);
-      text('averageExact', `Ungerundet: ${current.average.toFixed(4)}`);
+      text('averageExact', `Rechenwert ≈ ${current.average.toFixed(4)}`);
       text('gradeCount', `${current.count} ${current.count === 1 ? 'Note' : 'Noten'}`);
       const pos = `${(current.average - 1) / 5 * 100}%`;
       $('scaleFill').style.width = pos; $('scalePointer').style.left = pos;
       $('gradeScale').setAttribute('aria-label', `Notenskala 1 bis 6. Ungerundeter Schnitt ${current.average.toFixed(4)}.`);
     }
     updatePlan();
+    $('compactAverage').textContent = current ? `Schnitt ${M.round(current.average, Number(s.rounding)).toFixed(2)} · ${current.count} Noten` : 'Noch kein gültiger Schnitt';
   }
   function updatePlan() {
-    const s = active(), next = M.decimal(s.nextWeight), simulated = M.decimal(s.scenario), target = M.decimal(s.target);
+    const s = active(), next = M.decimal(s.nextWeight), simulationWeight = M.decimal(s.scenarioWeight), simulated = M.decimal(s.scenario), target = M.decimal(s.target);
     const validWeight = Number.isFinite(next) && next >= .01 && next <= 100;
+    const validSimulationWeight = Number.isFinite(simulationWeight) && simulationWeight >= .01 && simulationWeight <= 100;
     const step = Number(s.gradeStep);
     const validSim = Number.isFinite(simulated) && simulated >= 1 && simulated <= 6 && Math.abs((simulated - 1) / step - Math.round((simulated - 1) / step)) < 1e-7;
     const validTarget = Number.isFinite(target) && target >= 1 && target <= 6;
+    $('scenarioWeight').setAttribute('aria-invalid', String(!validSimulationWeight));
     $('nextWeight').setAttribute('aria-invalid', String(!validWeight));
     $('scenarioGrade').setAttribute('aria-invalid', String(!validSim));
     $('targetAverage').setAttribute('aria-invalid', String(!validTarget));
     $('scenarioPointer').hidden = true;
-    text('scenarioWeightLabel', validWeight ? `mit Gewicht ${s.nextWeight}` : 'Gewicht prüfen');
-    if (current && validWeight && validSim) {
-      const projected = (current.sum + simulated * next) / (current.weight + next);
-      text('scenarioResult', M.round(projected, Number(s.rounding)).toFixed(2), true);
-      text('scenarioHint', `Ungerundet: ${projected.toFixed(4)}. Nur eine Simulation – nicht gespeichert als Note.`);
+    text('scenarioWeightLabel', validSimulationWeight ? `mit Gewicht ${s.scenarioWeight}` : 'Gewicht prüfen');
+    if (current && validSimulationWeight && validSim) {
+      const projected = (current.sum + simulated * simulationWeight) / (current.weight + simulationWeight);
+      text('scenarioResult', M.round(projected, Number(s.rounding)).toFixed(2));
+      text('scenarioHint', `Rechenwert ≈ ${projected.toFixed(4)}. Simulation, keine gespeicherte Prüfung.`);
+      $('gradeScale').setAttribute('aria-label', `Skala 1 bis 6. Aktuell ${current.average.toFixed(4)}, simuliert ${projected.toFixed(4)}. 4 ist eine Orientierung, keine Bestehensgarantie.`);
       $('scenarioPointer').hidden = false; $('scenarioPointer').style.left = `${(projected - 1) / 5 * 100}%`;
     } else {
       text('scenarioResult', '—'); text('scenarioHint', current ? `Nächste Note in ${s.gradeStep}er-Schritten und gültiges Gewicht eingeben.` : 'Mindestens eine gültige aktuelle Note eingeben.');
@@ -206,10 +195,17 @@
     checkpoint(); active().entries = [{ name: 'Prüfung 1', grade: '4.5', weight: '1' }, { name: 'Prüfung 2', grade: '5.5', weight: '1' }, { name: 'Prüfung 3', grade: '5', weight: '1' }, { name: 'Prüfung 4', grade: '6', weight: '1' }];
     renderRows(); compute(); persist(); toast('Beispielnoten eingesetzt.', true);
   });
-  $('undoAction').addEventListener('click', () => { if (undo) { model = undo; undo = null; populate(); persist(); } $('gradeToast').hidden = true; });
+  $('undoAction').addEventListener('click', () => {
+    if (undo) {
+      if (undoAfter !== JSON.stringify(model) && !confirm('Inzwischen hast du weitere Eingaben geändert. Rückgängig setzt auch diese auf den vorherigen Stand zurück. Trotzdem rückgängig machen?')) return;
+      model = undo; undo = null; undoAfter = null; populate(); persist();
+    }
+    $('gradeToast').hidden = true;
+    $('gradeEntries').querySelector('.grade-grade')?.focus();
+  });
   $('closeToast').addEventListener('click', () => { $('gradeToast').hidden = true; });
   $('saveGrades').addEventListener('change', () => { persistent = $('saveGrades').checked; persist(); });
-  for (const [id, key] of [['rounding', 'rounding'], ['gradeStep', 'gradeStep'], ['targetAverage', 'target'], ['nextWeight', 'nextWeight'], ['scenarioGrade', 'scenario'], ['targetBasis', 'basis']]) {
+  for (const [id, key] of [['rounding', 'rounding'], ['gradeStep', 'gradeStep'], ['targetAverage', 'target'], ['nextWeight', 'nextWeight'], ['scenarioGrade', 'scenario'], ['scenarioWeight', 'scenarioWeight'], ['targetBasis', 'basis']]) {
     $(id).addEventListener('input', () => {
       active()[key] = $(id).value;
       if (key === 'gradeStep' && Number.isFinite(M.decimal(active().scenario))) {
@@ -243,11 +239,16 @@
   function computePoints() {
     const ids = ['pointsEarned', 'pointsMax', 'pointsMinGrade', 'pointsMaxGrade'];
     const result = M.points(...ids.map(id => M.decimal($(id).value)));
-    text('pointsResult', Number.isFinite(result) ? M.round(result).toFixed(2) : '—', true);
+    text('pointsResult', Number.isFinite(result) ? M.round(result).toFixed(2) : '—');
     $('pointsResult').previousElementSibling.textContent = Number.isFinite(result) ? 'Rechnerische Note (2 Dezimalstellen)' : 'Punkte und Notengrenzen prüfen';
+    $('pointsError').textContent = Number.isFinite(result) ? '' : 'Punkte: 0 bis Maximum. Maximum: grösser 0, höchstens 1 000 000. Notenskala: 1–6, Mindestnote kleiner als Höchstnote.';
+    ids.forEach(id => $(id).setAttribute('aria-invalid', String(!Number.isFinite(result))));
   }
   ['pointsEarned', 'pointsMax', 'pointsMinGrade', 'pointsMaxGrade'].forEach(id => $(id).addEventListener('input', computePoints));
   populate(); computePoints();
-  // Do not overwrite an unreadable stored backup during initialisation.
-  if ($('saveStatus').dataset.error !== 'true') persist();
+  persist();
+  // A compact summary occupies its own space and hides while an input has focus.
+  if ('IntersectionObserver' in window) new IntersectionObserver(([entry]) => {
+    $('compactResult').hidden = entry.isIntersecting || entry.boundingClientRect.top > 0;
+  }).observe(document.querySelector('.result-panel'));
 })();

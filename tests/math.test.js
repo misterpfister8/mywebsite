@@ -50,4 +50,40 @@ for (const args of [['wake', '', 8, 0, 15], ['wake', '24:00', 8, 0, 15], ['wake'
 eq(M.duration(495), '8 h 15 min'); eq(M.duration(0), '0 min');
 near(M.points(45, 60), 4.75); near(M.points(0, 60), 1); near(M.points(60, 60), 6); near(M.points(30, 60, 2, 6), 4);
 for (const args of [[61, 60], [-1, 60], [10, 0], [10, 20, 6, 6], [NaN, 60]]) { assert.ok(Number.isNaN(M.points(...args))); checks++; }
+// Independent BigInt reference: round the resulting rational mean, then compare
+// to the target. Include tiny/large next weights, ties and off-grid display goals.
+for (const entries of [
+  [{ grade: '4.5', weight: '1' }, { grade: '6', weight: '2' }],
+  [{ grade: '5.49', weight: '100' }, { grade: '5.5', weight: '0.01' }],
+  [{ grade: '1', weight: '0.01' }], [{ grade: '6', weight: '100' }],
+  [{ grade: '3.99', weight: '2.13' }, { grade: '5.27', weight: '1.37' }],
+]) {
+  const c = M.summary(entries);
+  let n = 0n, d = 0n;
+  for (const e of entries) {
+    const g = BigInt(Math.round(Number(e.grade) * 100)), w = BigInt(Math.round(Number(e.weight) * 100));
+    n += g * w; d += w;
+  }
+  for (const weight of [.01, 1, 100]) for (const target of [1, 3.99, 4, 4.17, 5.49, 5.5, 5.51, 6])
+    for (const step of [.01, .1, .25, .5, 1]) for (const rounding of [.01, .1, .5, 1]) for (const basis of ['exact', 'display']) {
+      const w = BigInt(Math.round(weight * 100)), t = BigInt(Math.round(target * 100)), r = BigInt(Math.round(rounding * 100));
+      let expected = null;
+      for (let g = 100; g <= 600; g += Math.round(step * 100)) {
+        const numerator = n + BigInt(g) * w, denominator = d + w;
+        const meets = basis === 'exact' ? numerator >= t * denominator
+          : ((2n * numerator + denominator * r) / (2n * denominator * r)) * r >= t;
+        if (meets) { expected = g / 100; break; }
+      }
+      const plan = M.neededGrade(c, target, weight, step, rounding, basis);
+      eq(plan.required, expected); eq(plan.possible, expected !== null); eq(plan.secured, expected === 1);
+    }
+}
+eq(M.round(5.495 - 1e-10, .01), 5.49);
+eq(M.round(5.495, .01), 5.5);
+eq(M.round(4.25 - 1e-10, .5), 4);
+eq(M.clock(M.sleepPlan('bed', '23:37', 7, 23, 0).wake), '07:00');
+eq(M.sleepPlan('bed', '22:00', 2, 0, 0).day, 'Am Folgetag');
+eq(M.sleepPlan('wake', '08:15', 8, 0, 15).day, 'Am selben Tag');
+eq(M.clock(M.sleepPlan('wake', '00:00', 1, 0, 0).bed), '23:00');
+for (const args of [['bed', '00:00', 0, 59, 0], ['bed', '00:00', 8.1, 0, 0], ['bed', '00:00', 8, 0, -1], ['wake', '00:00', 8, NaN, 0]]) throws(() => M.sleepPlan(...args));
 console.log(`PASS: ${checks} mathematical assertions (including exhaustive grade-step comparisons).`);

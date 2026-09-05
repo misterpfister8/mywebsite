@@ -11,25 +11,28 @@
     const link = bench.querySelector('[data-scene-link]');
     const note = bench.querySelector('[data-scene-note]');
     const modules = {
-      grade: { href: './sechserrechner/', label: 'Notenrechner öffnen', note: 'Beispielwerte. Deine Noten bleiben bei dir.' },
-      sleep: { href: './sleepcalculator/', label: 'Schlafrechner öffnen', note: 'Deine Zeiten. Dein Rhythmus. Direkt berechnet.' },
-      code: { href: 'https://github.com/misterpfister8/spasstocsv', label: 'SpasstoCSV auf GitHub öffnen', note: 'Ein lokales Python-Tool. Keine Dateien hochladen.' },
+      grade: { href: './sechserrechner/', label: 'Notenrechner öffnen', note: 'Beispiel: (4.5 + 5.5 + 5 + 6) ÷ 4 = 5.25.' },
+      sleep: { href: './sleepcalculator/', label: 'Schlafrechner öffnen', note: 'Beispiel: 22:45 ins Bett, 15 min Einschlafen, 8 h Schlaf bis 07:00.' },
+      code: { href: 'https://github.com/misterpfister8/spasstocsv', label: 'SpasstoCSV auf GitHub öffnen', note: 'Formatbeispiel: .spass zu CSV oder Bitwarden JSON. Der Konverter läuft lokal.' },
     };
-    let paused = false, visible = true, frame = 0;
+    let paused = false, visible = true, frame = 0, selectionUntil = 0;
     let x = 0, y = 0, tx = 0, ty = 0;
-    const mayMove = () => !paused && !reduced.matches && fine.matches && visible && !document.hidden;
+    const mayMove = () => !paused && !reduced.matches && fine.matches && visible && !document.hidden && performance.now() >= selectionUntil;
     function stop() {
       if (frame) cancelAnimationFrame(frame);
       frame = 0; x = y = tx = ty = 0;
+      stage.style.willChange = 'auto';
       stage.style.removeProperty('--tilt-x'); stage.style.removeProperty('--tilt-y');
     }
     function tick() {
       frame = 0;
       if (!mayMove()) { stop(); return; }
       x += (tx - x) * 0.15; y += (ty - y) * 0.15;
+      stage.style.willChange = 'transform';
       stage.style.setProperty('--tilt-x', `${x.toFixed(3)}deg`);
       stage.style.setProperty('--tilt-y', `${y.toFixed(3)}deg`);
       if (Math.abs(tx - x) + Math.abs(ty - y) > 0.015) frame = requestAnimationFrame(tick);
+      else stage.style.willChange = 'auto';
     }
     function syncMotion() {
       bench.classList.toggle('motion-paused', paused || reduced.matches);
@@ -40,6 +43,7 @@
     }
     function select(name) {
       if (!modules[name]) return;
+      stop(); selectionUntil = performance.now() + 520;
       bench.dataset.selection = name;
       bench.querySelectorAll('[data-module],[data-select]').forEach(button => button.setAttribute('aria-pressed', String((button.dataset.module || button.dataset.select) === name)));
       link.href = modules[name].href; link.setAttribute('aria-label', modules[name].label);
@@ -67,7 +71,7 @@
     scene.addEventListener('pointerleave', () => { tx = ty = 0; if (mayMove() && !frame) frame = requestAnimationFrame(tick); });
     toggle.addEventListener('click', () => { paused = !paused; syncMotion(); });
     reduced.addEventListener('change', syncMotion); fine.addEventListener('change', syncMotion);
-    if ('IntersectionObserver' in window) new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; if (!visible) stop(); }).observe(bench);
+    if ('IntersectionObserver' in window) new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; if (!visible) stop(); }).observe(scene);
     document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
     syncMotion();
   }

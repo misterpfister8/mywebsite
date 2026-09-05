@@ -1,7 +1,6 @@
 /* Pure, independently testable calculator functions. All times are clock-only. */
 (() => {
   'use strict';
-  const EPS = 1e-9;
   function decimal(value, precision = 2) {
     const text = String(value ?? '').trim();
     if (!text || !new RegExp(`^(?:\\d+(?:[.,]\\d{0,${precision}})?|[.,]\\d{1,${precision}})$`).test(text)) return NaN;
@@ -9,7 +8,10 @@
   }
   function round(value, step = 0.01) {
     if (!Number.isFinite(value) || !Number.isFinite(step) || step <= 0) return NaN;
-    return Number((Math.round((value + EPS) / step) * step).toFixed(8));
+    const scaled = value / step;
+    // Correct machine representation error only, not values meaningfully below a tie.
+    const tolerance = Number.EPSILON * Math.max(1, Math.abs(scaled)) * 4;
+    return Number((Math.floor(scaled + 0.5 + tolerance) * step).toFixed(8));
   }
   function summary(entries) {
     let sum = 0, weight = 0, count = 0;
@@ -18,17 +20,31 @@
       const grade = decimal(entry.grade), w = decimal(entry.weight);
       if (!Number.isFinite(grade) || grade < 1 || grade > 6) throw new RangeError('grade');
       if (!Number.isFinite(w) || w < 0.01 || w > 100) throw new RangeError('weight');
-      sum += grade * w; weight += w; count++;
+      // Hundredths keep all accepted inputs exact while accumulating weights.
+      sum += Math.round(grade * 100) * Math.round(w * 100);
+      weight += Math.round(w * 100); count++;
     }
-    return count ? { sum, weight, count, average: sum / weight } : null;
+    return count ? { sum: sum / 10000, weight: weight / 100, count, average: sum / (weight * 100) } : null;
   }
   function neededGrade(current, target, nextWeight, gradeStep, displayStep, basis = 'exact') {
     if (!current || !Number.isFinite(target) || target < 1 || target > 6 || !Number.isFinite(nextWeight) || nextWeight < 0.01 || nextWeight > 100 || ![0.01, 0.1, 0.25, 0.5, 1].includes(gradeStep) || ![0.01, 0.1, 0.5, 1].includes(displayStep) || !['exact', 'display'].includes(basis)) throw new RangeError('planner');
-    // For display-based targets, first find the next attainable displayed value.
-    const threshold = basis === 'display' ? (Math.ceil((target - EPS) / displayStep) - 0.5) * displayStep : target;
-    const raw = (threshold * (current.weight + nextWeight) - current.sum) / nextWeight;
-    const stepped = Number((1 + Math.ceil((raw - 1 - EPS) / gradeStep) * gradeStep).toFixed(8));
-    return { raw, required: Math.max(1, stepped), secured: raw <= 1 + EPS, possible: stepped <= 6 + EPS };
+    // Search the complete finite grade grid (at most 501 grades). Integer
+    // cross-products make exact and half-up boundaries independent of float drift.
+    const targetCents = Math.round(target * 100), roundingCents = Math.round(displayStep * 100);
+    const stepCents = Math.round(gradeStep * 100), nextCents = Math.round(nextWeight * 100);
+    const weightCents = Math.round(current.weight * 100), sumUnits = Math.round(current.sum * 10000);
+    const thresholdTwice = basis === 'display'
+      ? 2 * Math.ceil(targetCents / roundingCents) * roundingCents - roundingCents
+      : 2 * targetCents;
+    const raw = (thresholdTwice / 200 * (current.weight + nextWeight) - current.sum) / nextWeight;
+    let required = null;
+    for (let grade = 100; grade <= 600; grade += stepCents) {
+      if (2 * (sumUnits + grade * nextCents) >= thresholdTwice * (weightCents + nextCents)) {
+        required = grade / 100;
+        break;
+      }
+    }
+    return { raw, required, secured: required === 1, possible: required !== null };
   }
   function clock(minutes) {
     const value = ((Math.round(minutes) % 1440) + 1440) % 1440;

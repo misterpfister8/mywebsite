@@ -5,7 +5,7 @@
   const M = globalThis.WorkshopMath, $ = id => document.getElementById(id);
   const KEY = 'misterpfister-sleep-v2', PREF = 'misterpfister-sleep-saving';
   const defaults = () => ({ mode: 'wake', time: '07:00', hours: 8, minutes: 0, latency: 15 });
-  let state = defaults(), persistent = true, storageBroken = false;
+  let state = defaults(), persistent = true, lastValidState = defaults(), undoPresets = null, undoPresetsAfter = null;
   let presets = [
     { name: 'Früh raus', mode: 'wake', time: '06:30', hours: 8, minutes: 0, latency: 15 },
     { name: 'Später Start', mode: 'wake', time: '09:00', hours: 8, minutes: 0, latency: 15 },
@@ -23,29 +23,26 @@
     M.sleepPlan(value.mode, value.time, value.hours, value.minutes, value.latency);
     return { mode: value.mode, time: value.time, hours: value.hours, minutes: value.minutes, latency: value.latency };
   }
-  try {
-    persistent = localStorage.getItem(PREF) !== 'false';
-    const raw = persistent ? localStorage.getItem(KEY) : null;
-    if (raw) {
-      const data = JSON.parse(raw);
-      if (data.version !== 1 || !Array.isArray(data.presets) || data.presets.length > 10) throw new Error('Ungültige Sicherung');
-      const restored = validState(data.state);
-      const restoredPresets = data.presets.map(preset => {
+  function validateBackup(data) {
+    if (!data || data.version !== 1 || !Array.isArray(data.presets) || data.presets.length > 10) throw new Error('Ungültige Sicherung');
+    return {
+      state: validState(data.state),
+      presets: data.presets.map(preset => {
         if (!preset || typeof preset.name !== 'string' || !preset.name.trim() || preset.name.length > 30) throw new Error('Ungültiges Preset');
         return { name: preset.name, ...validState(preset) };
-      });
-      state = restored; presets = restoredPresets;
-    }
-  } catch { storageBroken = true; }
+      }),
+    };
+  }
+  const storage = globalThis.WorkshopStorage(KEY, PREF, validateBackup);
+  const restored = storage.load();
+  persistent = restored.enabled;
+  if (restored.data) { state = restored.data.state; presets = restored.data.presets; }
+  lastValidState = { ...state };
   $('saveSleep').checked = persistent;
   function persist() {
-    try {
-      localStorage.setItem(PREF, String(persistent));
-      if (!persistent) localStorage.removeItem(KEY);
-      else if (validPlan) localStorage.setItem(KEY, JSON.stringify({ version: 1, state, presets }));
-      $('sleepSaveStatus').textContent = !persistent ? 'Nur für diese Sitzung' : validPlan ? 'Lokal gespeichert' : 'Eingabe nicht gespeichert';
-      $('sleepSaveStatus').dataset.error = String(persistent && !validPlan);
-    } catch { $('sleepSaveStatus').textContent = 'Speichern nicht möglich'; $('sleepSaveStatus').dataset.error = 'true'; }
+    const result = storage.save(persistent, { version: 1, state: lastValidState, presets });
+    $('sleepSaveStatus').textContent = result.text + (persistent && !result.error && !validPlan ? ' Letzte gültige Zeiten beibehalten.' : '');
+    $('sleepSaveStatus').dataset.error = String(result.error);
   }
   function populate() {
     document.querySelector(`input[name="sleepMode"][value="${state.mode}"]`).checked = true;
@@ -81,16 +78,20 @@
       document.querySelector('.sleep-visual').dataset.invalid = 'true';
       $('sleepResultTime').textContent = '—:—'; $('sleepDayLabel').textContent = 'Eingaben prüfen';
       $('durationLabel').textContent = '—'; $('legendDuration').textContent = 'Schlafdauer'; $('legendLatency').textContent = 'Einschlafdauer';
+      ['bedDay', 'onsetDay', 'wakeDay'].forEach(id => $(id).textContent = '—');
       ['bedTimeDisplay', 'onsetTimeDisplay', 'wakeTimeDisplay'].forEach(id => $(id).textContent = '—:—');
       $('sleepSummary').textContent = 'Kein gültiges Ergebnis. Bitte Eingaben prüfen.';
       $('sleepClock').setAttribute('aria-label', '24-Stunden-Uhr. Noch kein gültiger Zeitplan.');
       return;
     }
     const p = validPlan;
+    lastValidState = { ...state };
     $('sleepError').textContent = ''; document.querySelector('.sleep-visual').dataset.invalid = 'false';
     $('sleepResultTime').textContent = M.clock(p.result); $('sleepDayLabel').textContent = p.day;
     $('durationLabel').textContent = M.duration(p.length); $('durationSlider').value = String(p.length);
     $('legendDuration').textContent = `${M.duration(p.length)} Schlaf`; $('legendLatency').textContent = `${p.latency} min Einschlafen`;
+    const day = minutes => minutes < 0 ? 'Vorabend' : minutes >= 1440 ? 'Folgetag' : 'Derselbe Tag';
+    $('bedDay').textContent = day(p.bed); $('onsetDay').textContent = day(p.onset); $('wakeDay').textContent = day(p.wake);
     $('bedTimeDisplay').textContent = M.clock(p.bed); $('onsetTimeDisplay').textContent = M.clock(p.onset); $('wakeTimeDisplay').textContent = M.clock(p.wake);
     $('sleepSummary').textContent = `${p.day} ${state.mode === 'wake' ? 'ins Bett' : 'aufstehen'} · ${M.duration(p.total)} eingeplant.`;
     $('sleepArc').setAttribute('stroke-dasharray', `${p.length} ${1440 - p.length}`);
@@ -106,14 +107,22 @@
       const time = document.createElement('span'); time.textContent = preset.time; use.append(time);
       use.setAttribute('aria-label', `${preset.name}: ${preset.mode === 'wake' ? 'aufstehen' : 'ins Bett'} um ${preset.time}`);
       use.addEventListener('click', () => { state = validState(preset); populate(); render(); persist(); });
-      const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'preset-delete'; remove.textContent = '×';
+      const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'preset-delete'; remove.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg>';
       remove.setAttribute('aria-label', `Preset ${preset.name} löschen`);
-      remove.addEventListener('click', () => { presets.splice(index, 1); renderPresets(); persist(); $('presetHint').textContent = 'Preset gelöscht.'; });
+      remove.addEventListener('click', () => {
+        undoPresets = presets.map(p => ({ ...p })); presets.splice(index, 1);
+        undoPresetsAfter = JSON.stringify(presets);
+        renderPresets(); persist(); $('presetHint').textContent = 'Preset gelöscht.';
+        $('undoPreset').hidden = false; $('undoPreset').focus();
+      });
       chip.append(use, remove); return chip;
     }));
   }
   document.querySelectorAll('input[name="sleepMode"]').forEach(input => input.addEventListener('change', () => { render(); persist(); }));
-  ['anchorTime', 'sleepHours', 'sleepMinutes', 'sleepLatency'].forEach(id => $(id).addEventListener('input', () => { render(); persist(); }));
+  ['anchorTime', 'sleepHours', 'sleepMinutes', 'sleepLatency'].forEach(id => $(id).addEventListener('input', () => {
+    if (id === 'anchorTime' && /^\d{4}$/.test($(id).value)) $(id).value = $(id).value.slice(0, 2) + ':' + $(id).value.slice(2);
+    render(); persist();
+  }));
   $('durationSlider').addEventListener('input', () => {
     const minutes = Number($('durationSlider').value); $('sleepHours').value = String(Math.floor(minutes / 60)); $('sleepMinutes').value = String(minutes % 60); render(); persist();
   });
@@ -132,14 +141,20 @@
     if (!validPlan) { $('presetHint').textContent = 'Bitte zuerst gültige Zeiten einstellen.'; return; }
     const existing = presets.findIndex(preset => preset.name.toLocaleLowerCase('de-CH') === name.toLocaleLowerCase('de-CH'));
     const preset = { name: name.slice(0, 30), ...validState(state) };
-    if (existing >= 0) presets[existing] = preset;
+    if (existing >= 0) { undoPresets = presets.map(p => ({ ...p })); presets[existing] = preset; undoPresetsAfter = JSON.stringify(presets); $('undoPreset').hidden = false; }
     else if (presets.length < 10) presets.push(preset);
     else { $('presetHint').textContent = 'Höchstens zehn Presets. Bitte zuerst eines löschen.'; return; }
     $('presetForm').hidden = true; $('presetName').value = ''; renderPresets(); persist();
-    $('presetHint').textContent = persistent ? 'Preset lokal gespeichert.' : 'Preset für diese Sitzung gemerkt.';
+    $('presetHint').textContent = existing >= 0 ? 'Gleichnamiges Preset ersetzt. Rückgängig ist möglich.' : 'Preset gemerkt. Speicherstatus siehe unten.';
+    $('showPresetForm').focus();
+  });
+  $('undoPreset').addEventListener('click', () => {
+    if (undoPresets && undoPresetsAfter !== JSON.stringify(presets) && !confirm('Rückgängig setzt auch inzwischen hinzugefügte Presets zurück. Trotzdem fortfahren?')) return;
+    if (undoPresets) { presets = undoPresets; undoPresets = null; renderPresets(); persist(); }
+    $('undoPreset').hidden = true; $('presetHint').textContent = 'Preset-Änderung rückgängig gemacht.';
+    $('showPresetForm').focus();
   });
   $('saveSleep').addEventListener('change', () => { persistent = $('saveSleep').checked; persist(); });
   populate(); render(); renderPresets();
-  if (storageBroken) { $('sleepSaveStatus').textContent = 'Sicherung nicht lesbar'; $('sleepSaveStatus').dataset.error = 'true'; }
-  else persist();
+  persist();
 })();
