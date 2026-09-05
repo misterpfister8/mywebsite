@@ -1,80 +1,72 @@
-# misterpfister.net
+# misterpfister.net — Werkplatz 02
 
-Personal digital workshop for Kilian Pfister. Hosted on GitHub Pages with a custom domain.
+Personal digital workshop for Kilian Pfister. Static HTML, CSS and JavaScript,
+served from the root of `main` by GitHub Pages. Preserve `CNAME` and existing URLs.
+No build step, framework, CDN, external font, tracking script or runtime package.
 
-**Live:** [misterpfister.net](https://misterpfister.net)
+## What changed
 
----
+- Selectable CSS-3D tool modules replace the unrelated cube. Pointer motion is
+  smoothed with a short-lived animation frame loop; nothing rotates endlessly.
+  Touch/keyboard selection, explicit pause and reduced motion are supported.
+- Normal links remain available immediately. Cross-document View Transitions
+  progressively connect project cards with the corresponding calculator panel.
+- Grades: weighted mean, raw/rounded values, configurable grade steps and target
+  basis, next-grade scenario, subjects, optional local saving, JSON backup/import,
+  undo for destructive actions, and configurable linear points-to-grade conversion.
+- Sleep: reactive 24-hour dial, wake/bedtime modes, arbitrary bedtime, Now action,
+  minute-precise duration, latency, custom presets and optional local saving.
+  Clock times only: no date/DST handling, alarms or sleep-stage predictions.
+- SpasstoCSV project explanation uses fictional examples only. No password upload.
 
-## Projects
+## Files
 
-| Project | Description | Type |
-|---|---|---|
-| [SpasstoCSV](https://github.com/misterpfister8/spasstocsv) | Local Samsung Pass `.spass` converter for CSV and Bitwarden JSON | Open Source |
-| [Notenrechner](https://misterpfister.net/sechserrechner/) | Weighted calculator for the Swiss 1–6 grade scale | Tool |
-| [Schlafrechner](https://misterpfister.net/sleepcalculator/) | Bedtime and wake-time planner with configurable sleep latency | Tool |
+- `index.html`, `sechserrechner/index.html`, `sleepcalculator/index.html`
+- `assets/site.css`: responsive shared design, CSS 3D, SVG styling, transitions
+- `assets/theme.js`: existing persistent theme control
+- `assets/workbench.js`: home interactions, no navigation interception
+- `assets/tool-math.js`: pure calculator functions, also importable from Node
+- `assets/grades.js`, `assets/sleep.js`: local UI/state logic
+- `tests/math.test.js`, `tests/browser_review.py`: regression tests
+- `docs/REDESIGN_QA.md`: actual checks and explicit verification limits
 
----
+## Local development
 
-## Stack
-
-Pure HTML, CSS, JavaScript — no frameworks, tracking scripts, or build step.
-
-- Shared responsive workshop design in `assets/site.css`
-- CSS 3D sculpture with pointer interaction, pause control, reduced-motion and offscreen handling in `assets/sculpture.js`
-- Persistent dark/light theme handling in `assets/theme.js`
-- System fonts only; no external font requests
-- Semantic HTML and responsive CSS Grid layouts
-- Deployed via GitHub Pages with custom domain (CNAME)
-
----
-
-## Local Development
-
-```bash
-git clone git@github.com:misterpfister8/mywebsite.git
-cd mywebsite
+```sh
 python3 -m http.server 8000
 ```
 
-Open [localhost:8000](http://localhost:8000).
+Open `http://127.0.0.1:8000/` in a browser. No production compilation is required.
 
----
+## Tests
 
-## Structure
-
-```
-mywebsite/
-├── assets/
-│   ├── favicon.svg
-│   ├── site.css
-│   ├── theme.js
-│   └── sculpture.js
-├── index.html
-├── sechserrechner/
-│   └── index.html
-├── sleepcalculator/
-│   └── index.html
-├── CNAME
-└── README.md
+```sh
+node tests/math.test.js
+python3 -m pip install playwright
+python3 -m playwright install chromium
+# In a second terminal, with the HTTP server running:
+python3 tests/browser_review.py --base-url http://127.0.0.1:8000/
 ```
 
----
+For restricted environments only, the browser runner also supports
+`--offline-fixture`. This requires `beautifulsoup4` and embeds the same local
+assets with a simulated Storage object. It is NOT a real navigation or native
+localStorage test. `--chromium /path/to/chromium` selects an existing executable.
+Reports/screenshots go to ignored `test-results/` or an explicit `--output` path.
 
-© 2026 misterpfister.net
+## Data and safety
 
-## Verification
+Inputs are not sent to a server. Local saving can be switched off independently
+for each tool, which removes its saved data. Browser storage is not a durable
+backup: export important grades. Import validates format, size and bounds before
+replacement and supports undo. Imported text is not inserted as HTML.
+Theme preferences keep the existing storage key.
 
-Browser checks cover weighted grades, decimal commas, rounding, target planning,
-invalid inputs, row controls, reset, Enter, sleep modes, midnight rollover,
-320–1440px layouts, theme persistence, reduced motion and navigation.
-With a local server running and Playwright CLI installed:
+The grade target can explicitly apply to either the exact average or its rounded
+appearance. Grade-step settings constrain planned future grades, not historical
+entries. School-specific grading policies remain authoritative.
 
-```bash
-playwright-cli open http://localhost:8000
-playwright-cli run-code "$(cat tests/browser-checks.js)"
-```
+## Deployment
 
-The check function returns a list of passed assertions and throws on failure.
-No build step or runtime dependency is needed. GitHub Pages publishes the root
-of `main`; preserve `CNAME` and push only fast-forward updates.
+Stage related files together, test, then fast-forward `main`. GitHub Pages handles
+publication. Do not force-push or change the hosting/domain configuration.

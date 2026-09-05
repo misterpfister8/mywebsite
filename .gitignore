@@ -1,2 +1,5 @@
 .playwright-cli/
 output/
+test-results/
+__pycache__/
+.venv/

@@ -1,288 +1,49 @@
 <!doctype html>
 <html lang="de-CH">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#111310" />
-    <meta name="description" content="Gewichtete Noten auf der Schweizer Skala von 1 bis 6 berechnen." />
-
-    <title>Notenrechner – misterpfister.net</title>
-
-    <link rel="canonical" href="https://misterpfister.net/sechserrechner/" />
-    <link rel="icon" href="../assets/favicon.svg?v=workplace-1" type="image/svg+xml" />
-    <script src="../assets/theme.js?v=workplace-1"></script>
-    <link rel="stylesheet" href="../assets/site.css?v=workplace-1" />
-  </head>
-  <body class="tool-page">
-    <a class="skip-link" href="#main">Zum Rechner springen</a>
-
-    <header class="tool-header">
-      <div class="tool-nav-inner">
-        <a class="back-link" href="../">← misterpfister.net</a>
-        <button class="theme-toggle" type="button" data-theme-toggle>
-          <svg class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-theme-icon></svg>
-          <span class="sr-only" data-theme-label>Hell</span>
-        </button>
-      </div>
-    </header>
-
-    <main id="main" class="tool-main">
-      <header class="tool-heading">
-        <p class="tool-label">01 / Lernen</p>
-        <h1>Auf Kurs<br>zur <span>Sechs.</span></h1>
-        <p class="tool-subtitle">Der Sechser-Rechner</p>
-        <p>Gewichteten Durchschnitt auf der Schweizer Skala von 1 bis 6 berechnen.</p>
-        <div class="tool-decoration grade-decoration" aria-hidden="true">6<span>.0</span></div>
-        <a class="text-link tool-crosslink" href="../sleepcalculator/">Danach: Schlaf planen ↗</a>
-      </header>
-
-      <section class="tool-surface" aria-label="Noten berechnen">
-        <div class="surface-heading"><span>NOTENRECHNER</span><span>LIVE-BERECHNUNG</span></div>
-        <form id="gradeForm" novalidate>
-          <div class="grade-column-heads" aria-hidden="true">
-            <span>Note</span>
-            <span>Gewicht</span>
-            <span></span>
-          </div>
-          <div id="entries" class="grade-rows"></div>
-
-          <p class="form-hint">Gewicht: 1 = normal, 2 = doppelt.</p>
-
-          <div class="form-actions">
-            <button id="addBtn" class="button button--secondary" type="button">+ Note hinzufügen</button>
-            <button id="resetBtn" class="button button--text" type="button">Zurücksetzen</button>
-          </div>
-
-          <p id="message" class="message" role="status" aria-live="polite"></p>
-
-          <section id="resultArea" class="inline-result" aria-label="Berechnungsergebnis" hidden>
-            <p class="result-caption">Dein gewichteter Schnitt</p>
-            <div class="result-line">
-              <output id="average" class="result-value"></output>
-              <span id="passStatus" class="result-status"></span>
-            </div>
-            <p id="resultLabel" class="result-summary"></p>
-          </section>
-
-          <details class="planner" open>
-            <summary>Welche Note brauche ich als Nächstes?</summary>
-            <div class="planner-grid">
-              <label>
-                <span class="form-label">Zielschnitt</span>
-                <input id="targetAverage" class="form-control" type="text" inputmode="decimal" autocomplete="off" value="4" />
-              </label>
-              <label>
-                <span class="form-label">Nächstes Gewicht</span>
-                <input id="nextWeight" class="form-control" type="text" inputmode="decimal" autocomplete="off" value="1" />
-              </label>
-            </div>
-            <output id="planningResult" class="planner-output" aria-live="polite">Zuerst mindestens eine Note eingeben.</output>
-          </details>
-        </form>
-      </section>
-
-      <p class="disclaimer">Der Durchschnitt wird auf zwei Dezimalstellen gerundet. Status und benötigte Note beziehen sich auf diesen gerundeten Wert; massgebend sind die Regeln deiner Schule.</p>
-    </main>
-
-    <footer class="site-footer">
-      <div class="footer-inner">
-        <span>© 2026 Kilian Pfister</span>
-        <a class="footer-link" href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">GitHub</a>
-      </div>
-    </footer>
-
-    <script>
-      const entriesEl = document.getElementById('entries');
-      const messageEl = document.getElementById('message');
-      const resultAreaEl = document.getElementById('resultArea');
-      const averageEl = document.getElementById('average');
-      const resultLabelEl = document.getElementById('resultLabel');
-      const passStatusEl = document.getElementById('passStatus');
-      const targetAverageEl = document.getElementById('targetAverage');
-      const nextWeightEl = document.getElementById('nextWeight');
-      const planningResultEl = document.getElementById('planningResult');
-
-      let nextEntryId = 1;
-      let currentState = null;
-
-      // Accepts the Swiss comma as well as the dot; NaN for anything else, including empty.
-      function parseDecimal(text) {
-        const normalized = text.trim().replace(',', '.');
-        if (!/^(\d+(\.\d*)?|\.\d+)$/.test(normalized)) return NaN;
-        return Number(normalized);
-      }
-
-      function hasHundredthPrecision(value) {
-        return Math.abs(value * 100 - Math.round(value * 100)) < 0.0000001;
-      }
-
-      function roundToHundredth(value) {
-        return Math.round((value + 0.0000000001) * 100) / 100;
-      }
-
-      function addEntry(values = {}, shouldFocus = false) {
-        const id = nextEntryId++;
-        const row = document.createElement('div');
-        row.className = 'grade-row';
-        row.innerHTML = `
-          <label>
-            <span class="sr-only">Note ${id}</span>
-            <input class="form-control grade-input" type="text" inputmode="decimal" autocomplete="off" placeholder="z. B. 5,25" value="${values.grade ?? ''}" />
-          </label>
-          <label>
-            <span class="sr-only">Gewicht der Note ${id}</span>
-            <input class="form-control weight-input" type="text" inputmode="decimal" autocomplete="off" value="${values.weight ?? '1'}" />
-          </label>
-          <button class="icon-button remove-button" type="button" aria-label="Notenzeile ${id} entfernen" title="Zeile entfernen">×</button>
-        `;
-
-        row.querySelectorAll('input').forEach((input) => {
-          input.addEventListener('input', calculateGrades);
-        });
-
-        row.querySelector('.remove-button').addEventListener('click', () => {
-          const focusRow = row.nextElementSibling || row.previousElementSibling;
-          row.remove();
-          if (!entriesEl.children.length) {
-            addEntry({}, true);
-            return;
-          }
-          calculateGrades();
-          focusRow.querySelector('.grade-input').focus();
-        });
-
-        entriesEl.appendChild(row);
-        calculateGrades();
-        if (shouldFocus) row.querySelector('.grade-input').focus();
-        return row;
-      }
-
-      function clearResult() {
-        currentState = null;
-        resultAreaEl.hidden = true;
-        averageEl.textContent = '';
-        resultLabelEl.textContent = '';
-        passStatusEl.textContent = '';
-        passStatusEl.removeAttribute('data-tone');
-        updatePlanner();
-      }
-
-      function setError(text) {
-        messageEl.textContent = text;
-        clearResult();
-      }
-
-      function calculateGrades() {
-        const rows = Array.from(entriesEl.querySelectorAll('.grade-row'));
-        let weightedSum = 0;
-        let totalWeight = 0;
-        let count = 0;
-
-        messageEl.textContent = '';
-
-        for (const row of rows) {
-          const gradeInput = row.querySelector('.grade-input');
-          const weightInput = row.querySelector('.weight-input');
-          const gradeText = gradeInput.value.trim();
-          const weightText = weightInput.value.trim();
-
-          if (!gradeText) continue;
-
-          const grade = parseDecimal(gradeText);
-          const weight = parseDecimal(weightText);
-
-          if (!Number.isFinite(grade) || grade < 1 || grade > 6 || !hasHundredthPrecision(grade)) {
-            setError('Noten müssen zwischen 1.00 und 6.00 liegen und dürfen höchstens zwei Dezimalstellen haben.');
-            return;
-          }
-
-          if (!Number.isFinite(weight) || weight < 0.01 || weight > 100 || !hasHundredthPrecision(weight)) {
-            setError('Gewichte müssen zwischen 0.01 und 100 liegen und dürfen höchstens zwei Dezimalstellen haben.');
-            return;
-          }
-
-          weightedSum += grade * weight;
-          totalWeight += weight;
-          count += 1;
-        }
-
-        if (!count) {
-          clearResult();
-          return;
-        }
-
-        const average = weightedSum / totalWeight;
-        const roundedAverage = roundToHundredth(average);
-        const passed = roundedAverage >= 4;
-        const formattedWeight = new Intl.NumberFormat('de-CH', { maximumFractionDigits: 2 }).format(totalWeight);
-
-        currentState = { weightedSum, totalWeight, count, average };
-        resultAreaEl.hidden = false;
-        averageEl.textContent = roundedAverage.toFixed(2);
-        passStatusEl.textContent = passed ? 'Gerundet ≥ 4.00' : 'Gerundet < 4.00';
-        passStatusEl.dataset.tone = passed ? 'success' : 'danger';
-        resultLabelEl.textContent = `${count} ${count === 1 ? 'Note' : 'Noten'} · Gesamtgewicht ${formattedWeight}`;
-        updatePlanner();
-      }
-
-      function updatePlanner() {
-        planningResultEl.removeAttribute('data-tone');
-
-        if (!currentState) {
-          planningResultEl.textContent = 'Zuerst mindestens eine Note eingeben.';
-          return;
-        }
-
-        const target = parseDecimal(targetAverageEl.value);
-        const nextWeight = parseDecimal(nextWeightEl.value);
-
-        if (!Number.isFinite(target) || target < 1 || target > 6 || !hasHundredthPrecision(target)
-          || !Number.isFinite(nextWeight) || nextWeight < 0.01 || nextWeight > 100 || !hasHundredthPrecision(nextWeight)) {
-          planningResultEl.textContent = 'Zielschnitt und Gewicht müssen gültig sein und dürfen höchstens zwei Dezimalstellen haben.';
-          planningResultEl.dataset.tone = 'danger';
-          return;
-        }
-
-        // The displayed average is rounded to two decimals, so the target counts as
-        // reached from half a hundredth below it. Planning against the exact target
-        // would demand a higher grade than the status line already accepts.
-        const thresholdAverage = target - 0.005;
-        const required = (thresholdAverage * (currentState.totalWeight + nextWeight) - currentState.weightedSum) / nextWeight;
-        const requiredToHundredth = Math.ceil((required - 0.0000000001) * 100) / 100;
-
-        if (requiredToHundredth <= 1) {
-          planningResultEl.textContent = `Ziel ${target.toFixed(2)} ist bereits gesichert — auch mit einer 1.00.`;
-          planningResultEl.dataset.tone = 'success';
-        } else if (requiredToHundredth > 6) {
-          planningResultEl.textContent = `Nicht erreichbar: selbst eine 6.00 genügt für den Zielschnitt ${target.toFixed(2)} nicht.`;
-          planningResultEl.dataset.tone = 'danger';
-        } else {
-          planningResultEl.textContent = `Benötigte nächste Note: ${requiredToHundredth.toFixed(2)}.`;
-          planningResultEl.dataset.tone = 'success';
-        }
-      }
-
-      function resetCalculator() {
-        entriesEl.replaceChildren();
-        nextEntryId = 1;
-        targetAverageEl.value = '4';
-        nextWeightEl.value = '1';
-        addEntry();
-        addEntry();
-        messageEl.textContent = '';
-        clearResult();
-      }
-
-      document.getElementById('addBtn').addEventListener('click', () => addEntry({}, true));
-      document.getElementById('resetBtn').addEventListener('click', resetCalculator);
-      targetAverageEl.addEventListener('input', updatePlanner);
-      nextWeightEl.addEventListener('input', updatePlanner);
-
-      document.getElementById('gradeForm').addEventListener('submit', (event) => {
-        event.preventDefault();
-        calculateGrades();
-      });
-      resetCalculator();
-    </script>
-  </body>
-</html>
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111310">
+<title>Notenrechner — Dein nächster Schritt · misterpfister.net</title><meta name="description" content="Gewichtete Noten, Zielnoten und Was-wäre-wenn-Szenarien. Fächer lokal speichern, Daten exportieren und Punkte in Noten umrechnen.">
+<link rel="canonical" href="https://misterpfister.net/sechserrechner/">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Notenrechner — Dein nächster Schritt · misterpfister.net"><meta property="og:description" content="Gewichtete Noten, Zielnoten und Was-wäre-wenn-Szenarien. Fächer lokal speichern, Daten exportieren und Punkte in Noten umrechnen.">
+<meta property="og:type" content="website"><meta property="og:locale" content="de_CH">
+<meta property="og:url" content="https://misterpfister.net/sechserrechner/">
+<script src="../assets/theme.js?v=werkplatz-2"></script>
+<link rel="stylesheet" href="../assets/site.css?v=werkplatz-2">
+<script src="../assets/workbench.js?v=werkplatz-2" defer></script><script src="../assets/tool-math.js?v=werkplatz-2" defer></script><script src="../assets/grades.js?v=werkplatz-2" defer></script>
+</head>
+<body class="tool-page grade-page"><a href="#main" class="skip-link">Zum Inhalt springen</a>
+<header class="site-header"><div class="nav-shell wrap">
+<a class="brand" href="../" aria-label="misterpfister.net – Startseite"><span class="brand-mark">m.</span><span class="brand-word">misterpfister<span>.net</span></span></a>
+<a href="../" class="back-link"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg><span>Werkplatz</span></a><nav class="main-nav" aria-label="Hauptnavigation"><a href="../sechserrechner/" aria-current=page>Noten</a><a href="../sleepcalculator/" >Schlaf</a></nav>
+<button type="button" class="theme-toggle" data-theme-toggle aria-label="Farbschema wechseln"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" data-theme-icon aria-hidden="true"></svg><span class="sr-only" data-theme-label>Hell</span></button>
+</div></header><noscript><div class="noscript wrap">Für die Berechnung bitte JavaScript aktivieren. Alle Berechnungen laufen lokal in deinem Browser.</div></noscript>
+<main id="main" class="wrap tool-main">
+<div class="tool-intro"><div><p class="eyebrow"><span class="tool-symbol"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 18V9M12 18V4M19 18v-6"/></svg></span> Dein nächster Schritt</p><h1>Noten. Mit Überblick.</h1><p>Wo du stehst. Was möglich ist. Was du noch brauchst.</p></div><span class="local-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Nur in deinem Browser</span></div>
+<div class="calculator-layout" data-grade-app>
+<section class="panel input-panel" aria-labelledby="entries-title">
+<div class="panel-heading"><h2 id="entries-title">Deine Noten</h2><button type="button" class="text-button" id="loadExample">Beispiel laden</button></div>
+<div class="subject-controls"><label class="field grow">Fach<select id="subjectSelect" aria-label="Fach auswählen"></select></label><button type="button" class="icon-button" id="addSubject" aria-label="Fach hinzufügen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+<form id="subjectForm" class="inline-form" hidden><label class="field grow">Neues Fach<input id="subjectName" maxlength="60" placeholder="Zum Beispiel Mathematik" autocomplete="off"></label><button class="button secondary" type="submit">Anlegen</button><button class="icon-button" type="button" id="cancelSubject" aria-label="Abbrechen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></form>
+<div class="grade-columns" aria-hidden="true"><span>Prüfung (optional)</span><span>Note</span><span>Gewicht</span><span></span></div>
+<form id="gradeForm" novalidate><div id="gradeEntries" class="grade-entries"></div><button class="button secondary add-row" type="button" id="addEntry"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Note hinzufügen</button><button type="submit" class="sr-only">Noten berechnen</button></form>
+<p id="gradeError" class="form-message" role="status"></p>
+<div class="save-row"><label class="check-label"><input type="checkbox" id="saveGrades" checked> Auf diesem Gerät speichern</label><span class="save-status" id="saveStatus" role="status"></span></div>
+<details class="settings-details"><summary>Rundung &amp; Notenschritte <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><div class="field-grid"><label class="field">Anzeige runden auf<select id="rounding"><option value="0.01">0.01 · Hundertstel</option><option value="0.1">0.1 · Zehntel</option><option value="0.5">0.5 · Halbe Note</option><option value="1">1 · Ganze Note</option></select></label><label class="field">Nächste Noten in Schritten von<select id="gradeStep"><option value="0.01">0.01</option><option value="0.1">0.1</option><option value="0.25">0.25</option><option value="0.5">0.5</option><option value="1">1.0</option></select></label></div><p class="fineprint">Die Originalnoten bleiben unverändert. Es wird kaufmännisch auf den gewählten Schritt gerundet. Massgebend sind die Regeln deiner Schule.</p></details>
+<details class="settings-details"><summary>Fach &amp; Datensicherung <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><label class="field">Fach umbenennen<input id="renameSubject" maxlength="60" autocomplete="off"></label><div class="utility-actions"><button class="button secondary" id="exportGrades" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg> Export</button><button class="button secondary" id="importGrades" type="button">Import</button><button class="text-button danger-text" id="deleteSubject" type="button">Fach löschen</button></div><input type="file" id="importFile" accept="application/json,.json" hidden><p class="fineprint">JSON-Export als Sicherung. Ein Import ersetzt die Fächer nach Bestätigung. Browserdaten können gelöscht werden: wichtige Noten zusätzlich exportieren.</p></details>
+</section>
+<section class="panel result-panel" data-transition-target="grade" aria-labelledby="result-title">
+<div class="panel-heading"><h2 id="result-title">Dein Schnitt</h2><span class="tag" id="gradeCount">Noch keine Noten</span></div>
+<div class="grade-metric"><output id="average" aria-label="Gerundeter Notendurchschnitt">—</output><div><span id="averageDetail">Trage deine erste Note ein.</span><span id="averageExact"></span></div></div>
+<div class="grade-scale" role="img" id="gradeScale" aria-label="Notenskala von 1 bis 6"><div class="scale-track"><div class="scale-fill" id="scaleFill"></div><span class="scale-reference" style="left:60%"></span><span class="scale-pointer" id="scalePointer" hidden></span><span class="scale-scenario" id="scenarioPointer" hidden></span></div><div class="scale-labels"><span>1.0</span><span>2.0</span><span>3.0</span><span>4.0</span><span>5.0</span><span>6.0</span></div></div>
+<p class="result-explanation">Gewichtet berechnet. Rundung gemäss deiner Einstellung.</p>
+</section>
+<section class="panel scenario-panel" aria-labelledby="scenario-title"><div class="panel-heading"><h2 id="scenario-title">Was wäre, wenn …</h2><span class="tag">LIVE</span></div><p>… deine nächste Note so ausfällt?</p><div class="scenario-row"><input type="range" id="scenarioSlider" min="1" max="6" step="0.01" value="5" aria-label="Nächste Note simulieren"><label class="field small-field"><span class="sr-only">Simulierte nächste Note</span><input type="text" inputmode="decimal" id="scenarioGrade" value="5.00" aria-label="Simulierte nächste Note"></label></div><div class="scenario-answer"><span>Neuer Schnitt<small id="scenarioWeightLabel">mit Gewicht 1</small></span><output id="scenarioResult">—</output></div><p class="fineprint" id="scenarioHint">Mindestens eine aktuelle Note eingeben.</p></section>
+<section class="panel target-panel" aria-labelledby="target-title"><div class="panel-heading"><h2 id="target-title">Deine Zielnote</h2><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></div><div class="field-grid"><label class="field">Zielschnitt<input type="text" inputmode="decimal" id="targetAverage" value="4.00"></label><label class="field">Gewicht der nächsten Note<input type="text" inputmode="decimal" id="nextWeight" value="1"></label></div><label class="field target-basis">Ziel gilt für<select id="targetBasis"><option value="exact">Ungerundeten Schnitt</option><option value="display">Gerundete Anzeige</option></select></label><div class="target-answer" id="targetResult" role="status">Zuerst eine aktuelle Note eingeben.</div><p class="fineprint" id="targetDetail">Der Planer berücksichtigt deine gewählten Notenschritte.</p></section>
+</div>
+<section class="panel points-panel" aria-labelledby="points-title"><div><p class="eyebrow">Noch ein kleiner Helfer</p><h2 id="points-title">Punkte rein. Note raus.</h2><p class="fineprint">Lineare Formel: Mindestnote + (Punkte ÷ Maximum) × Notenspanne. Nur verwenden, wenn deine Prüfung so bewertet wird.</p></div><div class="points-form"><label class="field">Erreichte Punkte<input type="text" inputmode="decimal" id="pointsEarned" value="45"></label><label class="field">Maximale Punkte<input type="text" inputmode="decimal" id="pointsMax" value="60"></label><label class="field">Mindestnote<input type="text" inputmode="decimal" id="pointsMinGrade" value="1"></label><label class="field">Höchstnote<input type="text" inputmode="decimal" id="pointsMaxGrade" value="6"></label><div class="points-answer"><span>Rechnerische Note</span><output id="pointsResult">4.75</output></div></div></section>
+<p class="privacy-line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Keine Konten. Keine Übertragung deiner Noten. Komma und Punkt werden beide akzeptiert.</p>
+<div class="toast" id="gradeToast" role="status" hidden><span id="toastMessage"></span><button class="text-button" type="button" id="undoAction">Rückgängig</button><button class="icon-button" type="button" id="closeToast" aria-label="Hinweis schliessen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div>
+</main><footer class="site-footer wrap"><span>© 2026 Kilian Pfister</span><span class="footer-note">Kleine Tools. Ohne Umwege.</span><a href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">GitHub <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a></footer>
+</body></html>
