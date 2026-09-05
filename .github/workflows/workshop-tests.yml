@@ -1,0 +1,33 @@
+name: Workshop regression tests
+on:
+  push:
+    branches: [main, codex/interactive-workbench-20260905]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Install test dependencies
+        run: |
+          pip install -r tests/requirements.txt
+          python -m playwright install --with-deps chromium
+      - name: Math and browser tests
+        run: |
+          node tests/math.test.js
+          python -m http.server 8000 > /tmp/workshop-http.log 2>&1 &
+          for i in $(seq 1 20); do curl -sf http://127.0.0.1:8000/ >/dev/null && break; sleep 1; done
+          python tests/browser_review.py
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: workshop-browser-report
+          path: test-results/
+          retention-days: 7
