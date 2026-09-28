@@ -13,10 +13,10 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_CH">
   <meta property="og:url" content="https://misterpfister.net/">
-  <script src="./assets/transitions.js?v=werkplatz-3"></script>
-  <script src="./assets/theme.js?v=werkplatz-3"></script>
-  <link rel="stylesheet" href="./assets/site.css?v=werkplatz-3">
-  <script src="./assets/workbench.js?v=werkplatz-3" defer></script>
+  <script src="./assets/transitions.js?v=werkplatz-4"></script>
+  <script src="./assets/theme.js?v=werkplatz-4"></script>
+  <link rel="stylesheet" href="./assets/site.css?v=werkplatz-4">
+  <script src="./assets/workbench.js?v=werkplatz-4" defer></script>
 </head>
 <body class="home-page">
   <a href="#main" class="skip-link">Zum Inhalt springen</a>
@@ -44,15 +44,15 @@
       </div>
       <div class="workbench" data-workbench data-selection="grade">
         <div class="scene-caption">
-          <span><span class="status-dot"></span> Drei Tools zum Ausprobieren</span>
-          <button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false">Bewegung pausieren</button>
+          <span><span class="status-dot"></span> Zwei Tools und ein Projekt</span>
         </div>
-        <div class="scene" role="group" aria-label="Interaktive Vorschau der Werkzeuge">
+        <!-- Pointer shortcut: the front card opens its tool, the others come forward first. The dock below is the accessible control. -->
+        <div class="scene" aria-hidden="true">
           <div class="scene-grid" aria-hidden="true"></div>
           <div class="scene-stage">
-            <button class="module module-code" type="button" data-module="code" aria-pressed="false" aria-label="SpasstoCSV-Vorschau auswählen"><span class="module-kicker">SpasstoCSV</span><span class="file-badge">.spass</span><span class="file-route"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 4v12h14m-5-5 5 5-5 5"/></svg> <b>.csv</b></span><span class="module-foot">Lokal. In deinem Format.</span></button>
-            <button class="module module-sleep" type="button" data-module="sleep" aria-pressed="false" aria-label="Schlafrechner-Vorschau auswählen"><span class="module-kicker">Schlaf planen</span><div class="mini-clock " aria-hidden="true"><svg viewBox="0 0 160 160"><circle class="mini-clock-track" cx="80" cy="80" r="64"/><circle class="mini-clock-arc" cx="80" cy="80" r="64" pathLength="100" stroke-dasharray="33.3333 66.6667" transform="rotate(-105 80 80)"/><circle class="mini-clock-latency" cx="80" cy="80" r="64" pathLength="1440" stroke-dasharray="15 1425" transform="rotate(-108.75 80 80)"/><circle cx="80" cy="80" r="49" fill="none" stroke="currentColor" stroke-opacity=".15" stroke-dasharray="1 9"/></svg><div><span>INS BETT</span><b>22:45</b></div></div><span class="module-foot">8 h Schlaf <span>07:00 aufstehen</span></span></button>
-            <button class="module module-grade" type="button" data-module="grade" aria-pressed="true" aria-label="Notenrechner-Vorschau auswählen"><span class="module-kicker">Noten berechnen</span><span class="module-grade-label">Beispiel · Schnitt</span><span class="module-score">5<span>.25</span></span><span class="mini-scale"><i></i><b></b></span><span class="module-foot">1.00 <span>6.00</span></span></button>
+            <a class="module module-code" href="https://github.com/misterpfister8/spasstocsv" target="_blank" rel="noopener noreferrer" data-module="code" tabindex="-1"><span class="module-kicker">SpasstoCSV</span><span class="file-badge">.spass</span><span class="file-route"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 4v12h14m-5-5 5 5-5 5"/></svg> <b>.csv</b></span><span class="module-foot">Lokal. In deinem Format.</span></a>
+            <a class="module module-sleep" href="./sleepcalculator/" data-module="sleep" tabindex="-1"><span class="module-kicker">Schlaf planen</span><div class="mini-clock" aria-hidden="true"><svg viewBox="0 0 160 160"><circle class="mini-clock-track" cx="80" cy="80" r="64"/><circle class="mini-clock-arc" cx="80" cy="80" r="64" pathLength="100" stroke-dasharray="33.3333 66.6667" transform="rotate(-105 80 80)"/><circle class="mini-clock-latency" cx="80" cy="80" r="64" pathLength="1440" stroke-dasharray="10 1430" transform="rotate(-107.5 80 80)"/><circle cx="80" cy="80" r="49" fill="none" stroke="currentColor" stroke-opacity=".15" stroke-dasharray="1 9"/></svg><div><span>INS BETT</span><b>22:50</b></div></div><span class="module-foot">8 h Schlaf <span>07:00 aufstehen</span></span></a>
+            <a class="module module-grade" href="./sechserrechner/" data-module="grade" tabindex="-1"><span class="module-kicker">Noten berechnen</span><span class="module-grade-label">Beispiel · Schnitt</span><span class="module-score">5<span>.25</span></span><span class="mini-scale"><i></i><b></b></span><span class="module-foot">1.00 <span>6.00</span></span></a>
           </div>
         </div>
         <div class="scene-dock">
@@ -112,8 +112,8 @@
             <span class="round-arrow"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span>
           </div>
           <div class="sleep-preview" aria-hidden="true">
-            <div class="mini-clock " aria-hidden="true"><svg viewBox="0 0 160 160"><circle class="mini-clock-track" cx="80" cy="80" r="64"/><circle class="mini-clock-arc" cx="80" cy="80" r="64" pathLength="100" stroke-dasharray="33.3333 66.6667" transform="rotate(-105 80 80)"/><circle class="mini-clock-latency" cx="80" cy="80" r="64" pathLength="1440" stroke-dasharray="15 1425" transform="rotate(-108.75 80 80)"/><circle cx="80" cy="80" r="49" fill="none" stroke="currentColor" stroke-opacity=".15" stroke-dasharray="1 9"/></svg><div><span>INS BETT</span><b>22:45</b></div></div>
-            <div class="sleep-preview-time"><span>AUFSTEHEN</span><b>07:00</b><span>8 h Schlaf + 15 min Einschlafen.</span></div>
+            <div class="mini-clock" aria-hidden="true"><svg viewBox="0 0 160 160"><circle class="mini-clock-track" cx="80" cy="80" r="64"/><circle class="mini-clock-arc" cx="80" cy="80" r="64" pathLength="100" stroke-dasharray="33.3333 66.6667" transform="rotate(-105 80 80)"/><circle class="mini-clock-latency" cx="80" cy="80" r="64" pathLength="1440" stroke-dasharray="10 1430" transform="rotate(-107.5 80 80)"/><circle cx="80" cy="80" r="49" fill="none" stroke="currentColor" stroke-opacity=".15" stroke-dasharray="1 9"/></svg><div><span>INS BETT</span><b>22:50</b></div></div>
+            <div class="sleep-preview-time"><span>AUFSTEHEN</span><b>07:00</b><span>8 h Schlaf + 10 min Einschlafen.</span></div>
           </div>
           <div class="card-bottom">
             <h3>Abschalten.<br>Zur richtigen Zeit.</h3>

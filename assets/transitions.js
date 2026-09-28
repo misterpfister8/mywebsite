@@ -18,8 +18,9 @@
     const card = document.querySelector(`[data-transition-card="${tool}"]`);
     const rect = card.getBoundingClientRect();
     const visible = rect.top < innerHeight && rect.bottom > 0;
-    const source = outgoing && clicked?.matches('[data-transition-card]') ? clicked
-      : visible ? card : document.querySelector(`[data-module="${tool}"]`);
+    // Morph from the element that was actually clicked when it shows this tool.
+    const own = outgoing && clicked && (clicked.dataset.transitionCard === tool || clicked.dataset.module === tool) ? clicked : null;
+    const source = own || (visible ? card : document.querySelector(`[data-module="${tool}"]`));
     source.style.viewTransitionName = `${tool}-tool`;
     const cleanup = () => source.style.removeProperty('view-transition-name');
     event.viewTransition.finished.then(cleanup, cleanup);

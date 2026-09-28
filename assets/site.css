@@ -21,7 +21,7 @@ html[data-theme=dark] {
   --shadow: 0 20px 65px #0003;
   --radius: 22px;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-  --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   --ease: cubic-bezier(.22, .75, .2, 1);
 }
 
@@ -443,7 +443,7 @@ svg {
 .hero h1 {
   font-size: clamp(58px, 6.2vw, 88px);
   line-height: 1.015;
-  letter-spacing: -.065em;
+  letter-spacing: -.045em;
   font-weight: 650;
   margin-top: 24px;
 }
@@ -493,24 +493,14 @@ svg {
   gap: 7px;
 }
 
-.motion-toggle {
-  min-height: 44px;
-  padding: 8px 0;
-  background: none;
-  border: 0;
-  color: var(--muted);
-  font: 12px var(--sans);
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-/* The perspective floor is a visual layer; it must not enlarge the page. */
+/* The perspective floor must not widen the page; card shadows may overflow vertically. */
 .scene {
   position: relative;
   height: 423px;
   perspective: 1200px;
   isolation: isolate;
-  overflow: clip;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .scene-grid {
@@ -542,6 +532,7 @@ svg {
   margin: -131px 0 0 -127px;
   padding: 22px;
   text-align: left;
+  text-decoration: none;
   border: 1px solid #e7f7d460;
   border-radius: 23px;
   box-shadow: 1px 2px 0 #f2ffd449, 4px 8px 0 #3a492e, 12px 24px 36px #0004;
@@ -553,11 +544,6 @@ svg {
   flex-direction: column;
   justify-content: space-between;
   pointer-events: auto;
-}
-
-.module:focus-visible {
-  outline: 3px solid var(--ink);
-  outline-offset: 8px;
 }
 
 .module-grade {
@@ -595,13 +581,13 @@ svg {
   display: block;
   font-size: 91px;
   line-height: 1;
-  letter-spacing: -9px;
+  letter-spacing: -.05em;
   font-weight: 600;
 }
 
 .module-score > span {
   font-size: 67px;
-  letter-spacing: -6px;
+  letter-spacing: -.04em;
 }
 
 .module-foot {
@@ -817,8 +803,7 @@ svg {
   color: var(--muted);
 }
 
-.strip-plus,
-.strip-arrow {
+.strip-plus {
   font-size: 20px;
   color: var(--accent);
 }
@@ -972,11 +957,6 @@ svg {
 .preview-stats .forecast strong {
   color: var(--muted);
   font-size: 26px;
-}
-
-.preview-stats small {
-  font-size: 18px;
-  color: var(--accent);
 }
 
 .preview-chart {
@@ -1476,7 +1456,7 @@ svg {
 
 .input-panel {
   grid-column: 1;
-  grid-row: 1/span 3;
+  grid-row: 1/span 2;
 }
 
 .result-panel {
@@ -1485,14 +1465,9 @@ svg {
   overflow: hidden;
 }
 
-.scenario-panel {
+.next-panel {
   grid-column: 2;
   grid-row: 2;
-}
-
-.target-panel {
-  grid-column: 2;
-  grid-row: 3;
 }
 
 .subject-controls {
@@ -1643,6 +1618,13 @@ svg {
   white-space: nowrap;
 }
 
+/* Placeholders read as "no value yet", not as a coloured bar. */
+.panel output[data-state=empty] {
+  color: var(--faint);
+  font-weight: 400;
+  letter-spacing: .02em;
+}
+
 .grade-metric > div {
   display: flex;
   flex-direction: column;
@@ -1712,15 +1694,60 @@ svg {
 }
 
 .result-explanation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
   font-size: 12px;
   color: var(--muted);
   margin-top: 16px;
 }
 
-.scenario-panel > p:not(.fineprint) {
+.scale-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scale-key i {
+  display: block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.scale-key .key-current {
+  background: var(--accent);
+}
+
+.scale-key .key-scenario {
+  border: 2px solid var(--lavender);
+}
+
+.scale-key .key-reference {
+  width: 1px;
+  height: 12px;
+  border-radius: 0;
+  background: var(--muted);
+  opacity: .5;
+}
+
+.next-block {
+  border-top: 1px solid var(--rule);
+  margin-top: 20px;
+  padding-top: 18px;
+}
+
+.next-block h3 {
+  font-size: 16px;
+  font-weight: 550;
+  letter-spacing: -.3px;
+}
+
+.next-lead {
   font-size: 14px;
   color: var(--muted);
-  margin-top: -7px;
+  margin-top: 2px;
 }
 
 .scenario-row {
@@ -1738,10 +1765,6 @@ svg {
 .small-field input {
   text-align: center;
   padding: 8px;
-}
-
-.scenario-weight-field {
-  margin-bottom: 18px;
 }
 
 input[type=range] {
@@ -1819,7 +1842,10 @@ input[type=range]::-moz-range-thumb {
   font-variant-numeric: tabular-nums;
 }
 
-.target-basis {
+.target-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
   margin-top: 14px;
 }
 
@@ -1839,9 +1865,72 @@ input[type=range]::-moz-range-thumb {
   color: var(--danger);
 }
 
-.target-panel > .fineprint {
-  font-size: 14px;
+.target-answer + .fineprint {
   margin-top: 9px;
+}
+
+.overview-panel {
+  margin-top: 22px;
+}
+
+.overview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.overview-table th,
+.overview-table td {
+  padding: 2px 0;
+  border-bottom: 1px solid var(--rule);
+  text-align: left;
+  font-weight: 400;
+}
+
+.overview-table thead th {
+  padding-bottom: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.overview-table thead th + th,
+.overview-table td {
+  text-align: right;
+  padding-left: 16px;
+}
+
+.overview-table tbody .text-button {
+  color: var(--ink);
+  text-align: left;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.overview-table tbody .text-button:hover {
+  text-decoration: underline;
+}
+
+.overview-table tr[aria-current=true] .text-button,
+.overview-table tr[aria-current=true] td:last-child {
+  color: var(--accent);
+  font-weight: 550;
+}
+
+.overview-table tfoot th,
+.overview-table tfoot td {
+  border-bottom: 0;
+  padding-top: 12px;
+  font-weight: 550;
+}
+
+.overview-table tfoot td {
+  font-size: 22px;
+  color: var(--accent);
+}
+
+.overview-panel > .fineprint {
+  margin-top: 12px;
 }
 
 .points-panel {
@@ -1885,6 +1974,15 @@ input[type=range]::-moz-range-thumb {
   font-size: 29px;
   letter-spacing: -1px;
   color: var(--accent);
+  white-space: nowrap;
+}
+
+.points-answer.points-needed {
+  grid-column: 2/-1;
+  align-self: end;
+  min-height: 46px;
+  padding-top: 0;
+  border-top: 0;
 }
 
 #pointsError {
@@ -2049,6 +2147,34 @@ input[type=range]::-moz-range-thumb {
 .duration-heading > span {
   font: 14px var(--mono);
   color: var(--accent);
+}
+
+.duration-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.duration-presets button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--control-rule);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.duration-presets button:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.duration-presets button[aria-pressed=true] {
+  background: var(--surface-2);
+  border-color: var(--accent);
+  color: var(--ink);
 }
 
 .duration-fields {
@@ -2305,14 +2431,6 @@ input[type=range]::-moz-range-thumb {
   font-variant-numeric: tabular-nums;
 }
 
-.sleep-summary {
-  text-align: center;
-  font-size: 14px;
-  color: var(--muted);
-  margin-top: 20px;
-  min-height: 18px;
-}
-
 .sleep-visual[data-invalid=true] .clock-arc,
 .sleep-visual[data-invalid=true] .latency-arc {
   opacity: 0;
@@ -2376,13 +2494,19 @@ input[type=range]::-moz-range-thumb {
   view-transition-name: sleep-tool;
 }
 
-.motion-paused .module,
-.motion-paused .scene-stage {
-  transition: none !important;
+/* Keep the result in view while adjusting inputs on wide screens. */
+@media (min-width: 681px) and (min-height: 720px) {
+  .sleep-visual {
+    position: sticky;
+    top: 16px;
+  }
 }
 
-.motion-paused .scene-stage {
-  transform: none !important;
+@media (min-width: 681px) {
+  .input-panel.fits-viewport {
+    position: sticky;
+    top: 16px;
+  }
 }
 
 /* Responsive layers, from wide to narrow. */
@@ -2850,151 +2974,12 @@ input[type=range]::-moz-range-thumb {
     margin-top: 8px;
   }
 
+  /* The spatial preview repeats the tool cards below; phones go straight to the cards. */
   .workbench {
-    margin-top: 4px;
-  }
-
-  .scene-caption {
-    position: relative;
-    z-index: 2;
-  }
-
-  .scene-caption,
-  .scene-caption > span,
-  .motion-toggle {
-    font-size: 11px;
-  }
-
-  .scene {
-    max-width: 420px;
-    margin: 0 auto;
-    height: 218px;
-    width: 100%;
-  }
-
-  .scene-grid {
-    inset: 0 0 -20%;
-  }
-
-  .scene-stage {
-    scale: 1;
-  }
-
-  .module {
-    width: 190px;
-    height: 174px;
-    margin: -87px 0 0 -95px;
-    padding: 14px;
-    border-radius: 16px;
-  }
-
-  .module-grade {
-    transform: translate3d(-47px, 5px, 45px) rotateX(8deg) rotateY(-8deg) rotateZ(-7deg);
-  }
-
-  .module-sleep {
-    transform: translate3d(92px, 27px, -25px) rotateZ(9deg) scale(.73);
-  }
-
-  .module-code {
-    transform: translate3d(74px, -56px, -55px) rotateZ(8deg) scale(.64);
-  }
-
-  .module-grade-label {
-    margin-top: 3px;
-    font-size: 13px;
-  }
-
-  .module-score {
-    font-size: 58px;
-    letter-spacing: -4px;
-  }
-
-  .module-score > span {
-    font-size: 48px;
-    letter-spacing: -3px;
-  }
-
-  .module-foot,
-  .module-foot > span {
-    font-size: 11px;
-    margin-top: 5px;
-  }
-
-  .mini-scale {
-    margin-top: 8px;
-  }
-
-  .module-sleep .mini-clock {
-    width: 112px;
-    height: 112px;
-  }
-
-  .module-sleep .mini-clock b {
-    font-size: 26px;
-  }
-
-  .file-badge {
-    font-size: 24px;
-    margin-top: 8px;
-  }
-
-  .file-route b {
-    font-size: 30px;
-  }
-
-  .workbench[data-selection=sleep] .module-sleep {
-    transform: translate3d(2px, 1px, 70px) rotateZ(4deg);
-  }
-
-  .workbench[data-selection=sleep] .module-grade {
-    transform: translate3d(-92px, 16px, -40px) rotateZ(-12deg) scale(.7);
-  }
-
-  .workbench[data-selection=sleep] .module-code {
-    transform: translate3d(88px, -37px, -50px) rotateZ(10deg) scale(.65);
-  }
-
-  .workbench[data-selection=code] .module-code {
-    transform: translate3d(0, 0, 70px) rotateZ(-3deg);
-  }
-
-  .workbench[data-selection=code] .module-grade {
-    transform: translate3d(-90px, 17px, -45px) rotateZ(-12deg) scale(.7);
-  }
-
-  .workbench[data-selection=code] .module-sleep {
-    transform: translate3d(92px, 25px, -40px) rotateZ(12deg) scale(.68);
-  }
-
-  .scene-dock {
-    margin-top: 0;
-    padding: 4px;
-  }
-
-  .scene-switches button {
-    font-size: 13px;
-    padding: 9px 12px;
-  }
-
-  .scene-note {
-    font-size: 12px;
-    line-height: 1.4;
-    min-height: 34px;
-    margin-top: 8px;
+    display: none;
   }
 
   .discipline-strip {
-    display: none;
-    gap: 8px;
-    padding: 16px 0;
-  }
-
-  .strip-plus {
-    font-size: 14px;
-  }
-
-  .strip-arrow {
     display: none;
   }
 
@@ -3005,12 +2990,6 @@ input[type=range]::-moz-range-thumb {
   .section-heading {
     align-items: start;
     margin-bottom: 18px;
-  }
-
-  .section-heading .eyebrow {
-    font-size: 8px;
-    margin-bottom: 10px;
-    letter-spacing: 1px;
   }
 
   .section-heading .eyebrow,
@@ -3032,10 +3011,6 @@ input[type=range]::-moz-range-thumb {
   .about-section h2 {
     font-size: 35px;
     letter-spacing: -1.8px;
-  }
-
-  .section-note {
-    padding-top: 30px;
   }
 
   .tool-grid {
@@ -3229,12 +3204,8 @@ input[type=range]::-moz-range-thumb {
     order: 1;
   }
 
-  .scenario-panel {
+  .next-panel {
     order: 2;
-  }
-
-  .target-panel {
-    order: 3;
   }
 
   .result-panel .panel-heading {
@@ -3357,6 +3328,11 @@ input[type=range]::-moz-range-thumb {
 
   .points-form {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .points-answer.points-needed {
+    grid-column: 1/-1;
+    min-height: 0;
   }
 
   /* Undo stays in document flow on phones, away from keyboards and form actions. */
@@ -3482,20 +3458,6 @@ input[type=range]::-moz-range-thumb {
     font-size: 11px;
   }
 
-  .sleep-summary {
-    grid-column: 1/-1;
-    grid-row: 4;
-    margin-top: 10px;
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    min-height: 0;
-    padding: 0;
-    border: 0;
-  }
-
   .sleep-controls {
     order: 1;
   }
@@ -3577,27 +3539,6 @@ input[type=range]::-moz-range-thumb {
   .hero-actions .icon {
     width: 14px;
     height: 14px;
-  }
-
-  .scene-switches button {
-    padding-inline: 10px;
-  }
-
-  .scene-caption > span {
-    font-size: 10px;
-    max-width: 146px;
-  }
-
-  .scene-note {
-    font-size: 12px;
-  }
-
-  .scene-stage {
-    scale: .93;
-  }
-
-  .section-heading .section-note {
-    font-size: 7px;
   }
 
   .sleep-preview-time > b {

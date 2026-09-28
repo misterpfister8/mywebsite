@@ -46,6 +46,14 @@
     }
     return { raw, required, secured: required === 1, possible: required !== null };
   }
+  // Lenient 24-hour input: 07:00, 7:00, 7.00, 7,00, 0700, 700 or 7. Returns HH:MM or ''.
+  function parseTime(value) {
+    const text = String(value ?? '').trim();
+    const match = /^(\d{1,2})(?:[:.,](\d{2}))?$/.exec(text) || /^(\d{1,2})(\d{2})$/.exec(text);
+    if (!match) return '';
+    const h = Number(match[1]), m = Number(match[2] ?? 0);
+    return h <= 23 && m <= 59 ? `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}` : '';
+  }
   function clock(minutes) {
     const value = ((Math.round(minutes) % 1440) + 1440) % 1440;
     return `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
@@ -72,7 +80,11 @@
     if (![earned, maxPoints, low, high].every(Number.isFinite) || earned < 0 || maxPoints <= 0 || maxPoints > 1e6 || earned > maxPoints || low < 1 || high > 6 || high <= low) return NaN;
     return low + (earned / maxPoints) * (high - low);
   }
-  const api = Object.freeze({ decimal, round, summary, neededGrade, clock, duration, sleepPlan, points });
+  function pointsFor(target, maxPoints, low = 1, high = 6) {
+    if (![target, maxPoints, low, high].every(Number.isFinite) || maxPoints <= 0 || maxPoints > 1e6 || low < 1 || high > 6 || high <= low || target < low || target > high) return NaN;
+    return (target - low) / (high - low) * maxPoints;
+  }
+  const api = Object.freeze({ decimal, round, summary, neededGrade, parseTime, clock, duration, sleepPlan, points, pointsFor });
   globalThis.WorkshopMath = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })();

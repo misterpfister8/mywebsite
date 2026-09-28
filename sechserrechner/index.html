@@ -13,13 +13,13 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_CH">
   <meta property="og:url" content="https://misterpfister.net/sechserrechner/">
-  <script src="../assets/transitions.js?v=werkplatz-3"></script>
-  <script src="../assets/theme.js?v=werkplatz-3"></script>
-  <link rel="stylesheet" href="../assets/site.css?v=werkplatz-3">
-  <script src="../assets/workbench.js?v=werkplatz-3" defer></script>
-  <script src="../assets/tool-storage.js?v=werkplatz-3" defer></script>
-  <script src="../assets/tool-math.js?v=werkplatz-3" defer></script>
-  <script src="../assets/grades.js?v=werkplatz-3" defer></script>
+  <script src="../assets/transitions.js?v=werkplatz-4"></script>
+  <script src="../assets/theme.js?v=werkplatz-4"></script>
+  <link rel="stylesheet" href="../assets/site.css?v=werkplatz-4">
+  <script src="../assets/workbench.js?v=werkplatz-4" defer></script>
+  <script src="../assets/tool-storage.js?v=werkplatz-4" defer></script>
+  <script src="../assets/tool-math.js?v=werkplatz-4" defer></script>
+  <script src="../assets/grades.js?v=werkplatz-4" defer></script>
 </head>
 <body class="tool-page grade-page">
   <a href="#main" class="skip-link">Zum Inhalt springen</a>
@@ -67,6 +67,11 @@
         </div>
         <div class="compact-result" id="compactResult" hidden><span id="compactAverage"></span><a href="#result-title">Zum Ergebnis</a></div>
         <form id="gradeForm" novalidate><div id="gradeEntries" class="grade-entries"></div><button class="button secondary add-row" type="button" id="addEntry"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Note hinzufügen</button><button type="submit" class="sr-only">Noten berechnen</button></form>
+        <div class="toast" id="gradeToast" role="status" hidden>
+          <span id="toastMessage"></span>
+          <button class="text-button" type="button" id="undoAction">Rückgängig</button>
+          <button class="icon-button" type="button" id="closeToast" aria-label="Hinweis schliessen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
+        </div>
         <p class="fineprint input-limits">Noten 1–6 · Gewicht 0.01–100 · höchstens 2 Dezimalstellen.</p>
         <p id="gradeError" class="form-message" role="status"></p>
         <div class="save-row">
@@ -99,7 +104,7 @@
           <span class="tag" id="gradeCount">Noch keine Noten</span>
         </div>
         <div class="grade-metric" aria-live="polite" aria-atomic="true">
-          <output id="average" aria-label="Gerundeter Notendurchschnitt">—</output>
+          <output id="average" aria-label="Gerundeter Notendurchschnitt" data-state="empty">-.--</output>
           <div>
             <span id="averageDetail">Trage deine erste Note ein.</span>
             <span id="averageExact"></span>
@@ -116,44 +121,59 @@
             <span>6.0</span>
           </div>
         </div>
-        <p class="result-explanation">Lime: aktuell · Violett: Simulation. Die 4 dient nur als Orientierung, nicht als Bestehensgarantie.</p>
+        <p class="result-explanation"><span class="scale-key"><i class="key-current"></i>Aktuell</span><span class="scale-key"><i class="key-scenario"></i>Simulation</span><span class="scale-key"><i class="key-reference"></i>4.0: Orientierung, keine Bestehensgarantie</span></p>
       </section>
-      <section class="panel scenario-panel" aria-labelledby="scenario-title">
+      <section class="panel next-panel" aria-labelledby="next-title">
         <div class="panel-heading">
-          <h2 id="scenario-title">Was wäre, wenn …</h2>
-          <span class="tag">Simulation</span>
+          <h2 id="next-title">Deine nächste Note</h2>
+          <span class="tag">Planung</span>
         </div>
-        <p>… deine nächste Note so ausfällt?</p>
-        <div class="scenario-row">
-          <input type="range" id="scenarioSlider" min="1" max="6" step="0.01" value="5" aria-label="Nächste Note simulieren">
-          <label class="field small-field"><span class="sr-only">Simulierte nächste Note</span><input type="text" inputmode="decimal" id="scenarioGrade" value="5.00" aria-label="Simulierte nächste Note"></label>
+        <label class="field">Gewicht der nächsten Note<input type="text" inputmode="decimal" id="nextWeight" value="1" maxlength="20"></label>
+        <div class="next-block" role="group" aria-labelledby="scenario-title">
+          <h3 id="scenario-title">Was wäre, wenn …</h3>
+          <p class="next-lead">… deine nächste Note so ausfällt?</p>
+          <div class="scenario-row">
+            <input type="range" id="scenarioSlider" min="1" max="6" step="0.01" value="5" aria-label="Nächste Note simulieren">
+            <label class="field small-field"><span class="sr-only">Simulierte nächste Note</span><input type="text" inputmode="decimal" id="scenarioGrade" value="5.00" aria-label="Simulierte nächste Note"></label>
+          </div>
+          <div class="scenario-answer" aria-live="polite" aria-atomic="true">
+            <span>Neuer Schnitt<small id="scenarioWeightLabel">mit Gewicht 1</small></span>
+            <output id="scenarioResult" data-state="empty">-.--</output>
+          </div>
+          <p class="fineprint" id="scenarioHint">Mindestens eine aktuelle Note eingeben.</p>
         </div>
-        <label class="field scenario-weight-field">Gewicht der simulierten Note<input type="text" inputmode="decimal" id="scenarioWeight" value="1" maxlength="20"></label>
-        <div class="scenario-answer" aria-live="polite" aria-atomic="true">
-          <span>Neuer Schnitt<small id="scenarioWeightLabel">mit Gewicht 1</small></span>
-          <output id="scenarioResult">—</output>
+        <div class="next-block" role="group" aria-labelledby="target-title">
+          <h3 id="target-title">Deine Zielnote</h3>
+          <div class="target-grid">
+            <label class="field">Zielschnitt<input type="text" inputmode="decimal" id="targetAverage" value="4.00"></label>
+            <label class="field">Ziel gilt für<select id="targetBasis"><option value="exact">Ungerundeten Schnitt</option><option value="display">Gerundete Anzeige</option></select></label>
+          </div>
+          <div class="target-answer" id="targetResult" role="status">Zuerst eine aktuelle Note eingeben.</div>
+          <p class="fineprint" id="targetDetail">Der Planer berücksichtigt deine gewählten Notenschritte.</p>
         </div>
-        <p class="fineprint" id="scenarioHint">Mindestens eine aktuelle Note eingeben.</p>
-      </section>
-      <section class="panel target-panel" aria-labelledby="target-title">
-        <div class="panel-heading">
-          <h2 id="target-title">Deine Zielnote</h2>
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg>
-        </div>
-        <div class="field-grid">
-          <label class="field">Zielschnitt<input type="text" inputmode="decimal" id="targetAverage" value="4.00"></label>
-          <label class="field">Gewicht der nächsten Note<input type="text" inputmode="decimal" id="nextWeight" value="1"></label>
-        </div>
-        <label class="field target-basis">Ziel gilt für<select id="targetBasis"><option value="exact">Ungerundeten Schnitt</option><option value="display">Gerundete Anzeige</option></select></label>
-        <div class="target-answer" id="targetResult" role="status">Zuerst eine aktuelle Note eingeben.</div>
-        <p class="fineprint" id="targetDetail">Der Planer berücksichtigt deine gewählten Notenschritte.</p>
       </section>
     </div>
+    <section class="panel overview-panel" id="overviewPanel" aria-labelledby="overview-title" hidden>
+      <div class="panel-heading">
+        <h2 id="overview-title">Alle Fächer</h2>
+        <span class="tag" id="overviewCount"></span>
+      </div>
+      <table class="overview-table">
+        <thead>
+          <tr><th scope="col">Fach</th><th scope="col">Noten</th><th scope="col">Schnitt</th></tr>
+        </thead>
+        <tbody id="overviewRows"></tbody>
+        <tfoot>
+          <tr><th scope="row" colspan="2">Gesamtschnitt</th><td id="overviewAverage">–</td></tr>
+        </tfoot>
+      </table>
+      <p class="fineprint">Mittel der gerundeten Fachschnitte, jeweils mit der Rundung des Fachs. Massgebend sind die Regeln deiner Schule.</p>
+    </section>
     <section class="panel points-panel" aria-labelledby="points-title">
       <div>
         <p class="eyebrow">Noch ein kleiner Helfer</p>
         <h2 id="points-title">Punkte rein. Note raus.</h2>
-        <p class="fineprint">Lineare Formel: Mindestnote + (Punkte ÷ Maximum) × Notenspanne. Nur verwenden, wenn deine Prüfung so bewertet wird.</p>
+        <p class="fineprint">Lineare Formel: Mindestnote + (Punkte ÷ Maximum) × Notenspanne. Nur verwenden, wenn deine Prüfung so bewertet wird. Nötige Punkte sind ein Mindestwert: bei ganzen oder halben Punkten aufrunden.</p>
       </div>
       <div class="points-form">
         <label class="field">Erreichte Punkte<input type="text" inputmode="decimal" id="pointsEarned" value="45"></label>
@@ -164,15 +184,15 @@
           <span>Rechnerische Note</span>
           <output id="pointsResult">4.75</output>
         </div>
+        <label class="field">Wunschnote<input type="text" inputmode="decimal" id="pointsTarget" value="4"></label>
+        <div class="points-answer points-needed" aria-live="polite" aria-atomic="true">
+          <span id="pointsNeededLabel">Nötig für eine 4.00</span>
+          <output id="pointsNeeded">36 von 60</output>
+        </div>
         <p id="pointsError" class="form-message" role="status"></p>
       </div>
     </section>
     <p class="privacy-line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Keine Konten. Keine Übertragung deiner Noten. Komma und Punkt werden beide akzeptiert.</p>
-    <div class="toast" id="gradeToast" role="status" hidden>
-      <span id="toastMessage"></span>
-      <button class="text-button" type="button" id="undoAction">Rückgängig</button>
-      <button class="icon-button" type="button" id="closeToast" aria-label="Hinweis schliessen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
-    </div>
   </main>
   <footer class="site-footer wrap">
     <span>© 2026 Kilian Pfister</span>

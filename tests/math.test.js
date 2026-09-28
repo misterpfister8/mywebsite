@@ -86,4 +86,13 @@ eq(M.sleepPlan('bed', '22:00', 2, 0, 0).day, 'Am Folgetag');
 eq(M.sleepPlan('wake', '08:15', 8, 0, 15).day, 'Am selben Tag');
 eq(M.clock(M.sleepPlan('wake', '00:00', 1, 0, 0).bed), '23:00');
 for (const args of [['bed', '00:00', 0, 59, 0], ['bed', '00:00', 8.1, 0, 0], ['bed', '00:00', 8, 0, -1], ['wake', '00:00', 8, NaN, 0]]) throws(() => M.sleepPlan(...args));
+// Lenient 24-hour input: separators, missing leading zero, digits only, hour only.
+for (const [input, expected] of [['07:00', '07:00'], ['7:00', '07:00'], ['7.00', '07:00'], ['07.30', '07:30'], ['7,30', '07:30'], ['0700', '07:00'], ['700', '07:00'], ['2330', '23:30'], ['7', '07:00'], ['23', '23:00'], ['0', '00:00'], [' 6.45 ', '06:45'], ['23:59', '23:59']]) eq(M.parseTime(input), expected);
+for (const input of ['', '24:00', '24', '7:5', '12:60', '999', '07:000', 'abc', '7h30', '-1', '12:3O', null, undefined]) eq(M.parseTime(input), '');
+// Every canonical clock value survives parsing and every digit-only form maps to it.
+for (let t = 0; t < 1440; t++) { const c = M.clock(t); eq(M.parseTime(c), c); eq(M.parseTime(c.replace(':', '')), c); eq(M.parseTime(c.replace(':', '.')), c); }
+near(M.pointsFor(4, 60), 36); near(M.pointsFor(6, 60), 60); near(M.pointsFor(1, 60), 0); near(M.pointsFor(4, 47), 28.2); near(M.pointsFor(4, 60, 2, 6), 30);
+for (const args of [[0.5, 60], [6.01, 60], [4, 0], [4, 1e6 + 1], [4, 60, 6, 6], [NaN, 60], [4, 60, 0.5, 6]]) { assert.ok(Number.isNaN(M.pointsFor(...args))); checks++; }
+// The inverse is exact for the linear formula.
+for (const max of [10, 47, 60, 100]) for (const target of [1, 3.5, 4, 4.25, 5.5, 6]) near(M.points(M.pointsFor(target, max), max), target);
 console.log(`PASS: ${checks} mathematical assertions (including exhaustive grade-step comparisons).`);

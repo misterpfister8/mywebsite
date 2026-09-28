@@ -20,15 +20,15 @@ with sync_playwright() as w, tempfile.TemporaryDirectory(prefix='misterpfister-p
     assert p.locator('#average').inner_text() == '5.50'
     p.locator('.grade-weight').first.fill('')
     p.goto(args.base_url+'sleepcalculator/')
-    assert p.locator('#sleepResultTime').inner_text() == '22:30'
+    assert p.locator('#sleepResultTime').inner_text() == '22:35'
     p.locator('#sleepHours').fill(''); c.close()
     c,p = launch(); p.goto(args.base_url+'sechserrechner/')
     assert p.locator('.grade-weight').first.input_value() == ''
     assert p.locator('.grade-grade').nth(1).input_value() == '6'
-    assert p.locator('#average').inner_text() == '—'
+    assert p.locator('#average').inner_text() == '-.--'
     p.locator('#saveGrades').uncheck()
     p.goto(args.base_url+'sleepcalculator/')
-    assert p.locator('#sleepResultTime').inner_text() == '22:30'
+    assert p.locator('#sleepResultTime').inner_text() == '22:35'
     p.locator('#saveSleep').uncheck(); c.close()
     c,p = launch()
     for route,checkbox,key in [('sechserrechner/','#saveGrades','misterpfister-grades-v2'),('sleepcalculator/','#saveSleep','misterpfister-sleep-v2')]:
@@ -45,7 +45,7 @@ with sync_playwright() as w, tempfile.TemporaryDirectory(prefix='misterpfister-p
         assert p.locator('#average').inner_text() == '5.25'
         assert p.locator('#saveStatus').get_attribute('data-error') == 'true'
         p.goto(args.base_url+'sleepcalculator/'); p.locator('#anchorTime').fill('06:45')
-        assert p.locator('#sleepResultTime').inner_text() == '22:30'
+        assert p.locator('#sleepResultTime').inner_text() == '22:35'
         assert p.locator('#sleepSaveStatus').get_attribute('data-error') == 'true'
         browser.close()
 print('PASS: native profile restart, incomplete drafts, last valid sleep state, opt-out' + (' and browser-disabled storage' if args.browser=='chromium' else ''))

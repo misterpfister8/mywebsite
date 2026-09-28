@@ -4,11 +4,11 @@
   if (!document.querySelector('[data-sleep-app]')) return;
   const M = globalThis.WorkshopMath, $ = id => document.getElementById(id);
   const KEY = 'misterpfister-sleep-v2', PREF = 'misterpfister-sleep-saving';
-  const defaults = () => ({ mode: 'wake', time: '07:00', hours: 8, minutes: 0, latency: 15 });
+  const defaults = () => ({ mode: 'wake', time: '07:00', hours: 8, minutes: 0, latency: 10 });
   let state = defaults(), persistent = true, lastValidState = defaults(), undoPresets = null, undoPresetsAfter = null;
   let presets = [
-    { name: 'Früh raus', mode: 'wake', time: '06:30', hours: 8, minutes: 0, latency: 15 },
-    { name: 'Später Start', mode: 'wake', time: '09:00', hours: 8, minutes: 0, latency: 15 },
+    { name: 'Früh raus', mode: 'wake', time: '06:30', hours: 8, minutes: 0, latency: 10 },
+    { name: 'Später Start', mode: 'wake', time: '09:00', hours: 8, minutes: 0, latency: 10 },
   ];
   let validPlan = null;
   // Decorative half-hour ticks. The clock remains usable without this detail.
@@ -52,7 +52,7 @@
   }
   function readInteger(id) { return $(id).value.trim() === '' ? NaN : Number($(id).value); }
   function read() {
-    return { mode: document.querySelector('input[name="sleepMode"]:checked').value, time: $('anchorTime').value, hours: readInteger('sleepHours'), minutes: readInteger('sleepMinutes'), latency: readInteger('sleepLatency') };
+    return { mode: document.querySelector('input[name="sleepMode"]:checked').value, time: M.parseTime($('anchorTime').value), hours: readInteger('sleepHours'), minutes: readInteger('sleepMinutes'), latency: readInteger('sleepLatency') };
   }
   const angles = new Map();
   function rotate(id, minutes) {
@@ -74,12 +74,13 @@
       validPlan = null;
       const errorFields = error.message === 'time' ? ['anchorTime'] : error.message === 'latency' ? ['sleepLatency'] : ['sleepHours', 'sleepMinutes'];
       errorFields.forEach(id => $(id).setAttribute('aria-invalid', 'true'));
-      $('sleepError').textContent = error.message === 'time' ? 'Bitte eine gültige Uhrzeit wählen.' : error.message === 'latency' ? 'Einschlafdauer: 0–180 ganze Minuten.' : 'Schlafdauer: 1–16 Stunden. Minuten: 0–59, jeweils ganze Zahlen.';
+      $('sleepError').textContent = error.message === 'time' ? 'Bitte eine gültige Uhrzeit eingeben, z. B. 07:00 oder 7.00.' : error.message === 'latency' ? 'Einschlafdauer: 0–180 ganze Minuten.' : 'Schlafdauer: 1–16 Stunden. Minuten: 0–59, jeweils ganze Zahlen.';
       document.querySelector('.sleep-visual').dataset.invalid = 'true';
       $('sleepResultTime').textContent = '—:—'; $('sleepDayLabel').textContent = 'Eingaben prüfen';
       $('durationLabel').textContent = '—'; $('legendDuration').textContent = 'Schlafdauer'; $('legendLatency').textContent = 'Einschlafdauer';
       ['bedDay', 'onsetDay', 'wakeDay'].forEach(id => $(id).textContent = '—');
       ['bedTimeDisplay', 'onsetTimeDisplay', 'wakeTimeDisplay'].forEach(id => $(id).textContent = '—:—');
+      syncDurationPresets(null);
       $('sleepSummary').textContent = 'Kein gültiges Ergebnis. Bitte Eingaben prüfen.';
       $('sleepClock').setAttribute('aria-label', '24-Stunden-Uhr. Noch kein gültiger Zeitplan.');
       return;
@@ -90,14 +91,23 @@
     $('sleepResultTime').textContent = M.clock(p.result); $('sleepDayLabel').textContent = p.day;
     $('durationLabel').textContent = M.duration(p.length); $('durationSlider').value = String(p.length);
     $('legendDuration').textContent = `${M.duration(p.length)} Schlaf`; $('legendLatency').textContent = `${p.latency} min Einschlafen`;
-    const day = minutes => minutes < 0 ? 'Vorabend' : minutes >= 1440 ? 'Folgetag' : 'Derselbe Tag';
+    // Only times that cross midnight get a day label.
+    const day = minutes => minutes < 0 ? 'Vorabend' : minutes >= 1440 ? 'Folgetag' : '';
     $('bedDay').textContent = day(p.bed); $('onsetDay').textContent = day(p.onset); $('wakeDay').textContent = day(p.wake);
     $('bedTimeDisplay').textContent = M.clock(p.bed); $('onsetTimeDisplay').textContent = M.clock(p.onset); $('wakeTimeDisplay').textContent = M.clock(p.wake);
     $('sleepSummary').textContent = `${p.day} ${state.mode === 'wake' ? 'ins Bett' : 'aufstehen'} · ${M.duration(p.total)} eingeplant.`;
+    syncDurationPresets(p.length);
     $('sleepArc').setAttribute('stroke-dasharray', `${p.length} ${1440 - p.length}`);
     $('latencyArc').setAttribute('stroke-dasharray', `${p.latency} ${1440 - p.latency}`);
     rotate('sleepArcRotation', p.onset); rotate('latencyArcRotation', p.bed);
     $('sleepClock').setAttribute('aria-label', `24-Stunden-Uhr: ${M.clock(p.bed)} ins Bett, ${M.clock(p.onset)} einschlafen, ${M.clock(p.wake)} aufstehen. ${M.duration(p.length)} Schlaf und ${p.latency} Minuten zum Einschlafen.`);
+  }
+  function syncDurationPresets(length) {
+    document.querySelectorAll('[data-duration]').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.duration) === length)));
+  }
+  function normaliseTime() {
+    const time = M.parseTime($('anchorTime').value);
+    if (time) $('anchorTime').value = time;
   }
   function renderPresets() {
     $('presetList').replaceChildren(...presets.map((preset, index) => {
@@ -123,10 +133,14 @@
     if (id === 'anchorTime' && /^\d{4}$/.test($(id).value)) $(id).value = $(id).value.slice(0, 2) + ':' + $(id).value.slice(2);
     render(); persist();
   }));
+  $('anchorTime').addEventListener('change', normaliseTime);
+  document.querySelectorAll('[data-duration]').forEach(button => button.addEventListener('click', () => {
+    const minutes = Number(button.dataset.duration); $('sleepHours').value = String(Math.floor(minutes / 60)); $('sleepMinutes').value = String(minutes % 60); render(); persist();
+  }));
   $('durationSlider').addEventListener('input', () => {
     const minutes = Number($('durationSlider').value); $('sleepHours').value = String(Math.floor(minutes / 60)); $('sleepMinutes').value = String(minutes % 60); render(); persist();
   });
-  $('sleepForm').addEventListener('submit', event => { event.preventDefault(); render(); persist(); });
+  $('sleepForm').addEventListener('submit', event => { event.preventDefault(); normaliseTime(); render(); persist(); });
   $('sleepNow').addEventListener('click', () => {
     const now = new Date(); document.querySelector('input[name="sleepMode"][value="bed"]').checked = true;
     $('anchorTime').value = M.clock(now.getHours() * 60 + now.getMinutes()); render(); persist();

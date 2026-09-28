@@ -21,9 +21,16 @@ with sync_playwright() as pw:
     p = touch.new_page(); p.on('pageerror', lambda error: errors.append(str(error)))
     for width in [320, 375, 402]:
         p.set_viewport_size({'width': width, 'height': 874}); p.goto(args.base_url)
+        assert p.locator('[data-workbench]').is_hidden(), f'Phones skip the spatial preview: {width}'
+        assert p.locator('.tool-card').first.bounding_box()['y'] < 700, f'Tool cards start in the first screen: {width}'
+        report['touch'].append(f'{width}px: spatial preview skipped, tool cards first')
+    # Touch tablets keep the spatial preview.
+    for width in [768, 1024]:
+        p.set_viewport_size({'width': width, 'height': 1024}); p.goto(args.base_url)
         for name in ['grade', 'sleep', 'code']:
             p.locator(f'[data-select={name}]').tap(); p.wait_for_timeout(550)
-            assert p.locator(f'[data-module={name}]').get_attribute('aria-pressed') == 'true'
+            assert p.locator(f'[data-select={name}]').get_attribute('aria-pressed') == 'true'
+            assert p.locator('[data-workbench]').get_attribute('data-selection') == name
         for name in ['grade', 'sleep', 'code']:
             # Find an actually exposed part of the spatial card; never force clicks.
             point = p.locator(f'[data-module={name}]').evaluate('''el => {
@@ -35,15 +42,18 @@ with sync_playwright() as pw:
             }''')
             if not point:
                 p.screenshot(path=str(args.output/f'touch-unexposed-{width}-{name}.png'))
-                print(p.locator('.scene').evaluate('el=>({box:el.getBoundingClientRect().toJSON(),scroll:scrollY,width:innerWidth,selection:el.parentElement.dataset.selection,modules:[...el.querySelectorAll("button")].map(e=>({name:e.dataset.module,box:e.getBoundingClientRect().toJSON()}))})'))
+                print(p.locator('.scene').evaluate('el=>({box:el.getBoundingClientRect().toJSON(),scroll:scrollY,width:innerWidth,selection:el.parentElement.dataset.selection,modules:[...el.querySelectorAll("[data-module]")].map(e=>({name:e.dataset.module,box:e.getBoundingClientRect().toJSON()}))})'))
             assert point, f'No exposed touch area: {width} {name}'
             p.touchscreen.tap(point['x'], point['y']); p.wait_for_timeout(550)
             actual = p.locator('[data-workbench]').get_attribute('data-selection')
             if actual != name: p.screenshot(path=str(args.output/f'touch-failure-{width}-{name}.png'))
             assert actual == name, f'Touch {width}px expected {name}, got {actual} at {point}'
-        p.locator('[data-motion-toggle]').tap()
-        assert p.locator('[data-motion-toggle]').get_attribute('aria-pressed') == 'true'
-        report['touch'].append(f'{width}px: all spatial cards and selector buttons, pause')
+        # The front card is a real link.
+        p.locator('[data-select=grade]').tap(); p.wait_for_timeout(550)
+        box = p.locator('.module-grade').bounding_box()
+        p.touchscreen.tap(box['x'] + box['width'] * .4, box['y'] + box['height'] * .55)
+        p.wait_for_url('**/sechserrechner/')
+        report['touch'].append(f'{width}px: all spatial cards and selector buttons, front card opens its tool')
     touch.close()
     context = browser.new_context(viewport={'width': 1440, 'height': 1000}, locale='de-CH', color_scheme='dark', reduced_motion='no-preference', record_video_dir=str(args.output/'video'))
     context.add_init_script('''(() => {
@@ -76,12 +86,7 @@ with sync_playwright() as pw:
     assert len(set(transforms)) == 3, 'Scene selection did not animate through distinct transforms'
     report['motion']['selection_transforms'] = transforms
     assert p.locator('.scene').evaluate('(el)=>el.getAnimations({subtree:true}).length') == 0, 'Scene animation never settles'
-    p.locator('[data-motion-toggle]').click()
-    p.mouse.move(scene['x']+50,scene['y']+100)
-    count = p.evaluate('__frameRequests'); p.wait_for_timeout(300)
-    assert p.evaluate('__frameRequests') == count
-    report['motion']['pause_stops_frames'] = True
-    p.locator('[data-motion-toggle]').click()
+    assert p.locator('[data-motion-toggle]').count() == 0, 'No manual motion toggle'
     p.locator('#hintergrund').scroll_into_view_if_needed(); p.wait_for_timeout(350)
     count = p.evaluate('__frameRequests'); p.wait_for_timeout(300)
     assert p.evaluate('__frameRequests') == count

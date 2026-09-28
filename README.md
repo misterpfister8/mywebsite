@@ -10,15 +10,19 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
 
 ## Funktionen
 
-- Auswählbare räumliche Werkzeugkarten mit Tastatur, Touch, Pause und Reduced
-  Motion. Die direkten Toollinks funktionieren unabhängig von der Szene.
+- Räumliche Werkzeugkarten ab Tablet-Breite: Die vordere Karte öffnet ihr Tool,
+  die anderen kommen zuerst nach vorne. Auswahl per Tastatur und Touch, Reduced
+  Motion wird respektiert. Auf Handys entfällt die Szene zugunsten der Toolkarten.
+  Die direkten Toollinks funktionieren unabhängig von der Szene.
 - Native Cross-Document View Transitions verbinden die sichtbare Vorschau mit
   dem Rechner. Bei fehlender Unterstützung bleiben es normale Links.
-- Noten: gewichteter Schnitt, Anzeige-Rundung, unabhängig gewichtete Simulation,
-  Zielplanung, Fächer, Prüfungsnamen, lokale Entwürfe, Undo, JSON-Export/Import
-  und lineare Punkteumrechnung.
-- Schlaf: 24-Stunden-Uhr, frei wählbare Bett-/Aufstehzeit, minutengenaue Dauer,
-  Einschlafzeit, «Jetzt ins Bett», eigene Presets mit Undo und lokale Speicherung.
+- Noten: gewichteter Schnitt, Anzeige-Rundung, Simulation und Zielplanung mit dem
+  Gewicht der nächsten Note, Fächer mit Übersicht und Gesamtschnitt,
+  Prüfungsnamen, Eingabe per Enter, lokale Entwürfe, Undo, JSON-Export/Import und
+  lineare Punkteumrechnung inklusive nötiger Punkte für eine Wunschnote.
+- Schlaf: 24-Stunden-Uhr, frei wählbare Bett-/Aufstehzeit (07:00, 7.00, 700 oder
+  7), minutengenaue Dauer mit Schnellwahl 7–9 h, Einschlafzeit (Standard 10 min),
+  «Jetzt ins Bett», eigene Presets mit Undo und lokale Speicherung.
 - SpasstoCSV: Formatillustration mit erfundenen Daten und Verweis auf das
   [lokale Python-Projekt](https://github.com/misterpfister8/spasstocsv).
   Unterstützte Formate laut dessen öffentlicher README: Raw-, Chrome- und
@@ -32,12 +36,16 @@ Die Anzeige wird kaufmännisch auf 0.01, 0.1, 0.5 oder 1 gerundet. Der zusätzli
 angezeigte Rechenwert ist auf vier Dezimalstellen angenähert. Die Zielplanung
 vergleicht intern ganzzahlige Kreuzprodukte; sie sucht die kleinste erreichbare
 Note in Schritten von 0.01, 0.1, 0.25, 0.5 oder 1. Historische Noten bleiben
-unverändert. Die Markierung bei 4 ist keine allgemeine Bestehensgarantie.
+unverändert. Die Markierung bei 4 ist keine allgemeine Bestehensgarantie. Der
+Gesamtschnitt der Fächerübersicht ist das Mittel der gerundeten Fachschnitte
+(jeweils mit der Rundung des Fachs), angezeigt auf 0.01. Ältere Sicherungen mit
+separatem Simulationsgewicht bleiben importierbar; es wird ignoriert.
 
 Schlafdauer: 1–16 Stunden; Einschlafdauer: 0–180 ganze Minuten. Uhrzeiten ohne
 Datum, Alarm oder medizinisches Zyklusmodell. Zeitumstellungen werden nicht
 berücksichtigt. Die Punkteformel ist linear, keine universelle Schulregel;
-Maximum grösser null und höchstens 1 000 000, Notenskala innerhalb von 1–6.
+Maximum grösser null und höchstens 1 000 000, Notenskala innerhalb von 1–6. Nötige
+Punkte für eine Wunschnote sind ein Mindestwert ohne Aufrundung.
 
 Die Speicherung ist für beide Tools einzeln abschaltbar. Abschalten entfernt
 nur deren gespeicherte Daten, die Sitzung bleibt benutzbar. Notenentwürfe werden

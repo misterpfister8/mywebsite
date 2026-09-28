@@ -9,7 +9,8 @@
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const clone = object => JSON.parse(JSON.stringify(object));
   const emptyRow = () => ({ name: '', grade: '', weight: '1' });
-  const newSubject = (name = 'Allgemein') => ({ name, entries: [emptyRow(), emptyRow()], rounding: '0.01', gradeStep: '0.01', target: '4.00', nextWeight: '1', scenario: '5.00', scenarioWeight: '1', basis: 'exact' });
+  const newSubject = (name = 'Allgemein') => ({ name, entries: [emptyRow(), emptyRow()], rounding: '0.01', gradeStep: '0.01', target: '4.00', nextWeight: '1', scenario: '5.00', basis: 'exact' });
+  const EMPTY = '-.--';
   let model = { type: 'misterpfister-grades', version: 1, active: 0, subjects: [newSubject()] };
   let current = null, undo = null, undoAfter = null, persistent = true;
   function validateImport(data, drafts = false) {
@@ -25,10 +26,11 @@
         return { name: row.name, grade: row.grade, weight: row.weight };
       });
       if (!['0.01', '0.1', '0.5', '1'].includes(s.rounding) || !['0.01', '0.1', '0.25', '0.5', '1'].includes(s.gradeStep) || !['exact', 'display'].includes(s.basis)) throw new Error('Ungültige Rundungsregel.');
-      for (const [key, max] of [['target', 6], ['nextWeight', 100], ['scenario', 6], ['scenarioWeight', 100]]) {
-        const input = key === 'scenarioWeight' ? (s[key] ?? s.nextWeight) : s[key];
+      // Older saves also carry scenarioWeight; the simulation now uses the weight of the next grade.
+      for (const [key, max] of [['target', 6], ['nextWeight', 100], ['scenario', 6]]) {
+        const input = s[key];
         const value = M.decimal(input);
-        if (typeof input !== 'string' || input.length > 20 || (!drafts && (!Number.isFinite(value) || value < (key.endsWith('Weight') ? .01 : 1) || value > max))) throw new Error('Ungültige Planungseinstellung.');
+        if (typeof input !== 'string' || input.length > 20 || (!drafts && (!Number.isFinite(value) || value < (key === 'nextWeight' ? .01 : 1) || value > max))) throw new Error('Ungültige Planungseinstellung.');
         result[key] = input;
       }
       result.rounding = s.rounding; result.gradeStep = s.gradeStep; result.basis = s.basis;
@@ -52,11 +54,18 @@
     el.textContent = value;
     // Results stay fully opaque and stable while typing; only the scale moves.
   }
+  function result(id, value, placeholder = EMPTY) {
+    text(id, value ?? placeholder);
+    $(id).dataset.state = value === null ? 'empty' : '';
+  }
   function toast(message, canUndo = false) {
     $('toastMessage').textContent = message;
     $('undoAction').hidden = !canUndo;
     if (canUndo) undoAfter = JSON.stringify(model);
     $('gradeToast').hidden = false;
+    // On phones the notice sits in the panel flow; bring it into view instead of leaving it off-screen.
+    const box = $('gradeToast').getBoundingClientRect();
+    if (box.top < 0 || box.bottom > innerHeight) $('gradeToast').scrollIntoView({ block: 'nearest', behavior: reduced.matches ? 'auto' : 'smooth' });
   }
   function checkpoint() { undo = clone(model); }
   function renderSubjects() {
@@ -73,7 +82,7 @@
       for (const [key, label, placeholder] of [['name', `Prüfung ${index + 1} (optional)`, 'Prüfung'], ['grade', `Note ${index + 1}`, '–'], ['weight', `Gewicht ${index + 1}`, '1']]) {
         const input = document.createElement('input'); input.type = 'text'; input.className = `grade-${key}`;
         input.value = entry[key]; input.placeholder = placeholder; input.autocomplete = 'off';
-        input.maxLength = key === 'name' ? 120 : 20;
+        input.maxLength = key === 'name' ? 120 : 20; input.enterKeyHint = 'next';
         input.setAttribute('aria-label', label);
         if (key !== 'name') input.inputMode = 'decimal';
         input.addEventListener('input', () => { entry[key] = input.value; compute(); persist(); });
@@ -81,10 +90,12 @@
       }
       const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'icon-button'; remove.setAttribute('aria-label', `Note ${index + 1} entfernen`);
       remove.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg>';
-      remove.addEventListener('click', () => {
+      remove.addEventListener('click', event => {
         checkpoint(); active().entries.splice(index, 1);
         if (!active().entries.length) active().entries.push(emptyRow());
-        renderRows(Math.min(index, active().entries.length - 1)); compute(); persist(); toast('Note entfernt.', true);
+        // Keyboard users continue in the next row; a tap lands on "Rückgängig" instead of opening the phone keyboard.
+        renderRows(event.detail === 0 ? Math.min(index, active().entries.length - 1) : null); compute(); persist(); toast('Note entfernt.', true);
+        if (event.detail !== 0) $('undoAction').focus({ preventScroll: true });
       });
       row.append(remove); entries.append(row);
     });
@@ -94,7 +105,7 @@
   function populate() {
     renderSubjects(); renderRows();
     const s = active();
-    for (const [id, key] of [['rounding', 'rounding'], ['gradeStep', 'gradeStep'], ['targetAverage', 'target'], ['nextWeight', 'nextWeight'], ['scenarioGrade', 'scenario'], ['scenarioWeight', 'scenarioWeight'], ['targetBasis', 'basis']]) $(id).value = s[key];
+    for (const [id, key] of [['rounding', 'rounding'], ['gradeStep', 'gradeStep'], ['targetAverage', 'target'], ['nextWeight', 'nextWeight'], ['scenarioGrade', 'scenario'], ['targetBasis', 'basis']]) $(id).value = s[key];
     $('scenarioSlider').step = s.gradeStep; $('scenarioSlider').value = s.scenario;
     compute();
   }
@@ -113,12 +124,12 @@
     $('scalePointer').hidden = !current;
     $('scenarioPointer').hidden = true;
     if (!current) {
-      text('average', '—'); text('averageDetail', invalid ? 'Bitte Eingaben prüfen.' : 'Trage deine erste Note ein.');
+      result('average', null); text('averageDetail', invalid ? 'Bitte Eingaben prüfen.' : 'Trage deine erste Note ein.');
       text('averageExact', ''); text('gradeCount', invalid ? 'Eingabe prüfen' : 'Noch keine Noten');
       $('scaleFill').style.width = '0%';
       $('gradeScale').setAttribute('aria-label', 'Notenskala von 1 bis 6. Noch kein gültiges Ergebnis.');
     } else {
-      text('average', M.round(current.average, Number(s.rounding)).toFixed(2));
+      result('average', M.round(current.average, Number(s.rounding)).toFixed(2));
       text('averageDetail', `Gewicht ${new Intl.NumberFormat('de-CH', { maximumFractionDigits: 2 }).format(current.weight)} · Rundung ${s.rounding}`);
       text('averageExact', `Rechenwert ≈ ${current.average.toFixed(4)}`);
       text('gradeCount', `${current.count} ${current.count === 1 ? 'Note' : 'Noten'}`);
@@ -128,28 +139,27 @@
     }
     updatePlan();
     $('compactAverage').textContent = current ? `Schnitt ${M.round(current.average, Number(s.rounding)).toFixed(2)} · ${current.count} Noten` : 'Noch kein gültiger Schnitt';
+    renderOverview();
   }
   function updatePlan() {
-    const s = active(), next = M.decimal(s.nextWeight), simulationWeight = M.decimal(s.scenarioWeight), simulated = M.decimal(s.scenario), target = M.decimal(s.target);
+    const s = active(), next = M.decimal(s.nextWeight), simulated = M.decimal(s.scenario), target = M.decimal(s.target);
     const validWeight = Number.isFinite(next) && next >= .01 && next <= 100;
-    const validSimulationWeight = Number.isFinite(simulationWeight) && simulationWeight >= .01 && simulationWeight <= 100;
     const step = Number(s.gradeStep);
     const validSim = Number.isFinite(simulated) && simulated >= 1 && simulated <= 6 && Math.abs((simulated - 1) / step - Math.round((simulated - 1) / step)) < 1e-7;
     const validTarget = Number.isFinite(target) && target >= 1 && target <= 6;
-    $('scenarioWeight').setAttribute('aria-invalid', String(!validSimulationWeight));
     $('nextWeight').setAttribute('aria-invalid', String(!validWeight));
     $('scenarioGrade').setAttribute('aria-invalid', String(!validSim));
     $('targetAverage').setAttribute('aria-invalid', String(!validTarget));
     $('scenarioPointer').hidden = true;
-    text('scenarioWeightLabel', validSimulationWeight ? `mit Gewicht ${s.scenarioWeight}` : 'Gewicht prüfen');
-    if (current && validSimulationWeight && validSim) {
-      const projected = (current.sum + simulated * simulationWeight) / (current.weight + simulationWeight);
-      text('scenarioResult', M.round(projected, Number(s.rounding)).toFixed(2));
+    text('scenarioWeightLabel', validWeight ? `mit Gewicht ${s.nextWeight}` : 'Gewicht prüfen');
+    if (current && validWeight && validSim) {
+      const projected = (current.sum + simulated * next) / (current.weight + next);
+      result('scenarioResult', M.round(projected, Number(s.rounding)).toFixed(2));
       text('scenarioHint', `Rechenwert ≈ ${projected.toFixed(4)}. Simulation, keine gespeicherte Prüfung.`);
       $('gradeScale').setAttribute('aria-label', `Skala 1 bis 6. Aktuell ${current.average.toFixed(4)}, simuliert ${projected.toFixed(4)}. 4 ist eine Orientierung, keine Bestehensgarantie.`);
       $('scenarioPointer').hidden = false; $('scenarioPointer').style.left = `${(projected - 1) / 5 * 100}%`;
     } else {
-      text('scenarioResult', '—'); text('scenarioHint', current ? `Nächste Note in ${s.gradeStep}er-Schritten und gültiges Gewicht eingeben.` : 'Mindestens eine gültige aktuelle Note eingeben.');
+      result('scenarioResult', null); text('scenarioHint', current ? `Nächste Note in ${s.gradeStep}er-Schritten und gültiges Gewicht eingeben.` : 'Mindestens eine gültige aktuelle Note eingeben.');
     }
     $('targetResult').removeAttribute('data-tone');
     if (!current) {
@@ -164,13 +174,50 @@
     else text('targetResult', `Du brauchst mindestens eine ${plan.required.toFixed(2)}.`);
     text('targetDetail', `${plan.secured ? 'Ziel auch mit der Mindestnote erreicht' : `Rechnerisch ${plan.raw.toFixed(3)}`} · ${s.gradeStep}er-Schritte · Ziel für ${s.basis === 'display' ? 'die gerundete Anzeige' : 'den ungerundeten Schnitt'}.`);
   }
+  function renderOverview() {
+    $('overviewPanel').hidden = model.subjects.length < 2;
+    if ($('overviewPanel').hidden) return;
+    const rounded = [];
+    $('overviewRows').replaceChildren(...model.subjects.map((subject, index) => {
+      let summary = null, invalid = false;
+      try { summary = M.summary(subject.entries); } catch { invalid = true; }
+      const value = summary ? M.round(summary.average, Number(subject.rounding)) : null;
+      if (value !== null) rounded.push(value);
+      const row = document.createElement('tr');
+      if (index === model.active) row.setAttribute('aria-current', 'true');
+      const name = document.createElement('th'); name.scope = 'row';
+      const open = document.createElement('button'); open.type = 'button'; open.className = 'text-button'; open.textContent = subject.name;
+      open.addEventListener('click', event => {
+        model.active = index; populate(); persist();
+        document.querySelector('.calculator-layout').scrollIntoView({ block: 'start', behavior: reduced.matches ? 'auto' : 'smooth' });
+        if (event.detail === 0) $('subjectSelect').focus();
+      });
+      name.append(open);
+      const count = document.createElement('td'); count.textContent = String(summary ? summary.count : 0);
+      const average = document.createElement('td'); average.textContent = invalid ? 'prüfen' : value === null ? '–' : value.toFixed(2);
+      row.append(name, count, average);
+      return row;
+    }));
+    const mean = rounded.length ? rounded.reduce((sum, value) => sum + value, 0) / rounded.length : null;
+    text('overviewAverage', mean === null ? '–' : M.round(mean, .01).toFixed(2));
+    text('overviewCount', `${rounded.length} von ${model.subjects.length} mit Noten`);
+  }
   $('addEntry').addEventListener('click', () => {
     if (active().entries.length >= MAX_ROWS) return;
     active().entries.push(emptyRow()); renderRows(active().entries.length - 1); compute(); persist();
     const row = $('gradeEntries').lastElementChild;
     if (!reduced.matches && row.animate) row.animate([{ opacity: 0, transform: 'translateY(-8px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 220, easing: 'ease-out' });
   });
-  $('gradeForm').addEventListener('submit', event => { event.preventDefault(); compute(); });
+  // Enter moves on: from the name to its grade, from a grade or weight to the next row's grade.
+  $('gradeForm').addEventListener('submit', event => {
+    event.preventDefault(); compute();
+    const input = document.activeElement, row = input?.closest?.('.grade-row');
+    if (!row) return;
+    const rows = [...$('gradeEntries').children], index = rows.indexOf(row);
+    if (input.classList.contains('grade-name')) row.querySelector('.grade-grade').focus();
+    else if (index < rows.length - 1) rows[index + 1].querySelector('.grade-grade').focus();
+    else if (active().entries[index].grade.trim() && active().entries.length < MAX_ROWS) $('addEntry').click();
+  });
   $('subjectSelect').addEventListener('change', () => { model.active = Number($('subjectSelect').value); populate(); persist(); });
   $('addSubject').addEventListener('click', () => {
     if (model.subjects.length >= MAX_SUBJECTS) { toast(`Höchstens ${MAX_SUBJECTS} Fächer möglich.`); return; }
@@ -184,9 +231,11 @@
     $('subjectName').value = ''; $('subjectForm').hidden = true; populate(); persist(); $('gradeEntries').querySelector('.grade-grade').focus();
   });
   $('renameSubject').addEventListener('change', () => {
-    const name = $('renameSubject').value.trim(); if (name) active().name = name.slice(0, 60); renderSubjects(); persist();
+    const name = $('renameSubject').value.trim(); if (name) active().name = name.slice(0, 60); renderSubjects(); renderOverview(); persist();
   });
   $('deleteSubject').addEventListener('click', () => {
+    const count = active().entries.filter(entry => entry.grade.trim()).length;
+    if (!confirm(`Fach «${active().name}»${count ? ` mit ${count} ${count === 1 ? 'Note' : 'Noten'}` : ''} löschen?`)) return;
     checkpoint(); model.subjects.splice(model.active, 1);
     if (!model.subjects.length) model.subjects.push(newSubject());
     model.active = Math.min(model.active, model.subjects.length - 1); populate(); persist(); toast('Fach gelöscht.', true);
@@ -195,17 +244,17 @@
     checkpoint(); active().entries = [{ name: 'Prüfung 1', grade: '4.5', weight: '1' }, { name: 'Prüfung 2', grade: '5.5', weight: '1' }, { name: 'Prüfung 3', grade: '5', weight: '1' }, { name: 'Prüfung 4', grade: '6', weight: '1' }];
     renderRows(); compute(); persist(); toast('Beispielnoten eingesetzt.', true);
   });
-  $('undoAction').addEventListener('click', () => {
+  $('undoAction').addEventListener('click', event => {
     if (undo) {
       if (undoAfter !== JSON.stringify(model) && !confirm('Inzwischen hast du weitere Eingaben geändert. Rückgängig setzt auch diese auf den vorherigen Stand zurück. Trotzdem rückgängig machen?')) return;
       model = undo; undo = null; undoAfter = null; populate(); persist();
     }
     $('gradeToast').hidden = true;
-    $('gradeEntries').querySelector('.grade-grade')?.focus();
+    if (event.detail === 0) $('gradeEntries').querySelector('.grade-grade')?.focus();
   });
   $('closeToast').addEventListener('click', () => { $('gradeToast').hidden = true; });
   $('saveGrades').addEventListener('change', () => { persistent = $('saveGrades').checked; persist(); });
-  for (const [id, key] of [['rounding', 'rounding'], ['gradeStep', 'gradeStep'], ['targetAverage', 'target'], ['nextWeight', 'nextWeight'], ['scenarioGrade', 'scenario'], ['scenarioWeight', 'scenarioWeight'], ['targetBasis', 'basis']]) {
+  for (const [id, key] of [['rounding', 'rounding'], ['gradeStep', 'gradeStep'], ['targetAverage', 'target'], ['nextWeight', 'nextWeight'], ['scenarioGrade', 'scenario'], ['targetBasis', 'basis']]) {
     $(id).addEventListener('input', () => {
       active()[key] = $(id).value;
       if (key === 'gradeStep' && Number.isFinite(M.decimal(active().scenario))) {
@@ -236,19 +285,31 @@
       checkpoint(); model = imported; populate(); persist(); toast('Sicherung importiert.', true);
     } catch (error) { toast(error instanceof SyntaxError ? 'Die Datei enthält kein gültiges JSON.' : error.message); }
   });
+  const points = new Intl.NumberFormat('de-CH', { maximumFractionDigits: 2 });
   function computePoints() {
     const ids = ['pointsEarned', 'pointsMax', 'pointsMinGrade', 'pointsMaxGrade'];
-    const result = M.points(...ids.map(id => M.decimal($(id).value)));
-    text('pointsResult', Number.isFinite(result) ? M.round(result).toFixed(2) : '—');
-    $('pointsResult').previousElementSibling.textContent = Number.isFinite(result) ? 'Rechnerische Note (2 Dezimalstellen)' : 'Punkte und Notengrenzen prüfen';
-    $('pointsError').textContent = Number.isFinite(result) ? '' : 'Punkte: 0 bis Maximum. Maximum: grösser 0, höchstens 1 000 000. Notenskala: 1–6, Mindestnote kleiner als Höchstnote.';
-    ids.forEach(id => $(id).setAttribute('aria-invalid', String(!Number.isFinite(result))));
+    const [earned, max, low, high] = ids.map(id => M.decimal($(id).value));
+    const grade = M.points(earned, max, low, high);
+    result('pointsResult', Number.isFinite(grade) ? M.round(grade).toFixed(2) : null);
+    $('pointsResult').previousElementSibling.textContent = Number.isFinite(grade) ? 'Rechnerische Note (2 Dezimalstellen)' : 'Punkte und Notengrenzen prüfen';
+    $('pointsError').textContent = Number.isFinite(grade) ? '' : 'Punkte: 0 bis Maximum. Maximum: grösser 0, höchstens 1 000 000. Notenskala: 1–6, Mindestnote kleiner als Höchstnote.';
+    ids.forEach(id => $(id).setAttribute('aria-invalid', String(!Number.isFinite(grade))));
+    // Inverse: the minimum points for a wished grade, independent of the points earned.
+    const target = M.decimal($('pointsTarget').value), needed = M.pointsFor(target, max, low, high);
+    $('pointsTarget').setAttribute('aria-invalid', String(Number.isFinite(M.points(0, max, low, high)) && !Number.isFinite(needed)));
+    text('pointsNeededLabel', Number.isFinite(needed) ? `Nötig für eine ${target.toFixed(2)}` : 'Wunschnote prüfen');
+    result('pointsNeeded', Number.isFinite(needed) ? `${points.format(M.round(needed, .01))} von ${points.format(max)}` : null, '–');
   }
-  ['pointsEarned', 'pointsMax', 'pointsMinGrade', 'pointsMaxGrade'].forEach(id => $(id).addEventListener('input', computePoints));
+  ['pointsEarned', 'pointsMax', 'pointsMinGrade', 'pointsMaxGrade', 'pointsTarget'].forEach(id => $(id).addEventListener('input', computePoints));
   populate(); computePoints();
   persist();
   // A compact summary occupies its own space and hides while an input has focus.
   if ('IntersectionObserver' in window) new IntersectionObserver(([entry]) => {
     $('compactResult').hidden = entry.isIntersecting || entry.boundingClientRect.top > 0;
   }).observe(document.querySelector('.result-panel'));
+  // The input column follows the reader only while it fits the viewport completely.
+  const inputPanel = document.querySelector('.input-panel');
+  const fitPanel = () => inputPanel.classList.toggle('fits-viewport', inputPanel.offsetHeight + 32 <= innerHeight);
+  if ('ResizeObserver' in window) new ResizeObserver(fitPanel).observe(inputPanel);
+  addEventListener('resize', fitPanel); fitPanel();
 })();
