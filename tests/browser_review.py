@@ -267,7 +267,7 @@ class Review:
 
     def settle(self, timeout=15000):
         # The software-renderer still frame JITs for about 750 ms after load.
-        self.page.wait_for_function(SETTLED, timeout=timeout)
+        self.page.wait_for_function(SETTLED, timeout=timeout, polling=100)
         return self.page.evaluate(GLASS)
 
     def frames(self):
@@ -339,15 +339,15 @@ def run(review):
     r.check(exported['type'] == 'misterpfister-grades' and len(exported['subjects']) == 2, 'Export serialises all subjects')
     p.on('dialog', lambda dialog: dialog.accept())
     p.locator('#importFile').set_input_files({'name': 'backup.json', 'mimeType': 'application/json', 'buffer': json.dumps(exported).encode()})
-    p.wait_for_function("document.querySelector('#toastMessage').textContent==='Sicherung importiert.'")
+    p.wait_for_function("document.querySelector('#toastMessage').textContent==='Sicherung importiert.'", polling=100)
     r.check(r.text('#average') == '4.75', 'JSON backup imports correctly')
     bad = {'name': 'bad.json', 'mimeType': 'application/json', 'buffer': b'{"version":99}'}
     p.locator('#importFile').set_input_files(bad)
-    p.wait_for_function("document.querySelector('#toastMessage').textContent.includes('Keine gültige')")
+    p.wait_for_function("document.querySelector('#toastMessage').textContent.includes('Keine gültige')", polling=100)
     r.check(r.text('#average') == '4.75', 'Invalid import leaves existing grades intact')
     malicious = json.loads(json.dumps(exported)); malicious['subjects'][1]['name'] = '<img src=x onerror=alert(1)>'
     p.locator('#importFile').set_input_files({'name': 'text-only.json', 'mimeType': 'application/json', 'buffer': json.dumps(malicious).encode()})
-    p.wait_for_function("document.querySelector('#toastMessage').textContent==='Sicherung importiert.'")
+    p.wait_for_function("document.querySelector('#toastMessage').textContent==='Sicherung importiert.'", polling=100)
     r.check(p.locator('#subjectSelect option:checked').inner_text().startswith('<img') and p.locator('img').count() == 0, 'Imported names remain text, not executable markup')
     p.locator('#undoAction').click()
     p.locator('#saveGrades').uncheck()
@@ -451,7 +451,7 @@ def run(review):
                 if p.locator('html').get_attribute('data-theme') != theme:
                     p.locator('[data-theme-toggle]').click()
                     # With motion allowed the theme lands inside the view-transition callback, one frame later.
-                    p.wait_for_function(f"document.documentElement.dataset.theme === '{theme}'")
+                    p.wait_for_function(f"document.documentElement.dataset.theme === '{theme}'", polling=100)
                 for width in [320, 370, 371, 375, 390, 402, 680, 681, 768, 900, 901, 1024, 1025, 1150, 1151, 1440, 1600, 1601, 1920]:
                     p.set_viewport_size({'width': width, 'height': 874 if width < 681 else 1000})
                     p.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
@@ -563,7 +563,7 @@ def workflow(r):
     legacy = {'type': 'misterpfister-grades', 'version': 1, 'active': 0, 'subjects': [{'name': 'Alt', 'entries': [{'name': '', 'grade': '5', 'weight': '1'}], 'rounding': '0.01', 'gradeStep': '0.01', 'target': '4.00', 'nextWeight': '1', 'scenario': '5.00', 'scenarioWeight': '3', 'basis': 'exact'}]}
     p.once('dialog', lambda dialog: dialog.accept())
     p.locator('#importFile').set_input_files({'name': 'legacy.json', 'mimeType': 'application/json', 'buffer': json.dumps(legacy).encode()})
-    p.wait_for_function("document.querySelector('#toastMessage').textContent==='Sicherung importiert.'")
+    p.wait_for_function("document.querySelector('#toastMessage').textContent==='Sicherung importiert.'", polling=100)
     r.check(r.text('#subjectSelect option:checked') == 'Alt' and r.text('#scenarioWeightLabel') == 'mit Gewicht 1' and 'scenarioWeight' not in p.evaluate("localStorage.getItem('misterpfister-grades-v2')"), 'Legacy backups with a separate simulation weight still import')
 
 
@@ -671,9 +671,11 @@ def extended(r):
     before = p.evaluate("[document.querySelector('[data-format=\"json\"]').getAttribute('aria-pressed'), matchMedia('(prefers-reduced-motion: reduce)').matches, document.querySelectorAll('[data-conversion-format]').length]")
     p.locator('[data-format="json"]').click()
     r.check(flip.text_content().startswith('.json') and p.locator('[data-format="json"]').get_attribute('aria-pressed') == 'true', 'Format demo text switches synchronously')
-    flipped = waits(p, 'window.__flip === true') and waits(p, "!document.querySelector('[data-conversion-format]').classList.contains('is-flipping')", 4000)
-    state = p.evaluate("[window.__flip, window.__flipLog, document.querySelector('[data-conversion-format]').className, matchMedia('(prefers-reduced-motion: reduce)').matches]")
-    r.check(flipped, f'Format badge flips once and cleans up (before {before}, after {state})')
+    # Read the recorded class history after the flip has had time to finish; rAF polling is unreliable on slow CI runners.
+    p.wait_for_timeout(1500)
+    state = p.evaluate("[window.__flip, window.__flipLog, document.querySelector('[data-conversion-format]').classList.contains('is-flipping'), document.querySelector('[data-glass-tier]')?.dataset.glassTier]")
+    if state[2]: p.wait_for_timeout(2500); state[2] = p.evaluate("document.querySelector('[data-conversion-format]').classList.contains('is-flipping')")
+    r.check(state[0] is True and state[1][:1] == ['conversion-file converted is-flipping'] and not state[2], f'Format badge flips once and cleans up (before {before}, after {state})')
     p.locator('[data-format="csv"]').click(); p.evaluate('scrollTo(0, 0)')
     p.locator('[data-select=grade]').click()
     p.locator('.module-sleep').click(position={'x': 150, 'y': 60}); p.wait_for_timeout(100)
@@ -697,8 +699,9 @@ def extended(r):
 
 
 def waits(page, expression, timeout=2500):
+    # Interval polling: requestAnimationFrame polling stalls on slow CI runners with software WebGL.
     try:
-        page.wait_for_function(expression, timeout=timeout)
+        page.wait_for_function(expression, timeout=timeout, polling=100)
         return True
     except Exception:
         return False
@@ -910,7 +913,7 @@ def instruments(r):
     full = {'type': 'misterpfister-grades', 'version': 1, 'active': 0, 'subjects': [{'name': 'Voll', 'entries': [{'name': '', 'grade': str(4 + (i % 5) * .5), 'weight': '1'} for i in range(100)], 'rounding': '0.01', 'gradeStep': '0.01', 'target': '4.00', 'nextWeight': '1', 'scenario': '5.00', 'basis': 'exact'}]}
     p.once('dialog', lambda dialog: dialog.accept())
     p.locator('#importFile').set_input_files({'name': 'full.json', 'mimeType': 'application/json', 'buffer': json.dumps(full).encode()})
-    p.wait_for_function("document.querySelector('#toastMessage').textContent==='Sicherung importiert.'"); r.frames()
+    p.wait_for_function("document.querySelector('#toastMessage').textContent==='Sicherung importiert.'", polling=100); r.frames()
     chart = p.locator('#entryChart').evaluate("el => ({bars: el.querySelectorAll('.chart-bars i:not(.is-ghost)').length, dense: el.hasAttribute('data-dense'), rows: document.querySelectorAll('.grade-row').length, add: document.querySelector('#addEntry').disabled, average: document.querySelector('#average').textContent})")
     r.check(chart == {'bars': 100, 'dense': True, 'rows': 100, 'add': True, 'average': '5.00'}, f'100 grades: 100 bars in a dense chart and no 101st row: {chart}')
     p.locator('#undoAction').click()
