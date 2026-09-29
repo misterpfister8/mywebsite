@@ -104,6 +104,10 @@
     format.replaceChildren(document.createTextNode(json ? '.json' : '.csv'));
     const small = document.createElement('small'); small.textContent = 'Dein Format'; format.append(small);
     document.querySelector('[data-conversion-example]').textContent = json ? '{"name":"Beispiel","login":{"username":"demo"}}' : 'name,url,username\nBeispiel,https://example.com,demo';
-    if (changed && !reduced.matches) { format.classList.remove('is-flipping'); void format.offsetWidth; format.classList.add('is-flipping'); }
+    if (changed && !reduced.matches) {
+      format.classList.remove('is-flipping'); void format.offsetWidth; format.classList.add('is-flipping');
+      // animationend never fires in hidden tabs or when the animation is cancelled; clean up anyway.
+      clearTimeout(format.flipTimer); format.flipTimer = setTimeout(() => format.classList.remove('is-flipping'), 700);
+    }
   }));
 })();

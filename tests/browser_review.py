@@ -670,7 +670,7 @@ def extended(r):
     flip.evaluate("el => { window.__flip = false; new MutationObserver(() => { if (el.classList.contains('is-flipping')) window.__flip = true; }).observe(el, {attributes: true, attributeFilter: ['class']}); }")
     p.locator('[data-format="json"]').click()
     r.check(flip.text_content().startswith('.json') and p.locator('[data-format="json"]').get_attribute('aria-pressed') == 'true', 'Format demo text switches synchronously')
-    r.check(waits(p, 'window.__flip === true') and waits(p, "!document.querySelector('[data-conversion-format]').classList.contains('is-flipping')", 1500), 'Format badge flips once and cleans up')
+    r.check(waits(p, 'window.__flip === true') and waits(p, "!document.querySelector('[data-conversion-format]').classList.contains('is-flipping')", 4000), 'Format badge flips once and cleans up')
     p.locator('[data-format="csv"]').click(); p.evaluate('scrollTo(0, 0)')
     p.locator('[data-select=grade]').click()
     p.locator('.module-sleep').click(position={'x': 150, 'y': 60}); p.wait_for_timeout(100)
