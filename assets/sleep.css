@@ -1,0 +1,338 @@
+/* Sleep tool (owner S). Page-scoped; loads after core.css. */
+.sleep-page {
+  --accent-text: var(--sleep-text);
+  --sun-gfx: var(--warm);
+  --track: color-mix(in srgb, var(--sleep-gfx) 9%, var(--surface-3));
+  --dial: clamp(220px, 62vw, 280px);
+  --i-sun: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='4.1'/%3E%3Cpath d='M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7'/%3E%3C/svg%3E");
+  --i-moon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 13a8.1 8.1 0 0 1-9-9 8.5 8.5 0 1 0 9 9Z'/%3E%3C/svg%3E");
+}
+:root[data-theme=light] .sleep-page { --sun-gfx: #C06A00; }
+.sleep-page .tool-main { padding-top: 16px; }
+.sleep-page .film-text { background-position: 72% 0; }
+
+/* Wann? → Deine Nacht → Feintuning; DOM order = visual order */
+.sleep-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-items: start; }
+@media (min-width: 681px) {
+  .sleep-page .tool-main { padding-top: 28px; }
+  .sleep-layout { gap: 20px; }
+  .sleep-page { --dial: 320px; }
+}
+@media (min-width: 901px) {
+  .sleep-page { --dial: clamp(220px, 100svh - 410px, 340px); }
+  .sleep-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "anchor visual" "tuning visual"; gap: 20px 24px; }
+  .sleep-anchor { grid-area: anchor; }
+  .sleep-visual { grid-area: visual; }
+  .sleep-tuning { grid-area: tuning; }
+}
+@media (min-width: 1025px) {
+  .sleep-page { --dial: clamp(220px, min(32vw, 100svh - 410px), 460px); }
+  .sleep-layout { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+}
+/* Sticky only while the whole panel fits (sleep.js measures); short screens drop the hint and tighten */
+@media (min-width: 901px) {
+  .sleep-visual.fits-viewport { position: sticky; top: calc(var(--header-h) + 16px); }
+}
+@media (min-width: 901px) and (max-height: 760px) {
+  .sleep-page { --dial: clamp(220px, 100svh - 380px, 340px); }
+  .sleep-visual .dial-hint { display: none; }
+  .sleep-visual .clock-legend { margin-top: 10px; }
+  .sleep-visual .sleep-timeline { margin-top: 12px; }
+}
+@media (min-width: 1025px) and (max-height: 760px) { .sleep-page { --dial: clamp(220px, min(32vw, 100svh - 380px), 460px); } }
+
+/* Core workaround: hit-testable radio (tests use .check()) */
+.sleep-page .segmented input { pointer-events: auto; }
+.sleep-anchor .segmented { margin-bottom: 18px; }
+.anchor-time { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0 12px; }
+.anchor-time .field { flex: 1 1 0; min-width: 0; }
+#anchorTimeLabel, #timeHint { white-space: nowrap; line-height: 20px; }
+#anchorTimeLabel { color: var(--ink); font-weight: 600; font-size: 15px; }
+.sleep-page #anchorTime {
+  height: 56px; padding-inline: 16px; font: 500 28px/1 var(--font-display); letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.sleep-page #anchorTime[aria-invalid=true] { padding-right: 44px; }
+.now-button { flex: none; height: 56px; margin-top: 28px; padding-inline: 18px; }
+/* The error replaces the limits line in the same slot, so it never moves the layout */
+.anchor-foot { display: grid; margin-top: 10px; }
+.anchor-foot > * { grid-area: 1 / 1; min-width: 0; }
+#sleepError:not(:empty) + .anchor-limits { visibility: hidden; }
+/* Small phones: "Jetzt" stays beside the time (the rest is read, not shown) */
+@media (max-width: 360px) {
+  .sleep-page .tool-intro { padding-block: 4px 12px; }
+  .sleep-layout { gap: 10px; }
+  .sleep-anchor .segmented { margin-bottom: 12px; }
+  .sleep-page .sleep-visual .panel-heading { margin-bottom: 4px; }
+  .sleep-page .sleep-clock-wrap { margin-top: 0; }
+  .now-button { padding-inline: 14px; }
+  .now-long { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+
+/* Visual panel */
+.sleep-page .sleep-visual { background: linear-gradient(165deg, var(--sleep-panel-a), var(--sleep-panel-b)); }
+.sleep-page .sleep-visual:focus-within { background: linear-gradient(165deg, var(--sleep-panel-a), var(--sleep-panel-b)) padding-box, var(--film) border-box; }
+.sleep-visual .panel-heading { margin-bottom: 8px; }
+@media (max-width: 440px) { .sleep-visual .panel-heading .tag { display: none; } }
+.sleep-clock-wrap {
+  position: relative; width: min(var(--dial), 100%); aspect-ratio: 1; margin: 12px auto 0;
+  container-type: inline-size; -webkit-user-select: none; user-select: none;
+}
+.sleep-clock { width: 100%; height: 100%; overflow: visible; transition: filter var(--t-ui), opacity var(--t-ui); }
+.clock-inner { fill: var(--surface); stroke: var(--rule); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.clock-stars circle { fill: var(--ink); opacity: .3; }
+:root[data-theme=light] .clock-stars { display: none; }
+.clock-ticks path { fill: none; stroke: var(--rule-strong); stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.clock-ticks .is-major { stroke: var(--faint); stroke-width: 1.5px; }
+.clock-track { fill: none; stroke: var(--track); stroke-width: 18; }
+.clock-arc, .latency-arc { fill: none; stroke-linecap: butt; transition: stroke-dasharray 520ms var(--spring); }
+.clock-arc { stroke: var(--sleep-gfx); stroke-width: 18; }
+:root:not([data-theme=light]) .clock-arc { filter: drop-shadow(0 0 7px #c6b9ff61); }
+.latency-arc { stroke: var(--data-gfx); stroke-width: 10; }
+.arc-rotation { transform-origin: 180px 180px; transition: transform 520ms var(--spring); }
+.clock-labels text {
+  fill: var(--muted); font: 500 calc(12px * var(--k, 1)) var(--font-mono); letter-spacing: .04em;
+  text-anchor: middle; dominant-baseline: central;
+}
+.clock-labels .minor { fill: var(--faint); font-size: calc(10px * var(--k, 1)); }
+.clock-hit { fill: none; stroke: transparent; stroke-width: 81; pointer-events: stroke; }
+@media (pointer: fine) { .clock-hit { cursor: pointer; } }
+
+.clock-readout {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; text-align: center; pointer-events: none;
+}
+#sleepResultLabel {
+  min-height: 16px; font: 500 var(--fs-label)/16px var(--font-mono); letter-spacing: .16em; text-transform: uppercase;
+  color: var(--sleep-text);
+}
+#sleepResultTime {
+  min-height: 1em; margin-right: -.06em; font: 300 clamp(38px, 17cqi, 46px)/1 var(--font-display); letter-spacing: -.06em;
+  font-variant-numeric: tabular-nums lining-nums; color: var(--ink);
+}
+#sleepDayLabel { min-height: 20px; font-size: 14px; line-height: 20px; color: var(--muted); }
+@media (min-width: 681px) {
+  #sleepResultTime { font-size: clamp(44px, 14cqi, 64px); }
+  .clock-readout { gap: 6px; }
+}
+
+/* Handles: HTML outside role=img */
+.dial-handles { position: absolute; inset: 0; pointer-events: none; }
+.sleep-clock-wrap { --bead: 26px; }
+@media (min-width: 681px) { .sleep-clock-wrap { --bead: clamp(26px, 7.2cqi, 34px); } }
+@media (max-width: 680px) { .sleep-clock-wrap { --bead: 22px; } }
+.dial-handle {
+  --r: var(--ring, 35.2778cqi);
+  position: absolute; left: 50%; top: 50%; z-index: 1; display: grid; place-items: center;
+  width: 44px; height: 44px; margin: -22px; border-radius: 50%; outline: none;
+  pointer-events: auto; touch-action: none; cursor: grab;
+  transform: rotate(var(--a, 0deg)) translateY(calc(var(--r) * -1)) rotate(calc(var(--a, 0deg) * -1));
+  transition: transform 520ms var(--spring), opacity var(--t-ui);
+}
+@media (pointer: coarse) { .dial-handle { width: 48px; height: 48px; margin: -24px; } }
+.sleep-clock-wrap:not([data-ready]) :is(.arc-rotation, .clock-arc, .latency-arc, .dial-handle),
+.sleep-clock-wrap:is(.is-dragging, .is-resizing) :is(.arc-rotation, .clock-arc, .latency-arc, .dial-handle) { transition: none; }
+/* Short nights: sun and moon step apart so both beads and the arc stay visible */
+.sleep-clock-wrap[data-close] .dial-handle { --r: calc(var(--ring, 35.2778cqi) + var(--bead) * .62); }
+.sleep-clock-wrap[data-close] .dial-handle.is-end { --r: calc(var(--ring, 35.2778cqi) - var(--bead) * .62); }
+.dial-handle:focus-visible, .dial-handle.is-dragging { z-index: 2; }
+.dial-handle.is-dragging { cursor: grabbing; }
+.dial-bead {
+  --c: var(--sleep-gfx); --ic: var(--i-moon);
+  position: relative; display: block; width: var(--bead); height: var(--bead); border-radius: 50%;
+  border: 2px solid var(--c); background: var(--panel-top);
+  box-shadow: 0 0 0 3px var(--surface), 0 4px 12px -3px rgb(0 0 0 / .55);
+  transition: transform var(--t-ui) var(--spring-pop), box-shadow var(--t-ui) var(--ease-out);
+}
+.dial-bead[data-icon=sun] { --c: var(--sun-gfx); --ic: var(--i-sun); }
+.dial-bead::before { content: ""; position: absolute; inset: 2px; background: var(--c); mask: var(--ic) center / 14px no-repeat; }
+@media (max-width: 680px) { .dial-bead::before { mask-size: 12px; } }
+@media (min-width: 681px) { .dial-bead::before { mask-size: clamp(14px, 3.8cqi, 18px); } }
+/* Anchor solid, end hollow: shape, not only colour */
+.dial-handle:not(.is-end) .dial-bead { background: var(--c); }
+.dial-handle:not(.is-end) .dial-bead::before { background: var(--panel-top); }
+:root[data-theme=light] .dial-bead { box-shadow: 0 0 0 3px var(--panel-top), 0 4px 12px -4px rgb(40 48 30 / .45); }
+.dial-handle:is(:focus-visible:not([data-pointer]), .is-dragging) .dial-bead {
+  transform: scale(1.12);
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 9px color-mix(in srgb, var(--sleep-gfx) 30%, transparent), 0 6px 16px -4px rgb(0 0 0 / .6);
+}
+@media (hover: hover) {
+  .dial-handle:hover .dial-bead { transform: scale(1.12); box-shadow: 0 0 0 3px var(--surface), 0 0 0 9px color-mix(in srgb, var(--sleep-gfx) 24%, transparent); }
+}
+.dial-handle:focus-visible:not([data-pointer]) .dial-bead { outline: 2px solid var(--focus); outline-offset: 5px; }
+.dial-tip {
+  --d: 30px;
+  position: absolute; left: 50%; top: 50%; padding: 4px 10px; border-radius: var(--r-pill);
+  border: 1px solid var(--sleep-gfx); background: var(--surface); color: var(--ink); box-shadow: var(--shadow-float);
+  font: 500 13px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap;
+  translate: -50% calc(-100% - var(--d)); scale: .9; opacity: 0; pointer-events: none;
+  transition: opacity var(--t-hover), scale var(--t-ui) var(--ease-out);
+}
+/* Outward along the handle's angle: the pill's near edge sits --d from the bead centre */
+@supports (translate: calc(sin(1deg) * 1px)) {
+  .dial-tip { translate: calc((sin(var(--a, 0deg)) - 1) * 50% + sin(var(--a, 0deg)) * var(--d)) calc((-1 - cos(var(--a, 0deg))) * 50% - cos(var(--a, 0deg)) * var(--d)); }
+}
+.dial-handle.is-dragging .dial-tip { opacity: 1; scale: 1; }
+.sleep-clock-wrap[data-readout] .dial-tip { visibility: hidden; }
+@media (max-width: 900px) { .dial-tip { display: none; } }
+.dial-hint { margin-top: 10px; text-align: center; }
+@media (hover: none) and (pointer: coarse) { .hint-keys { display: none; } }
+
+/* Invalid: last plan stays, dimmed */
+.sleep-visual[data-invalid=true] .sleep-clock { filter: saturate(.4); opacity: .6; }
+.sleep-visual[data-invalid=true] .dial-handle { opacity: .4; pointer-events: none; }
+.sleep-visual[data-invalid=true] .night-bar i { opacity: .45; }
+.sleep-visual[data-invalid=true] #sleepResultTime { color: var(--muted); font-family: var(--font-mono); font-weight: 300; letter-spacing: .04em; margin-right: 0; }
+.sleep-visual[data-invalid=true] .timeline-stops b { font-family: var(--font-mono); font-weight: 400; letter-spacing: 0; }
+
+.clock-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 22px; margin-top: 14px; font-size: 13px; line-height: 20px; color: var(--muted); }
+.clock-legend > span { display: inline-flex; align-items: center; gap: 8px; }
+.clock-legend i { flex: none; width: 18px; height: 8px; border-radius: 2px; background: var(--sleep-gfx); }
+.clock-legend .legend-latency { height: 4px; background: var(--data-gfx); }
+.sleep-visual[data-nolat] .legend-latency { opacity: .3; }
+.sleep-visual[data-nolat] .timeline-stops > div:nth-child(2) b { color: var(--muted); font-weight: 400; }
+
+/* Night bar + stops */
+.sleep-timeline { margin-top: 18px; padding-top: 4px; border-top: 1px solid var(--rule); }
+.night-bar { position: relative; display: flex; height: 10px; margin-top: 26px; border-radius: 5px; background: var(--track); }
+.night-bar i { flex: var(--g, 0) 1 0; min-width: 0; transition: flex-grow 520ms var(--spring), opacity var(--t-ui); }
+.sleep-visual:has(.sleep-clock-wrap:is(.is-dragging, :not([data-ready]))) .night-bar i { transition: none; }
+.night-bar .is-latency {
+  --g: var(--lat, 10); border-radius: 5px 0 0 5px;
+  background: repeating-linear-gradient(-45deg, var(--data-gfx) 0 2px, color-mix(in srgb, var(--data-gfx) 30%, transparent) 2px 4.5px);
+}
+.night-bar .is-sleep { --g: var(--len, 480); border-radius: 0 5px 5px 0; background: var(--sleep-gfx); }
+.night-bar[data-nolat] .is-sleep { border-radius: 5px; }
+.night-bar .midnight {
+  position: absolute; top: -21px; bottom: -3px; left: calc(var(--mid, 0) * 100%); width: 0;
+  display: flex; flex-direction: column; align-items: center;
+  font: 500 11px/14px var(--font-mono); letter-spacing: .04em; color: var(--muted); white-space: nowrap;
+}
+.night-bar .midnight::after {
+  content: ""; flex: 1; width: 2px; margin-top: 2px; border-radius: 1px;
+  background: linear-gradient(var(--muted) 0 5px, var(--bg) 0);
+}
+.night-bar[data-edge=start] .midnight { align-items: flex-start; }
+.night-bar[data-edge=end] .midnight { align-items: flex-end; }
+.timeline-stops { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+.timeline-stops > div { display: flex; flex-direction: column; min-width: 0; }
+.timeline-stops > div:nth-child(2) { align-items: center; text-align: center; }
+.timeline-stops > div:nth-child(3) { align-items: flex-end; text-align: right; }
+.timeline-stops span { font-size: 13px; line-height: 18px; color: var(--muted); }
+.timeline-stops b {
+  margin-top: 2px; font: 500 22px/1.15 var(--font-display); letter-spacing: -.035em;
+  font-variant-numeric: tabular-nums lining-nums; color: var(--ink);
+}
+.timeline-stops small { min-height: 18px; font-size: 12px; line-height: 18px; color: var(--muted); }
+
+/* 681–900: legend and timeline beside the dial */
+@media (min-width: 681px) and (max-width: 900px) {
+  .sleep-visual {
+    display: grid; grid-template-columns: var(--dial) minmax(0, 1fr); column-gap: clamp(24px, 4vw, 40px);
+    grid-template-rows: auto 1fr auto auto auto 1fr;
+    grid-template-areas: "head head" "dial ." "dial hint" "dial legend" "dial time" "dial .";
+  }
+  .sleep-visual .panel-heading { grid-area: head; }
+  .sleep-clock-wrap { grid-area: dial; margin: 8px 0 0; }
+  .dial-hint { grid-area: hint; margin: 0 0 14px; text-align: left; }
+  .clock-legend { grid-area: legend; flex-direction: column; justify-content: flex-start; margin: 0; }
+  .sleep-timeline { grid-area: time; }
+}
+
+/* Tuning panel */
+.duration-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.duration-heading h2 { font-size: var(--fs-h3); font-weight: 600; line-height: 1.15; letter-spacing: -.02em; }
+#durationLabel {
+  font: 400 30px/1 var(--font-display); letter-spacing: -.045em; color: var(--sleep-text);
+  font-variant-numeric: tabular-nums lining-nums; white-space: nowrap;
+}
+.sleep-tuning .range-scale { position: relative; display: block; height: 16px; }
+.sleep-tuning .range-scale > span { position: absolute; top: 0; left: calc(var(--at) * 100%); }
+.duration-presets { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+.duration-presets .chip { padding-inline: 8px; }
+@media (max-width: 479px) { .duration-presets { gap: 6px; } .duration-presets .chip { padding-inline: 4px; font-size: 13.5px; } }
+@media (max-width: 359px) { .duration-presets { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.duration-fields, .latency-field { margin-top: 16px; }
+
+.sleep-presets { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--rule); }
+.sleep-presets .panel-heading { margin-bottom: 10px; }
+.sleep-presets .panel-heading h2 { font-size: 17px; }
+.sleep-presets .text-button { margin-right: -4px; }
+.preset-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.preset-chip {
+  --c: var(--sun-gfx); --ic: var(--i-sun);
+  display: inline-flex; align-items: center; min-height: 44px; max-width: 100%; border-radius: var(--r-pill);
+  border: 1px solid var(--rule-strong); background: var(--surface-2);
+}
+.preset-chip[data-mode=bed] { --c: var(--sleep-gfx); --ic: var(--i-moon); }
+.preset-chip > button { display: inline-flex; align-items: center; min-height: 44px; border: 0; background: none; color: var(--ink); touch-action: manipulation; }
+.preset-chip > button:first-child { gap: 8px; min-width: 0; padding: 0 4px 0 12px; border-radius: var(--r-pill) 0 0 var(--r-pill); font-size: 14px; font-weight: 600; }
+.preset-icon { flex: none; width: 16px; height: 16px; background: var(--c); mask: var(--ic) center / contain no-repeat; }
+.preset-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.preset-time, .preset-length { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.preset-length { margin-left: -4px; }
+.preset-length::before { content: "· "; }
+.preset-chip[data-active] { border: 2px solid var(--c); margin: -1px; background: color-mix(in srgb, var(--c) 12%, var(--surface-2)); }
+.preset-chip > .preset-delete { flex: none; justify-content: center; width: 44px; padding: 0; border-radius: 0 var(--r-pill) var(--r-pill) 0; color: var(--muted); }
+.preset-delete .icon { width: 16px; height: 16px; }
+.preset-chip > button:focus-visible { outline-offset: -2px; }
+@media (hover: hover) {
+  .preset-chip:hover { border-color: var(--control-rule); }
+  .preset-chip > button:first-child:hover { background: var(--surface-3); }
+  .preset-chip > .preset-delete:hover { color: var(--danger); background: var(--danger-soft); }
+}
+.inline-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; margin-top: 12px; }
+.inline-form .field { flex: 1 1 180px; }
+#presetHint { margin-top: 10px; }
+#undoPreset { margin-top: 4px; margin-left: -4px; }
+.undo-confirm { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 4px 0 0 -4px; }
+.undo-confirm[hidden] { display: none; }
+#showPresetForm .icon { transition: rotate var(--t-ui) var(--ease-out); }
+#showPresetForm[aria-expanded=true] .icon { rotate: 45deg; }
+.sleep-tuning .save-row { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--rule); }
+.sleep-tuning > .fineprint { margin-top: 6px; }
+
+/* Guidance */
+.sleep-guidance { display: grid; gap: 12px; margin-top: 12px; }
+@media (min-width: 681px) { .sleep-guidance { gap: 20px; margin-top: 24px; } }
+@media (min-width: 901px) { .sleep-guidance { grid-template-columns: 1fr 1fr; gap: 24px; } }
+.sleep-guidance > div {
+  display: flex; gap: 16px; align-items: flex-start; padding: 20px; border-radius: var(--r-panel);
+  border: 1px solid var(--rule); background: var(--surface);
+}
+.sleep-guidance .icon {
+  width: 40px; height: 40px; padding: 9px; border-radius: 50%; color: var(--sleep-text); background: var(--sleep-soft);
+}
+.sleep-guidance p { font-size: 15px; line-height: 1.55; color: var(--muted); }
+.sleep-guidance strong { display: inline-block; margin-bottom: 2px; color: var(--ink); font-weight: 600; }
+@media (max-width: 480px) {
+  .sleep-guidance > div { gap: 14px; padding: 18px 16px; }
+  .sleep-guidance .icon { width: 36px; height: 36px; padding: 8px; }
+}
+@media (min-width: 1151px) { .sleep-guidance > div { padding: 24px 28px; } }
+@media (max-width: 680px) {
+  .sleep-page .privacy-line { display: block; padding-inline: 8px; }
+  .sleep-page .privacy-line .icon { display: inline-block; margin: 0 2px -2px 0; }
+}
+
+.sleep-compact { gap: 10px; padding: 0 4px 0 14px; }
+.compact-jump { display: grid; place-items: center; width: 44px; height: 44px; margin-left: -2px; border-radius: 50%; color: var(--sleep-text); }
+.compact-jump::after { content: ""; position: absolute; inset: 0; border-radius: var(--r-pill); }
+.compact-jump .icon { width: 18px; height: 18px; }
+.compact-jump:focus-visible { outline-offset: -4px; }
+@media (hover: hover) { .compact-jump:hover { background: var(--surface-2); } }
+.sleep-compact i { flex: none; width: 18px; height: 18px; background: var(--c, var(--sleep-gfx)); mask: var(--ic, var(--i-moon)) center / contain no-repeat; }
+.sleep-compact[data-mode=bed] i { --c: var(--sun-gfx); --ic: var(--i-sun); }
+@media (min-width: 681px) {
+  .sleep-compact { left: auto; right: max(var(--gutter), 50% - var(--wrap-max) / 2); translate: none; }
+  @starting-style { .sleep-compact { translate: 0 -12px; opacity: 0; } }
+}
+
+@media (forced-colors: active) {
+  .clock-arc, .latency-arc { stroke: Highlight; }
+  .clock-track, .clock-ticks path { stroke: GrayText; }
+  .clock-labels text { fill: CanvasText; }
+  .dial-bead { border-color: CanvasText; forced-color-adjust: none; background: Canvas; }
+  .dial-bead::before, .preset-icon, .sleep-compact i { background: CanvasText; }
+  .night-bar :is(.is-latency, .is-sleep), .clock-legend :is(i, .legend-latency) { background: Highlight; }
+}

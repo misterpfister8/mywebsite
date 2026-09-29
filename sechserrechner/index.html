@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#111310">
+  <meta name="theme-color" content="#0B0D0F">
   <title>Notenrechner — Dein nächster Schritt · misterpfister.net</title>
   <meta name="description" content="Gewichtete Noten, Zielnoten und Was-wäre-wenn-Szenarien. Fächer lokal speichern, Daten exportieren und Punkte in Noten umrechnen.">
   <link rel="canonical" href="https://misterpfister.net/sechserrechner/">
@@ -13,18 +13,21 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_CH">
   <meta property="og:url" content="https://misterpfister.net/sechserrechner/">
-  <script src="../assets/transitions.js?v=werkplatz-4"></script>
-  <script src="../assets/theme.js?v=werkplatz-4"></script>
-  <link rel="stylesheet" href="../assets/site.css?v=werkplatz-4">
-  <script src="../assets/workbench.js?v=werkplatz-4" defer></script>
-  <script src="../assets/tool-storage.js?v=werkplatz-4" defer></script>
-  <script src="../assets/tool-math.js?v=werkplatz-4" defer></script>
-  <script src="../assets/grades.js?v=werkplatz-4" defer></script>
+  <script src="../assets/transitions.js?v=werkplatz-5"></script>
+  <script src="../assets/theme.js?v=werkplatz-5"></script>
+  <script>/* Reserve the saved layout before the deferred grades.js builds it (no layout shift). */try{if(localStorage.getItem('misterpfister-grades-saving')!=='false'){const d=JSON.parse(localStorage.getItem('misterpfister-grades-v2')),s=d&&Array.isArray(d.subjects)&&d.subjects[d.active|0],r=document.documentElement;if(s&&Array.isArray(s.entries)){r.style.setProperty('--grade-rows',Math.min(s.entries.length,100)||2);if(s.entries.some(e=>e&&typeof e.grade==='string'&&e.grade.trim()))r.dataset.gradeFilled=''}if(d.subjects.length>1)r.dataset.gradeMulti=''}}catch{}</script>
+  <link rel="stylesheet" href="../assets/core.css?v=werkplatz-5">
+  <link rel="stylesheet" href="../assets/grades.css?v=werkplatz-5">
+  <noscript><style>.calculator-layout, .points-cards { display: none; }</style></noscript>
+  <script src="../assets/motion.js?v=werkplatz-5" defer></script>
+  <script src="../assets/tool-storage.js?v=werkplatz-5" defer></script>
+  <script src="../assets/tool-math.js?v=werkplatz-5" defer></script>
+  <script src="../assets/grades.js?v=werkplatz-5" defer></script>
 </head>
 <body class="tool-page grade-page">
   <a href="#main" class="skip-link">Zum Inhalt springen</a>
   <header class="site-header">
-    <div class="nav-shell wrap">
+    <div class="nav-shell">
       <a class="brand" href="../" aria-label="misterpfister.net – Startseite"><span class="brand-mark">m.</span><span class="brand-word">misterpfister<span>.net</span></span></a>
       <a href="../" class="back-link"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg><span>Werkplatz</span></a>
       <nav class="main-nav" aria-label="Hauptnavigation">
@@ -35,169 +38,228 @@
     </div>
   </header>
   <noscript><div class="noscript wrap">Für die Berechnung bitte JavaScript aktivieren. Alle Berechnungen laufen lokal in deinem Browser.</div></noscript>
-  <main id="main" class="wrap tool-main">
-    <div class="tool-intro">
-      <div>
-        <p class="eyebrow"><span class="tool-symbol"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 18V9M12 18V4M19 18v-6"/></svg></span> Dein nächster Schritt</p>
-        <h1>Noten. Mit Überblick.</h1>
-        <p>Wo du stehst. Was möglich ist. Was du noch brauchst.</p>
+  <main id="main" class="tool-main">
+    <div class="wrap">
+      <div class="tool-intro load-rise" style="--i:0">
+        <span class="tool-glyph" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke-linecap="round"><defs><linearGradient id="gradeFilm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--film-0)"/><stop offset=".36" style="stop-color:var(--film-1)"/><stop offset=".68" style="stop-color:var(--film-2)"/><stop offset="1" style="stop-color:var(--film-3)"/></linearGradient></defs><path d="M12.69 35.31A16 16 0 1 1 35.31 35.31" stroke="var(--rule-strong)" stroke-width="2"/><path d="M12.69 35.31A16 16 0 1 1 39.95 25.26" stroke="url(#gradeFilm)" stroke-width="5"/><path d="M24 24 33.97 24.78" stroke="var(--ink)" stroke-width="2"/><circle cx="39.95" cy="25.26" r="3.2" fill="url(#gradeFilm)"/><circle cx="24" cy="24" r="2.4" fill="var(--ink)"/></svg></span>
+        <div>
+          <p class="eyebrow">Notenrechner<span class="eyebrow-extra"> · Dein nächster Schritt</span></p>
+          <h1>Noten. Mit <span class="film-text">Überblick</span>.</h1>
+          <p class="tool-lead">Wo du stehst. Was möglich ist. Was du noch brauchst.</p>
+        </div>
+        <span class="local-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Nur in deinem Browser</span>
       </div>
-      <span class="local-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Nur in deinem Browser</span>
+
+      <div class="calculator-layout" data-grade-app>
+        <div class="subject-bar load-rise" style="--i:1">
+          <label class="field subject-field grow"><span class="field-label eyebrow">Fach</span><select id="subjectSelect" aria-label="Fach auswählen"></select></label>
+          <button type="button" class="icon-button bar-button" id="addSubject" aria-label="Fach hinzufügen" title="Fach hinzufügen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button type="button" class="icon-button bar-button" id="openSubjectSettings" aria-controls="subjectSettings" aria-label="Fach und Datensicherung öffnen" title="Fach und Datensicherung"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></button>
+          <a class="subject-summary text-button" id="subjectSummary" href="#overviewPanel" hidden></a>
+          <form id="subjectForm" class="inline-form" hidden>
+            <label class="field grow">Neues Fach<input id="subjectName" maxlength="60" placeholder="Zum Beispiel Mathematik" autocomplete="off"></label>
+            <button class="button secondary" type="submit">Anlegen</button>
+            <button class="icon-button" type="button" id="cancelSubject" aria-label="Abbrechen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
+          </form>
+        </div>
+
+        <section class="panel tint-grade result-panel load-rise" style="--i:2" data-transition-target="grade" aria-labelledby="result-title">
+          <div class="panel-heading">
+            <div><h2 id="result-title">Dein Schnitt</h2><p class="result-subject eyebrow" id="resultSubject">Allgemein</p></div>
+            <span class="tag" id="gradeCount" data-state="empty">Noch keine Noten</span>
+          </div>
+          <div class="gauge-wrap is-empty" data-intro>
+            <div class="grade-scale" role="img" id="gradeScale" aria-label="Notenskala von 1 bis 6">
+              <svg class="gauge" viewBox="0 0 240 240" aria-hidden="true" focusable="false">
+                <defs>
+                  <linearGradient id="gaugeFill" gradientUnits="userSpaceOnUse" x1="28" y1="0" x2="212" y2="0"><stop offset="0" class="gauge-stop-a"/><stop offset="1" class="gauge-stop-b"/></linearGradient>
+                  <mask id="gaugeNotch" maskUnits="userSpaceOnUse" x="0" y="0" width="240" height="240"><rect width="240" height="240" fill="#fff"/><path d="M158.14 45.16 165.4 30.9" stroke="#000" stroke-width="4" stroke-linecap="butt"/></mask>
+                </defs>
+                <g class="gauge-ticks"><line class="is-int" x1="44.34" y1="195.66" x2="37.27" y2="202.73"/><line x1="16.33" y1="153.68" x2="11.58" y2="155.23"/><line class="is-int" x1="14.32" y1="103.26" x2="4.44" y2="101.7"/><line x1="31.82" y1="55.93" x2="27.77" y2="52.99"/><line class="is-int" x1="71.42" y1="24.66" x2="66.88" y2="15.75"/><line x1="120" y1="11" x2="120" y2="6"/><line class="is-int" x1="168.58" y1="24.66" x2="173.12" y2="15.75"/><line x1="208.18" y1="55.93" x2="212.23" y2="52.99"/><line class="is-int" x1="225.68" y1="103.26" x2="235.56" y2="101.7"/><line x1="223.67" y1="153.68" x2="228.42" y2="155.23"/><line class="is-int" x1="195.66" y1="195.66" x2="202.73" y2="202.73"/></g>
+                <path class="gauge-zone" d="M63.43 176.57A80 80 0 0 1 156.32 48.72"/>
+                <g mask="url(#gaugeNotch)">
+                  <circle class="gauge-track" cx="120" cy="120" r="92" pathLength="100" transform="rotate(135 120 120)"/>
+                  <circle class="gauge-fill" id="scaleFill" cx="120" cy="120" r="92" pathLength="100" transform="rotate(135 120 120)"/>
+                </g>
+                <line class="scale-reference" x1="154.5" y1="52.28" x2="169.94" y2="21.99"/>
+                <circle class="gauge-sim-arc" id="scenarioArc" cx="120" cy="120" r="103" pathLength="100" transform="rotate(135 120 120)"/>
+                <g class="gauge-labels"><text x="71.92" y="168.08">1</text><text x="52.84" y="109.36">2</text><text x="89.13" y="59.41">3</text><text x="150.87" y="59.41">4</text><text x="187.16" y="109.36">5</text><text x="168.08" y="168.08">6</text></g>
+              </svg>
+              <span class="gauge-pointer" id="scalePointer" hidden><i></i></span>
+              <span class="gauge-pointer is-sim" id="scenarioPointer" hidden><i></i></span>
+              <span class="gauge-pointer is-target" id="targetPointer" hidden><i></i></span>
+            </div>
+            <div class="grade-metric" aria-live="polite" aria-atomic="true">
+              <output id="average" aria-label="Gerundeter Notendurchschnitt" data-state="empty">-.--</output>
+            </div>
+          </div>
+          <div class="result-meta"><span id="averageDetail">Trage deine erste Note ein.</span><span id="averageExact" class="mono-data"></span></div>
+          <p class="result-explanation"><span class="scale-key"><i class="key-current"></i>Aktuell</span><span class="scale-key"><i class="key-scenario"></i>Simulation</span><span class="scale-key"><i class="key-target"></i>Ziel</span><span class="scale-key"><i class="key-reference"></i>4.0: Orientierung, keine Bestehensgarantie</span></p>
+          <div class="entry-chart" id="entryChart" aria-hidden="true" data-empty="true">
+            <div class="chart-plot"><div class="chart-bars"></div><b class="chart-line is-ref"></b><b class="chart-line is-need" hidden></b><b class="chart-line is-avg" hidden></b></div>
+            <p class="chart-caption"><span>Balkenbreite = Gewicht</span><span>Höhe = Note</span></p>
+            <p class="chart-empty">Noch keine Noten. Tipp: «Beispiel laden».</p>
+          </div>
+        </section>
+
+        <section class="panel input-panel load-rise" style="--i:3" id="noten" aria-labelledby="entries-title">
+          <div class="panel-heading">
+            <h2 id="entries-title">Deine Noten</h2>
+            <button type="button" class="text-button" id="loadExample">Beispiel laden</button>
+          </div>
+          <div class="grade-columns eyebrow" aria-hidden="true"><span>#</span><span>Prüfung<span class="col-optional"> (optional)</span></span><span>Note</span><span>Gewicht</span><span></span></div>
+          <div class="compact-result compact-bar" id="compactResult" hidden><span id="compactAverage"></span><a class="text-button" href="#result-title">Zum Ergebnis ↑</a></div>
+          <form id="gradeForm" novalidate><div id="gradeEntries" class="grade-entries"></div><button class="button ghost add-row" type="button" id="addEntry"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Note hinzufügen <kbd class="enter-hint" aria-hidden="true">⏎ Enter</kbd></button><button type="submit" class="sr-only" tabindex="-1">Noten berechnen</button></form>
+          <div class="toast" id="gradeToast" role="status" hidden>
+            <span id="toastMessage"></span>
+            <button class="text-button" type="button" id="undoAction"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6 4 11l5 5M4 11h9.5a5.5 5.5 0 0 1 0 11H11"/></svg> Rückgängig</button>
+            <button class="icon-button" type="button" id="closeToast" aria-label="Hinweis schliessen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
+          </div>
+          <p class="fineprint input-limits">Noten 1–6 · Gewicht 0.01–100 · höchstens 2 Dezimalstellen.</p>
+          <p id="gradeError" class="form-message" role="status"></p>
+        </section>
+
+        <section class="panel next-panel load-rise" style="--i:4" aria-labelledby="next-title">
+          <div class="panel-heading">
+            <h2 id="next-title">Deine nächste Note</h2>
+            <span class="tag">Planung</span>
+          </div>
+          <div class="next-weight">
+            <label class="field">Gewicht der nächsten Note<input type="text" inputmode="decimal" id="nextWeight" value="1" maxlength="20"></label>
+            <div class="chips" role="group" aria-label="Gewicht schnell wählen"><button type="button" class="chip" data-next-weight="0.5" aria-pressed="false">0.5</button><button type="button" class="chip" data-next-weight="1" aria-pressed="true">1</button><button type="button" class="chip" data-next-weight="2" aria-pressed="false">2</button></div>
+          </div>
+          <div class="plan-grid">
+            <div class="next-block is-sim" role="group" aria-labelledby="scenario-title">
+              <h3 id="scenario-title"><i class="block-key" aria-hidden="true"></i>Was wäre, wenn …</h3>
+              <p class="next-lead">… deine nächste Note so ausfällt?</p>
+              <div class="scenario-row">
+                <input type="range" class="range" id="scenarioSlider" min="1" max="6" step="0.01" value="5" aria-label="Nächste Note simulieren" style="--p:.8">
+                <label class="field small-field"><span class="sr-only">Simulierte nächste Note</span><input type="text" inputmode="decimal" id="scenarioGrade" value="5.00" aria-label="Simulierte nächste Note"></label>
+              </div>
+              <div class="range-scale" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+              <div class="scenario-answer" aria-live="polite" aria-atomic="true">
+                <span>Neuer Schnitt<small id="scenarioWeightLabel">mit Gewicht 1</small></span>
+                <output id="scenarioResult" data-state="empty">-.--</output>
+              </div>
+              <span class="delta-chip" id="scenarioDelta" aria-hidden="true" data-dir="none"></span>
+              <p class="fineprint" id="scenarioHint">Mindestens eine aktuelle Note eingeben.</p>
+            </div>
+            <div class="next-block is-target" role="group" aria-labelledby="target-title">
+              <h3 id="target-title"><i class="block-key" aria-hidden="true"></i>Deine Zielnote</h3>
+              <div class="target-grid">
+                <label class="field">Zielschnitt<input type="text" inputmode="decimal" id="targetAverage" value="4.00"></label>
+                <label class="field">Ziel gilt für<select id="targetBasis"><option value="exact">Ungerundeten Schnitt</option><option value="display">Gerundete Anzeige</option></select></label>
+              </div>
+              <div class="target-answer" id="targetResult" role="status">Zuerst eine aktuelle Note eingeben.</div>
+              <p class="fineprint" id="targetDetail">Der Planer berücksichtigt deine gewählten Notenschritte.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel settings-panel load-rise" style="--i:5" aria-label="Einstellungen">
+          <div class="save-row">
+            <label class="check-label switch"><input type="checkbox" id="saveGrades" checked> Auf diesem Gerät speichern</label>
+            <span class="save-status" id="saveStatus" role="status"></span>
+          </div>
+          <div class="panel-tools">
+            <details class="settings-details disclosure" name="grade-tools">
+              <summary>Rundung &amp; Notenschritte <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+              <div class="details-body">
+                <div class="field-grid">
+                  <label class="field">Anzeige runden auf<select id="rounding"><option value="0.01">0.01 · Hundertstel</option><option value="0.1">0.1 · Zehntel</option><option value="0.5">0.5 · Halbe Note</option><option value="1">1 · Ganze Note</option></select></label>
+                  <label class="field">Nächste Noten in Schritten von<select id="gradeStep"><option value="0.01">0.01</option><option value="0.1">0.1</option><option value="0.25">0.25</option><option value="0.5">0.5</option><option value="1">1.0</option></select></label>
+                </div>
+                <p class="fineprint">Die Originalnoten bleiben unverändert. Es wird kaufmännisch auf den gewählten Schritt gerundet. Massgebend sind die Regeln deiner Schule.</p>
+              </div>
+            </details>
+            <details class="settings-details disclosure" name="grade-tools" id="subjectSettings">
+              <summary>Fach &amp; Datensicherung <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+              <div class="details-body">
+                <label class="field">Fach umbenennen<input id="renameSubject" maxlength="60" autocomplete="off"></label>
+                <div class="utility-actions">
+                  <button class="button secondary small" id="exportGrades" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg> Export</button>
+                  <button class="button secondary small" id="importGrades" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V9m-5 5 5-5 5 5M4 8V3h16v5"/></svg> Import</button>
+                  <button class="text-button danger-text" id="deleteSubject" type="button">Fach löschen</button>
+                </div>
+                <input type="file" id="importFile" accept="application/json,.json" hidden>
+                <p class="fineprint">JSON-Export als Sicherung. Ein Import ersetzt die Fächer nach Bestätigung. Browserdaten können gelöscht werden: wichtige Noten zusätzlich exportieren.</p>
+              </div>
+            </details>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel overview-panel" id="overviewPanel" aria-labelledby="overview-title" hidden>
+        <div class="panel-heading">
+          <h2 id="overview-title">Alle Fächer</h2>
+          <span class="tag" id="overviewCount"></span>
+        </div>
+        <div class="table-scroll">
+          <table class="overview-table data-table">
+            <thead>
+              <tr><th scope="col">Fach</th><th scope="col">Noten</th><th scope="col">Schnitt</th></tr>
+            </thead>
+            <tbody id="overviewRows"></tbody>
+            <tfoot>
+              <tr><th scope="row" colspan="2">Gesamtschnitt</th><td id="overviewAverage">–</td></tr>
+            </tfoot>
+          </table>
+        </div>
+        <p class="fineprint">Mittel der gerundeten Fachschnitte, jeweils mit der Rundung des Fachs. Massgebend sind die Regeln deiner Schule.</p>
+      </section>
+
+      <section class="panel points-panel" aria-labelledby="points-title">
+        <div class="points-intro">
+          <p class="eyebrow">Noch ein kleiner Helfer</p>
+          <h2 id="points-title">Punkte rein. Note raus.</h2>
+          <p class="fineprint">Lineare Formel: Mindestnote + (Punkte ÷ Maximum) × Notenspanne. Nur verwenden, wenn deine Prüfung so bewertet wird. Nötige Punkte sind ein Mindestwert: bei ganzen oder halben Punkten aufrunden.</p>
+        </div>
+        <div class="points-cards">
+          <div class="points-card" role="group" aria-labelledby="points-a-title">
+            <h3 id="points-a-title">Punkte → Note</h3>
+            <div class="points-form">
+              <label class="field">Erreichte Punkte<input type="text" inputmode="decimal" id="pointsEarned" value="45"></label>
+              <label class="field">Maximale Punkte<input type="text" inputmode="decimal" id="pointsMax" value="60"></label>
+              <label class="field">Mindestnote<input type="text" inputmode="decimal" id="pointsMinGrade" value="1"></label>
+              <label class="field">Höchstnote<input type="text" inputmode="decimal" id="pointsMaxGrade" value="6"></label>
+            </div>
+            <div class="points-foot">
+              <div class="points-meter" aria-hidden="true" style="--p:.75"><i></i></div>
+              <p class="points-formula mono-data" id="pointsFormula" aria-hidden="true">1 + (45 ÷ 60) × 5 = 4.75</p>
+              <div class="points-answer" aria-live="polite" aria-atomic="true">
+                <span>Rechnerische Note</span>
+                <output id="pointsResult">4.75</output>
+              </div>
+            </div>
+            <p id="pointsError" class="form-message" role="status"></p>
+          </div>
+          <div class="points-card" role="group" aria-labelledby="points-b-title">
+            <h3 id="points-b-title">Wunschnote → Punkte</h3>
+            <label class="field">Wunschnote<input type="text" inputmode="decimal" id="pointsTarget" value="4"></label>
+            <p class="fineprint">Rechnet mit Maximum und Notenskala aus «Punkte → Note».</p>
+            <div class="points-foot">
+              <div class="points-meter is-need" aria-hidden="true" style="--p:.6"><i></i></div>
+              <p class="points-formula mono-data" id="pointsNeededFormula" aria-hidden="true">(4 − 1) ÷ 5 × 60 = 36</p>
+              <div class="points-answer points-needed" aria-live="polite" aria-atomic="true">
+                <span id="pointsNeededLabel">Nötig für eine 4.00</span>
+                <output id="pointsNeeded">36 von 60</output>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <p class="privacy-line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Keine Konten. Keine Übertragung deiner Noten. Komma und Punkt werden beide akzeptiert.</p>
     </div>
-    <div class="calculator-layout" data-grade-app>
-      <section class="panel input-panel" id="noten" aria-labelledby="entries-title">
-        <div class="panel-heading">
-          <h2 id="entries-title">Deine Noten</h2>
-          <button type="button" class="text-button" id="loadExample">Beispiel laden</button>
-        </div>
-        <div class="subject-controls">
-          <label class="field grow">Fach<select id="subjectSelect" aria-label="Fach auswählen"></select></label>
-          <button type="button" class="icon-button" id="addSubject" aria-label="Fach hinzufügen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
-        </div>
-        <form id="subjectForm" class="inline-form" hidden>
-          <label class="field grow">Neues Fach<input id="subjectName" maxlength="60" placeholder="Zum Beispiel Mathematik" autocomplete="off"></label>
-          <button class="button secondary" type="submit">Anlegen</button>
-          <button class="icon-button" type="button" id="cancelSubject" aria-label="Abbrechen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
-        </form>
-        <div class="grade-columns" aria-hidden="true">
-          <span>Prüfung (optional)</span>
-          <span>Note</span>
-          <span>Gewicht</span>
-          <span></span>
-        </div>
-        <div class="compact-result" id="compactResult" hidden><span id="compactAverage"></span><a href="#result-title">Zum Ergebnis</a></div>
-        <form id="gradeForm" novalidate><div id="gradeEntries" class="grade-entries"></div><button class="button secondary add-row" type="button" id="addEntry"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Note hinzufügen</button><button type="submit" class="sr-only">Noten berechnen</button></form>
-        <div class="toast" id="gradeToast" role="status" hidden>
-          <span id="toastMessage"></span>
-          <button class="text-button" type="button" id="undoAction">Rückgängig</button>
-          <button class="icon-button" type="button" id="closeToast" aria-label="Hinweis schliessen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button>
-        </div>
-        <p class="fineprint input-limits">Noten 1–6 · Gewicht 0.01–100 · höchstens 2 Dezimalstellen.</p>
-        <p id="gradeError" class="form-message" role="status"></p>
-        <div class="save-row">
-          <label class="check-label"><input type="checkbox" id="saveGrades" checked> Auf diesem Gerät speichern</label>
-          <span class="save-status" id="saveStatus" role="status"></span>
-        </div>
-        <details class="settings-details">
-          <summary>Rundung &amp; Notenschritte <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
-          <div class="field-grid">
-            <label class="field">Anzeige runden auf<select id="rounding"><option value="0.01">0.01 · Hundertstel</option><option value="0.1">0.1 · Zehntel</option><option value="0.5">0.5 · Halbe Note</option><option value="1">1 · Ganze Note</option></select></label>
-            <label class="field">Nächste Noten in Schritten von<select id="gradeStep"><option value="0.01">0.01</option><option value="0.1">0.1</option><option value="0.25">0.25</option><option value="0.5">0.5</option><option value="1">1.0</option></select></label>
-          </div>
-          <p class="fineprint">Die Originalnoten bleiben unverändert. Es wird kaufmännisch auf den gewählten Schritt gerundet. Massgebend sind die Regeln deiner Schule.</p>
-        </details>
-        <details class="settings-details">
-          <summary>Fach &amp; Datensicherung <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
-          <label class="field">Fach umbenennen<input id="renameSubject" maxlength="60" autocomplete="off"></label>
-          <div class="utility-actions">
-            <button class="button secondary" id="exportGrades" type="button"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg> Export</button>
-            <button class="button secondary" id="importGrades" type="button">Import</button>
-            <button class="text-button danger-text" id="deleteSubject" type="button">Fach löschen</button>
-          </div>
-          <input type="file" id="importFile" accept="application/json,.json" hidden>
-          <p class="fineprint">JSON-Export als Sicherung. Ein Import ersetzt die Fächer nach Bestätigung. Browserdaten können gelöscht werden: wichtige Noten zusätzlich exportieren.</p>
-        </details>
-      </section>
-      <section class="panel result-panel" data-transition-target="grade" aria-labelledby="result-title">
-        <div class="panel-heading">
-          <h2 id="result-title">Dein Schnitt</h2>
-          <span class="tag" id="gradeCount">Noch keine Noten</span>
-        </div>
-        <div class="grade-metric" aria-live="polite" aria-atomic="true">
-          <output id="average" aria-label="Gerundeter Notendurchschnitt" data-state="empty">-.--</output>
-          <div>
-            <span id="averageDetail">Trage deine erste Note ein.</span>
-            <span id="averageExact"></span>
-          </div>
-        </div>
-        <div class="grade-scale" role="img" id="gradeScale" aria-label="Notenskala von 1 bis 6">
-          <div class="scale-track"><div class="scale-fill" id="scaleFill"></div><span class="scale-reference" style="left:60%"></span><span class="scale-pointer" id="scalePointer" hidden></span><span class="scale-scenario" id="scenarioPointer" hidden></span></div>
-          <div class="scale-labels">
-            <span>1.0</span>
-            <span>2.0</span>
-            <span>3.0</span>
-            <span>4.0</span>
-            <span>5.0</span>
-            <span>6.0</span>
-          </div>
-        </div>
-        <p class="result-explanation"><span class="scale-key"><i class="key-current"></i>Aktuell</span><span class="scale-key"><i class="key-scenario"></i>Simulation</span><span class="scale-key"><i class="key-reference"></i>4.0: Orientierung, keine Bestehensgarantie</span></p>
-      </section>
-      <section class="panel next-panel" aria-labelledby="next-title">
-        <div class="panel-heading">
-          <h2 id="next-title">Deine nächste Note</h2>
-          <span class="tag">Planung</span>
-        </div>
-        <label class="field">Gewicht der nächsten Note<input type="text" inputmode="decimal" id="nextWeight" value="1" maxlength="20"></label>
-        <div class="next-block" role="group" aria-labelledby="scenario-title">
-          <h3 id="scenario-title">Was wäre, wenn …</h3>
-          <p class="next-lead">… deine nächste Note so ausfällt?</p>
-          <div class="scenario-row">
-            <input type="range" id="scenarioSlider" min="1" max="6" step="0.01" value="5" aria-label="Nächste Note simulieren">
-            <label class="field small-field"><span class="sr-only">Simulierte nächste Note</span><input type="text" inputmode="decimal" id="scenarioGrade" value="5.00" aria-label="Simulierte nächste Note"></label>
-          </div>
-          <div class="scenario-answer" aria-live="polite" aria-atomic="true">
-            <span>Neuer Schnitt<small id="scenarioWeightLabel">mit Gewicht 1</small></span>
-            <output id="scenarioResult" data-state="empty">-.--</output>
-          </div>
-          <p class="fineprint" id="scenarioHint">Mindestens eine aktuelle Note eingeben.</p>
-        </div>
-        <div class="next-block" role="group" aria-labelledby="target-title">
-          <h3 id="target-title">Deine Zielnote</h3>
-          <div class="target-grid">
-            <label class="field">Zielschnitt<input type="text" inputmode="decimal" id="targetAverage" value="4.00"></label>
-            <label class="field">Ziel gilt für<select id="targetBasis"><option value="exact">Ungerundeten Schnitt</option><option value="display">Gerundete Anzeige</option></select></label>
-          </div>
-          <div class="target-answer" id="targetResult" role="status">Zuerst eine aktuelle Note eingeben.</div>
-          <p class="fineprint" id="targetDetail">Der Planer berücksichtigt deine gewählten Notenschritte.</p>
-        </div>
-      </section>
-    </div>
-    <section class="panel overview-panel" id="overviewPanel" aria-labelledby="overview-title" hidden>
-      <div class="panel-heading">
-        <h2 id="overview-title">Alle Fächer</h2>
-        <span class="tag" id="overviewCount"></span>
-      </div>
-      <table class="overview-table">
-        <thead>
-          <tr><th scope="col">Fach</th><th scope="col">Noten</th><th scope="col">Schnitt</th></tr>
-        </thead>
-        <tbody id="overviewRows"></tbody>
-        <tfoot>
-          <tr><th scope="row" colspan="2">Gesamtschnitt</th><td id="overviewAverage">–</td></tr>
-        </tfoot>
-      </table>
-      <p class="fineprint">Mittel der gerundeten Fachschnitte, jeweils mit der Rundung des Fachs. Massgebend sind die Regeln deiner Schule.</p>
-    </section>
-    <section class="panel points-panel" aria-labelledby="points-title">
-      <div>
-        <p class="eyebrow">Noch ein kleiner Helfer</p>
-        <h2 id="points-title">Punkte rein. Note raus.</h2>
-        <p class="fineprint">Lineare Formel: Mindestnote + (Punkte ÷ Maximum) × Notenspanne. Nur verwenden, wenn deine Prüfung so bewertet wird. Nötige Punkte sind ein Mindestwert: bei ganzen oder halben Punkten aufrunden.</p>
-      </div>
-      <div class="points-form">
-        <label class="field">Erreichte Punkte<input type="text" inputmode="decimal" id="pointsEarned" value="45"></label>
-        <label class="field">Maximale Punkte<input type="text" inputmode="decimal" id="pointsMax" value="60"></label>
-        <label class="field">Mindestnote<input type="text" inputmode="decimal" id="pointsMinGrade" value="1"></label>
-        <label class="field">Höchstnote<input type="text" inputmode="decimal" id="pointsMaxGrade" value="6"></label>
-        <div class="points-answer" aria-live="polite" aria-atomic="true">
-          <span>Rechnerische Note</span>
-          <output id="pointsResult">4.75</output>
-        </div>
-        <label class="field">Wunschnote<input type="text" inputmode="decimal" id="pointsTarget" value="4"></label>
-        <div class="points-answer points-needed" aria-live="polite" aria-atomic="true">
-          <span id="pointsNeededLabel">Nötig für eine 4.00</span>
-          <output id="pointsNeeded">36 von 60</output>
-        </div>
-        <p id="pointsError" class="form-message" role="status"></p>
-      </div>
-    </section>
-    <p class="privacy-line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Keine Konten. Keine Übertragung deiner Noten. Komma und Punkt werden beide akzeptiert.</p>
   </main>
-  <footer class="site-footer wrap">
-    <span>© 2026 Kilian Pfister</span>
-    <span class="footer-note">Kleine Tools. Ohne Umwege.</span>
-    <a href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">GitHub <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a>
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>© 2026 Kilian Pfister</span>
+      <span class="footer-note">Kleine Tools. Ohne Umwege.</span>
+      <a href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">GitHub <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a>
+      <a class="footer-top" href="#main">Nach oben <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></a>
+    </div>
+    <div class="wrap"><svg class="footer-mark" data-spotlight viewBox="0 0 1000 160" aria-hidden="true" focusable="false"><text class="mark-base" x="0" y="132" textLength="1000" lengthAdjust="spacingAndGlyphs">misterpfister</text><text class="mark-lit" x="0" y="132" textLength="1000" lengthAdjust="spacingAndGlyphs">misterpfister</text></svg></div>
   </footer>
 </body>
 </html>

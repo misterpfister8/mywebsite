@@ -41,10 +41,16 @@ const q = M.sleepPlan('bed', '23:30', 8, 0, 15);
 eq(M.clock(q.wake), '07:45'); eq(q.day, 'Am Folgetag');
 eq(M.clock(M.sleepPlan('wake', '07:00', 7, 15, 15).bed), '23:30');
 eq(M.clock(M.sleepPlan('wake', '07:00', 16, 0, 180).bed), '12:00');
+// A bedtime before 17:00 of the previous day is "Am Vortag", not the evening before; 17:00 itself still is.
+eq(M.sleepPlan('wake', '07:00', 16, 0, 180).day, 'Am Vortag');
+eq(M.sleepPlan('wake', '07:00', 14, 0, 0).day, 'Am Vorabend'); // bed 17:00 (-420)
+eq(M.sleepPlan('wake', '07:00', 14, 0, 1).day, 'Am Vortag');   // bed 16:59
+eq(M.sleepPlan('wake', '00:00', 1, 0, 0).day, 'Am Vorabend');
 for (let t = 0; t < 1440; t += 17) for (const h of [1, 7, 8, 16]) for (const latency of [0, 15, 180]) for (const mode of ['wake', 'bed']) {
   const a = M.sleepPlan(mode, M.clock(t), h, 0, latency);
   eq(a.wake - a.bed, h * 60 + latency); eq(a.onset - a.bed, latency);
   eq(mode === 'wake' ? a.wake : a.bed, t);
+  eq(a.day, mode === 'wake' ? (a.bed < -420 ? 'Am Vortag' : a.bed < 0 ? 'Am Vorabend' : 'Am selben Tag') : (a.wake >= 1440 ? 'Am Folgetag' : 'Am selben Tag'));
 }
 for (const args of [['wake', '', 8, 0, 15], ['wake', '24:00', 8, 0, 15], ['wake', '12:60', 8, 0, 15], ['bed', '12:00', 0, 0, 0], ['bed', '12:00', 16, 1, 15], ['bed', '12:00', 8, 60, 15], ['bed', '12:00', 8, 0, 181]]) throws(() => M.sleepPlan(...args));
 eq(M.duration(495), '8 h 15 min'); eq(M.duration(0), '0 min');
@@ -95,4 +101,46 @@ near(M.pointsFor(4, 60), 36); near(M.pointsFor(6, 60), 60); near(M.pointsFor(1, 
 for (const args of [[0.5, 60], [6.01, 60], [4, 0], [4, 1e6 + 1], [4, 60, 6, 6], [NaN, 60], [4, 60, 0.5, 6]]) { assert.ok(Number.isNaN(M.pointsFor(...args))); checks++; }
 // The inverse is exact for the linear formula.
 for (const max of [10, 47, 60, 100]) for (const target of [1, 3.5, 4, 4.25, 5.5, 6]) near(M.points(M.pointsFor(target, max), max), target);
+// 24-hour dial (Werkplatz 5): pointer angle, 0 = top, clockwise, [0, 360).
+const circular = (a, b, turn) => Math.min(Math.abs(a - b) % turn, turn - (Math.abs(a - b) % turn));
+for (const [dx, dy, deg] of [[0, -1, 0], [1, 0, 90], [0, 1, 180], [-1, 0, 270], [1, -1, 45], [1, 1, 135], [-1, 1, 225], [-1, -1, 315]]) near(M.pointerAngle(dx, dy), deg);
+for (let i = 0; i < 720; i++) {
+  const rad = i * Math.PI / 360, dx = Math.sin(rad), dy = -Math.cos(rad), angle = M.pointerAngle(dx, dy);
+  assert.ok(angle >= 0 && angle < 360, `pointerAngle out of range: ${angle}`); checks++;
+  near(circular(angle, i / 2, 360), 0);
+  near(circular(M.pointerAngle(dx * 173.5, dy * 173.5), angle, 360), 0); // independent of the dial size
+}
+// Dial angle -> snapped clock minutes (4 minutes per degree), wrapped to [0, 1440).
+for (const [args, expected] of [[[90], 360], [[359.9], 0], [[-15], 1380], [[90.3, 1], 361], [[360], 0], [[810], 360], [[105.7, 1], 423],
+  [[0], 0], [[105], 420], [[342.5], 1370], [[0.6], 0], [[1.2], 5], [[-0.6], 0], [[-1.2], 1435], [[180, 15], 720], [[359.99, 1], 0]]) eq(M.dialMinutes(...args), expected);
+for (let angle = -720; angle <= 720; angle += .37) for (const step of [1, 5, 15]) {
+  const minutes = M.dialMinutes(angle, step);
+  assert.ok(Number.isInteger(minutes) && minutes >= 0 && minutes < 1440 && minutes % step === 0, `dialMinutes(${angle}, ${step}) = ${minutes}`); checks++;
+  assert.ok(circular(minutes, ((angle * 4) % 1440 + 1440) % 1440, 1440) <= step / 2 + 1e-9, `dialMinutes snaps to the nearest step: ${angle}`); checks++;
+}
+// A drag to any clock position lands exactly on it (the pipeline sleep.js uses: pointer -> angle -> minutes).
+for (let t = 0; t < 1440; t++) {
+  const rad = t / 4 * Math.PI / 180, dx = Math.sin(rad) * 120, dy = -Math.cos(rad) * 120;
+  eq(M.dialMinutes(M.pointerAngle(dx, dy), 1), t);
+  if (t % 5 === 0) eq(M.dialMinutes(M.pointerAngle(dx, dy)), t);
+}
+// Duration handle: the inverse of sleepPlan, clamped to 1-16 h on the side the drag came from.
+eq(M.dialDuration('wake', 420, 1370, 10, 480), 480);
+eq(M.dialDuration('bed', 1370, 420, 10, 480), 480);
+eq(M.dialDuration('wake', 420, 390, 0, 70), 60);   // raw 30, came from the short side
+eq(M.dialDuration('wake', 420, 860, 0, 950), 960); // raw 1000, came from the long side
+eq(M.dialDuration('wake', 420, 400, 0, 960), 960); // wrapped to 20 from the 960 side stays 960
+eq(M.dialDuration('wake', 420, 430, 0, 60), 60);   // wrapped to 1430 from the 60 side stays 60
+eq(M.dialDuration('bed', 0, 1000, 0, 950), 960);   // bed mode, raw 1000
+eq(M.dialDuration('bed', 1380, 1395, 10, 70), 60); // bed mode, raw 5 across midnight
+eq(M.dialDuration('wake', 420, 360, 0, 480), 60);  // exactly 1 h is kept
+eq(M.dialDuration('wake', 420, 900, 0, 480), 960); // exactly 16 h is kept
+for (const mode of ['wake', 'bed']) for (let t = 0; t < 1440; t += 35) for (const [h, min] of [[1, 0], [7, 30], [8, 0], [9, 15], [16, 0]]) for (const latency of [0, 10, 180]) {
+  const plan = M.sleepPlan(mode, M.clock(t), h, min, latency), wake = ((plan.wake % 1440) + 1440) % 1440, bed = ((plan.bed % 1440) + 1440) % 1440;
+  for (const previous of [60, 480, 960]) eq(M.dialDuration(mode, mode === 'wake' ? wake : bed, mode === 'wake' ? bed : wake, latency, previous), h * 60 + min);
+}
+for (const mode of ['wake', 'bed']) for (const anchor of [0, 420, 1370]) for (let handle = 0; handle < 1440; handle += 7) for (const latency of [0, 10, 180]) for (const previous of [60, 300, 720, 960]) {
+  const length = M.dialDuration(mode, anchor, handle, latency, previous);
+  assert.ok(Number.isInteger(length) && length >= 60 && length <= 960, `dialDuration(${mode}, ${anchor}, ${handle}, ${latency}, ${previous}) = ${length}`); checks++;
+}
 console.log(`PASS: ${checks} mathematical assertions (including exhaustive grade-step comparisons).`);

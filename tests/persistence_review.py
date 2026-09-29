@@ -36,6 +36,19 @@ with sync_playwright() as w, tempfile.TemporaryDirectory(prefix='misterpfister-p
         assert not p.locator(checkbox).is_checked()
         assert p.evaluate('(key)=>localStorage.getItem(key)',key) is None
     c.close()
+    # The dial only writes the existing inputs, so its changes keep the stored format and survive a restart.
+    c,p = launch(); p.goto(args.base_url+'sleepcalculator/')
+    p.locator('#saveSleep').check()
+    p.locator('#dialAnchor').focus(); p.keyboard.press('PageUp'); p.keyboard.press('ArrowRight')
+    p.locator('#dialEnd').focus(); p.keyboard.press('PageDown'); p.keyboard.press('Shift+ArrowLeft')
+    assert p.locator('#anchorTime').input_value() == '08:05' and p.locator('#sleepHours').input_value() == '6' and p.locator('#sleepMinutes').input_value() == '59'
+    stored = p.evaluate("JSON.parse(localStorage.getItem('misterpfister-sleep-v2'))")
+    assert stored['version'] == 1 and stored['state'] == {'mode': 'wake', 'time': '08:05', 'hours': 6, 'minutes': 59, 'latency': 10}, stored
+    c.close()
+    c,p = launch(); p.goto(args.base_url+'sleepcalculator/')
+    assert p.locator('#saveSleep').is_checked() and p.locator('#anchorTime').input_value() == '08:05' and p.locator('#sleepResultTime').inner_text() == '00:56'
+    assert p.locator('#dialAnchor').get_attribute('aria-valuenow') == '485' and p.locator('#dialEnd').get_attribute('aria-valuenow') == '419'
+    c.close()
     if args.browser == 'chromium':
         browser = engine.launch(args=['--disable-local-storage'])
         p = browser.new_page()
@@ -48,4 +61,4 @@ with sync_playwright() as w, tempfile.TemporaryDirectory(prefix='misterpfister-p
         assert p.locator('#sleepResultTime').inner_text() == '22:35'
         assert p.locator('#sleepSaveStatus').get_attribute('data-error') == 'true'
         browser.close()
-print('PASS: native profile restart, incomplete drafts, last valid sleep state, opt-out' + (' and browser-disabled storage' if args.browser=='chromium' else ''))
+print('PASS: native profile restart, incomplete drafts, last valid sleep state, opt-out, dial changes' + (' and browser-disabled storage' if args.browser=='chromium' else ''))

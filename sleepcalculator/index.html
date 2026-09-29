@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#111310">
+  <meta name="theme-color" content="#0B0D0F">
   <title>Schlafrechner — Zeit für dich · misterpfister.net</title>
   <meta name="description" content="Schlafenszeit oder Aufwachzeit direkt berechnen. Interaktive 24-Stunden-Uhr, frei einstellbare Dauer und eigene lokale Presets.">
   <link rel="canonical" href="https://misterpfister.net/sleepcalculator/">
@@ -13,18 +13,19 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_CH">
   <meta property="og:url" content="https://misterpfister.net/sleepcalculator/">
-  <script src="../assets/transitions.js?v=werkplatz-4"></script>
-  <script src="../assets/theme.js?v=werkplatz-4"></script>
-  <link rel="stylesheet" href="../assets/site.css?v=werkplatz-4">
-  <script src="../assets/workbench.js?v=werkplatz-4" defer></script>
-  <script src="../assets/tool-storage.js?v=werkplatz-4" defer></script>
-  <script src="../assets/tool-math.js?v=werkplatz-4" defer></script>
-  <script src="../assets/sleep.js?v=werkplatz-4" defer></script>
+  <script src="../assets/transitions.js?v=werkplatz-5"></script>
+  <script src="../assets/theme.js?v=werkplatz-5"></script>
+  <link rel="stylesheet" href="../assets/core.css?v=werkplatz-5">
+  <link rel="stylesheet" href="../assets/sleep.css?v=werkplatz-5">
+  <script src="../assets/motion.js?v=werkplatz-5" defer></script>
+  <script src="../assets/tool-storage.js?v=werkplatz-5" defer></script>
+  <script src="../assets/tool-math.js?v=werkplatz-5" defer></script>
+  <script src="../assets/sleep.js?v=werkplatz-5" defer></script>
 </head>
 <body class="tool-page sleep-page">
   <a href="#main" class="skip-link">Zum Inhalt springen</a>
   <header class="site-header">
-    <div class="nav-shell wrap">
+    <div class="nav-shell">
       <a class="brand" href="../" aria-label="misterpfister.net – Startseite"><span class="brand-mark">m.</span><span class="brand-word">misterpfister<span>.net</span></span></a>
       <a href="../" class="back-link"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg><span>Werkplatz</span></a>
       <nav class="main-nav" aria-label="Hauptnavigation">
@@ -35,108 +36,133 @@
     </div>
   </header>
   <noscript><div class="noscript wrap">Für die Berechnung bitte JavaScript aktivieren. Alle Berechnungen laufen lokal in deinem Browser.</div></noscript>
-  <main id="main" class="wrap tool-main">
-    <div class="tool-intro">
-      <div>
-        <p class="eyebrow"><span class="tool-symbol"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13a8.1 8.1 0 0 1-9-9 8.5 8.5 0 1 0 9 9Z"/></svg></span> Dein Rhythmus, deine Zeit</p>
-        <h1>Zeit, abzuschalten.</h1>
-        <p>Ein Plan für deine Nacht. Ganz ohne Rätselraten.</p>
+  <main id="main" class="tool-main">
+    <div class="wrap">
+      <div class="tool-intro load-rise" style="--i:0">
+        <span class="tool-glyph" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke-linecap="round"><defs><linearGradient id="sleepFilm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--film-0)"/><stop offset=".36" style="stop-color:var(--film-1)"/><stop offset=".68" style="stop-color:var(--film-2)"/><stop offset="1" style="stop-color:var(--film-3)"/></linearGradient><mask id="sleepCrescent"><rect width="48" height="48" fill="#fff"/><circle cx="27.8" cy="21.3" r="6.7" fill="#000"/></mask></defs><circle cx="24" cy="24" r="17" stroke="var(--rule-strong)" stroke-width="2"/><path d="M19.6 7.58A17 17 0 0 1 40.42 28.4" stroke="url(#sleepFilm)" stroke-width="5"/><circle cx="40.42" cy="28.4" r="3.2" fill="url(#sleepFilm)"/><circle cx="24" cy="24" r="8" fill="url(#sleepFilm)" mask="url(#sleepCrescent)"/></svg></span>
+        <div>
+          <p class="eyebrow">Schlafrechner<span class="eyebrow-extra"> · Dein Rhythmus, deine Zeit</span></p>
+          <h1>Zeit, <span class="film-text">abzuschalten</span>.</h1>
+          <p class="tool-lead">Ein Plan für deine Nacht. Ganz ohne Rätselraten.</p>
+        </div>
+        <span class="local-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Nur in deinem Browser</span>
       </div>
-      <span class="local-badge"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Nur in deinem Browser</span>
-    </div>
-    <div class="sleep-layout" data-sleep-app>
-      <section class="panel sleep-controls" aria-labelledby="sleep-controls-title">
-        <h2 class="sr-only" id="sleep-controls-title">Schlafzeit einstellen</h2>
-        <form id="sleepForm" novalidate>
-          <fieldset class="segmented">
-            <legend class="sr-only">Berechnungsmodus</legend>
-            <label><input type="radio" name="sleepMode" value="wake" checked><span>Aufstehen um …</span></label>
-            <label><input type="radio" name="sleepMode" value="bed"><span>Ins Bett um …</span></label>
-          </fieldset>
-          <div class="anchor-time">
-            <label class="field grow"><span id="anchorTimeLabel">Ich möchte aufstehen um</span><input type="text" inputmode="decimal" id="anchorTime" value="07:00" placeholder="HH:MM" maxlength="5" aria-describedby="timeHint" autocomplete="off" required><span id="timeHint" class="fineprint">24 h · z. B. 07:00, 7.00 oder 700</span></label>
-            <button class="button secondary now-button" id="sleepNow" type="button">Jetzt ins Bett <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13a8.1 8.1 0 0 1-9-9 8.5 8.5 0 1 0 9 9Z"/></svg></button>
+
+      <div class="sleep-layout" data-sleep-app>
+        <section class="panel sleep-anchor load-rise" style="--i:1" aria-labelledby="sleep-controls-title">
+          <h2 class="sr-only" id="sleep-controls-title">Schlafzeit einstellen</h2>
+          <form id="sleepForm" novalidate>
+            <fieldset class="segmented">
+              <legend class="sr-only">Berechnungsmodus</legend>
+              <label><input type="radio" name="sleepMode" value="wake" checked><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"/></svg>Aufstehen um …</span></label>
+              <label><input type="radio" name="sleepMode" value="bed"><span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13a8.1 8.1 0 0 1-9-9 8.5 8.5 0 1 0 9 9Z"/></svg>Ins Bett um …</span></label>
+            </fieldset>
+            <div class="anchor-time">
+              <label class="field grow"><span id="anchorTimeLabel">Ich möchte aufstehen um</span><input type="text" inputmode="decimal" id="anchorTime" value="07:00" placeholder="HH:MM" maxlength="5" aria-describedby="timeHint" autocomplete="off" required><span id="timeHint" class="fineprint">24 h · z. B. 07:00, 7.00 oder 700</span></label>
+              <button class="button secondary now-button" id="sleepNow" type="button"><span>Jetzt<span class="now-long"> ins Bett</span></span> <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13a8.1 8.1 0 0 1-9-9 8.5 8.5 0 1 0 9 9Z"/></svg></button>
+            </div>
+            <div class="anchor-foot"><p id="sleepError" class="form-message" role="status"></p><p class="fineprint anchor-limits">Schlaf: 1–16 h · Einschlafen: 0–180 min.</p></div>
+            <button type="submit" class="sr-only" tabindex="-1">Schlafzeit berechnen</button>
+          </form>
+        </section>
+
+        <section class="panel sleep-visual load-rise" style="--i:2" data-transition-target="sleep" aria-labelledby="sleep-visual-title">
+          <div class="panel-heading">
+            <h2 id="sleep-visual-title">Deine Nacht auf einen Blick</h2>
+            <span class="tag">24 STUNDEN</span>
           </div>
-          <p class="fineprint">Schlaf: 1–16 h · Einschlafen: 0–180 min.</p>
+          <div class="sleep-clock-wrap">
+            <svg class="sleep-clock" id="sleepClock" viewBox="0 0 360 360" role="img" aria-label="24-Stunden-Uhr mit geplantem Schlafintervall">
+              <circle class="clock-inner" cx="180" cy="180" r="108"/>
+              <g class="clock-stars" aria-hidden="true"><circle cx="211.5" cy="93.6" r="1.1"/><circle cx="232" cy="133.2" r=".8"/><circle cx="272.7" cy="155.2" r="1.3"/><circle cx="262.7" cy="208.7" r=".9"/><circle cx="221.1" cy="229" r="1.1"/><circle cx="207.8" cy="271.3" r=".8"/><circle cx="153.3" cy="253.3" r="1.2"/><circle cx="105.2" cy="245.7" r=".9"/><circle cx="116.2" cy="197.1" r="1.1"/><circle cx="95.4" cy="149.2" r=".8"/><circle cx="131.8" cy="126.5" r="1.2"/><circle cx="154.9" cy="86.3" r=".9"/></g>
+              <g class="clock-ticks" id="clockTicks" aria-hidden="true"><path d="M199.1 34.8L199.6 31.3M217 41.9L218.8 35.1M236.1 44.7L237.4 41.4M251.5 56.2L255 50.1M269.2 63.8L271.3 61M281.1 78.9L286.1 73.9M296.2 90.8L299 88.7M303.8 108.5L309.9 105M315.3 123.9L318.6 122.6M318.1 143L324.9 141.2M325.2 160.9L328.7 160.4M325.2 199.1L328.7 199.6M318.1 217L324.9 218.8M315.3 236.1L318.6 237.4M303.8 251.5L309.9 255M296.2 269.2L299 271.3M281.1 281.1L286.1 286.1M269.2 296.2L271.3 299M251.5 303.8L255 309.9M236.1 315.3L237.4 318.6M217 318.1L218.8 324.9M199.1 325.2L199.6 328.7M160.9 325.2L160.4 328.7M143 318.1L141.2 324.9M123.9 315.3L122.6 318.6M108.5 303.8L105 309.9M90.8 296.2L88.7 299M78.9 281.1L73.9 286.1M63.8 269.2L61 271.3M56.2 251.5L50.1 255M44.7 236.1L41.4 237.4M41.9 217L35.1 218.8M34.8 199.1L31.3 199.6M34.8 160.9L31.3 160.4M41.9 143L35.1 141.2M44.7 123.9L41.4 122.6M56.2 108.5L50.1 105M63.8 90.8L61 88.7M78.9 78.9L73.9 73.9M90.8 63.8L88.7 61M108.5 56.2L105 50.1M123.9 44.7L122.6 41.4M143 41.9L141.2 35.1M160.9 34.8L160.4 31.3"/><path class="is-major" d="M180 41L180 30M319 180L330 180M180 319L180 330M41 180L30 180"/></g>
+              <circle class="clock-track" cx="180" cy="180" r="127"/>
+              <g class="arc-rotation" id="sleepArcRotation" style="transform:rotate(345deg)"><circle class="clock-arc" id="sleepArc" cx="180" cy="180" r="127" pathLength="1440" stroke-dasharray="480 960" transform="rotate(-90 180 180)"/></g>
+              <g class="arc-rotation" id="latencyArcRotation" style="transform:rotate(342.5deg)"><circle class="latency-arc" id="latencyArc" cx="180" cy="180" r="127" pathLength="1440" stroke-dasharray="10 1430" transform="rotate(-90 180 180)"/></g>
+              <g class="clock-labels"><text x="180" y="12">00</text><text x="348" y="180">06</text><text x="180" y="348">12</text><text x="12" y="180">18</text><text class="minor" x="298.8" y="61.2">03</text><text class="minor" x="298.8" y="298.8">09</text><text class="minor" x="61.2" y="298.8">15</text><text class="minor" x="61.2" y="61.2">21</text></g>
+              <circle class="clock-hit" cx="180" cy="180" r="139.5"/>
+            </svg>
+            <div class="clock-readout"><span id="sleepResultLabel">INS BETT</span><output id="sleepResultTime" aria-live="off">22:50</output><span id="sleepDayLabel">Am Vorabend</span></div>
+            <div class="dial-handles">
+              <div class="dial-handle" id="dialAnchor" style="--a:105deg" role="slider" tabindex="0" aria-label="Aufstehzeit am Zifferblatt" aria-valuemin="0" aria-valuemax="1439" aria-valuenow="420" aria-valuetext="07:00 Aufstehen" aria-describedby="dialHint"><i class="dial-bead" data-icon="sun"></i><span class="dial-tip" aria-hidden="true">07:00</span></div>
+              <div class="dial-handle is-end" id="dialEnd" style="--a:342.5deg" role="slider" tabindex="0" aria-label="Schlafdauer, Ende bei der Bettzeit" aria-valuemin="60" aria-valuemax="960" aria-valuenow="480" aria-valuetext="8 h Schlaf, ins Bett um 22:50" aria-describedby="dialHint"><i class="dial-bead" data-icon="moon"></i><span class="dial-tip" aria-hidden="true">8 h</span></div>
+            </div>
+          </div>
+          <p class="dial-hint fineprint" id="dialHint">Ziehe die Punkte am Ring<span class="hint-keys"> oder nutze die Pfeiltasten</span>.</p>
+          <div class="clock-legend"><span><i class="legend-sleep"></i> <span id="legendDuration">8 h Schlaf</span></span><span><i class="legend-latency"></i> <span id="legendLatency">10 min Einschlafen</span></span></div>
+          <div class="sleep-timeline">
+            <div class="night-bar" style="--lat:10;--len:480;--mid:.1429" aria-hidden="true"><i class="is-latency"></i><i class="is-sleep"></i><b class="midnight">00:00</b></div>
+            <div class="timeline-stops">
+              <div><span>Ins Bett</span><b id="bedTimeDisplay">22:50</b><small id="bedDay">Vorabend</small></div>
+              <div><span>Einschlafen</span><b id="onsetTimeDisplay">23:00</b><small id="onsetDay">Vorabend</small></div>
+              <div><span>Aufstehen</span><b id="wakeTimeDisplay">07:00</b><small id="wakeDay"></small></div>
+            </div>
+          </div>
+          <p class="sr-only" id="sleepSummary" role="status">Ins Bett um 22:50 (Am Vorabend) · 8 h Schlaf, 10 min Einschlafen.</p>
+        </section>
+
+        <section class="panel sleep-tuning load-rise" style="--i:3" aria-labelledby="duration-title">
           <div class="duration-heading">
-            <h2>Deine Schlafdauer</h2>
+            <h2 id="duration-title">Deine Schlafdauer</h2>
             <span id="durationLabel">8 h</span>
           </div>
-          <input type="range" id="durationSlider" min="60" max="960" step="1" value="480" aria-label="Schlafdauer in Minuten">
-          <div class="duration-presets" role="group" aria-label="Schlafdauer schnell wählen">
-            <button type="button" data-duration="420" aria-pressed="false">7 h</button>
-            <button type="button" data-duration="450" aria-pressed="false">7 h 30</button>
-            <button type="button" data-duration="480" aria-pressed="true">8 h</button>
-            <button type="button" data-duration="540" aria-pressed="false">9 h</button>
+          <input type="range" class="range" id="durationSlider" form="sleepForm" min="60" max="960" step="1" value="480" aria-label="Schlafdauer in Minuten" style="--p:.4667">
+          <div class="range-scale" aria-hidden="true"><span style="--at:0">1 h</span><span style="--at:.2">4 h</span><span style="--at:.4667">8 h</span><span style="--at:.7333">12 h</span><span style="--at:1">16 h</span></div>
+          <div class="duration-presets chips" role="group" aria-label="Schlafdauer schnell wählen">
+            <button type="button" class="chip" data-duration="420" aria-pressed="false">7 h</button>
+            <button type="button" class="chip" data-duration="450" aria-pressed="false">7 h 30</button>
+            <button type="button" class="chip" data-duration="480" aria-pressed="true">8 h</button>
+            <button type="button" class="chip" data-duration="540" aria-pressed="false">9 h</button>
           </div>
           <div class="field-grid duration-fields">
-            <label class="field">Stunden<input type="number" id="sleepHours" value="8" min="0" max="16" step="1" inputmode="numeric"></label>
-            <label class="field">Minuten<input type="number" id="sleepMinutes" value="0" min="0" max="59" step="1" inputmode="numeric"></label>
+            <label class="field">Stunden<input type="number" form="sleepForm" id="sleepHours" value="8" min="0" max="16" step="1" inputmode="numeric"></label>
+            <label class="field">Minuten<input type="number" form="sleepForm" id="sleepMinutes" value="0" min="0" max="59" step="1" inputmode="numeric"></label>
           </div>
-          <label class="field latency-field">Zeit zum Einschlafen<div class="input-unit"><input type="number" id="sleepLatency" value="10" min="0" max="180" step="1" inputmode="numeric"><span>Minuten</span></div></label>
-          <p id="sleepError" class="form-message" role="status"></p><button type="submit" class="sr-only">Schlafzeit berechnen</button>
-        </form>
-        <div class="sleep-presets">
-          <div class="panel-heading">
-            <h2>Deine Presets</h2>
-            <button type="button" class="text-button" id="showPresetForm"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Merken</button>
+          <label class="field latency-field">Zeit zum Einschlafen<div class="input-unit"><input type="number" form="sleepForm" id="sleepLatency" value="10" min="0" max="180" step="1" inputmode="numeric"><span>Minuten</span></div></label>
+          <div class="sleep-presets">
+            <div class="panel-heading">
+              <h2>Deine Presets</h2>
+              <button type="button" class="text-button" id="showPresetForm" aria-expanded="false" aria-controls="presetForm"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> <span>Merken</span></button>
+            </div>
+            <div class="preset-list" id="presetList"></div>
+            <form id="presetForm" class="inline-form" hidden>
+              <label class="field grow"><span class="sr-only">Preset-Name</span><input id="presetName" placeholder="Zum Beispiel Schule" maxlength="30" autocomplete="off"></label>
+              <button type="submit" class="button secondary">Speichern</button>
+            </form>
+            <p class="fineprint" id="presetHint" role="status">Zeiten mit einem Klick einsetzen. Eigene Presets lassen sich wieder löschen.</p>
+            <button type="button" id="undoPreset" class="text-button" hidden><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6 4 11l5 5M4 11h9.5a5.5 5.5 0 0 1 0 11H11"/></svg> Preset-Änderung rückgängig</button>
+            <div class="undo-confirm" id="undoConfirm" hidden><button type="button" class="text-button danger-text" id="undoYes">Ja, zurücksetzen</button><button type="button" class="text-button" id="undoNo">Nein</button></div>
           </div>
-          <div class="preset-list" id="presetList"></div>
-          <form id="presetForm" class="inline-form" hidden>
-            <label class="field grow"><span class="sr-only">Preset-Name</span><input id="presetName" placeholder="Zum Beispiel Schule" maxlength="30" autocomplete="off"></label>
-            <button type="submit" class="button secondary">Speichern</button>
-          </form>
-          <p class="fineprint" id="presetHint">Zeiten mit einem Klick einsetzen. Eigene Presets lassen sich wieder löschen.</p><button type="button" id="undoPreset" class="text-button" hidden>Preset-Änderung rückgängig</button>
-        </div>
-        <div class="save-row">
-          <label class="check-label"><input type="checkbox" id="saveSleep" checked> Auf diesem Gerät speichern</label>
-          <span class="save-status" id="sleepSaveStatus" role="status"></span>
-        </div>
-        <p class="fineprint">Bei unvollständigen Eingaben bleiben die letzten gültigen Zeiten gespeichert. Browserdaten sind kein dauerhaftes Backup.</p>
-      </section>
-      <section class="panel sleep-visual" data-transition-target="sleep" aria-labelledby="sleep-visual-title">
-        <div class="panel-heading">
-          <h2 id="sleep-visual-title">Deine Nacht auf einen Blick</h2>
-          <span class="tag">24 STUNDEN</span>
-        </div>
-        <div class="sleep-clock-wrap">
-          <svg class="sleep-clock" id="sleepClock" viewBox="0 0 360 360" role="img" aria-label="24-Stunden-Uhr mit geplantem Schlafintervall">
-            <circle class="clock-inner" cx="180" cy="180" r="108"/>
-            <g class="clock-ticks" id="clockTicks" aria-hidden="true"></g>
-            <circle class="clock-track" cx="180" cy="180" r="127"/>
-            <g class="arc-rotation" id="sleepArcRotation"><circle class="clock-arc" id="sleepArc" cx="180" cy="180" r="127" pathLength="1440" stroke-dasharray="480 960" transform="rotate(-90 180 180)"/></g>
-            <g class="arc-rotation" id="latencyArcRotation"><circle class="latency-arc" id="latencyArc" cx="180" cy="180" r="127" pathLength="1440" stroke-dasharray="10 1430" transform="rotate(-90 180 180)"/></g>
-            <g class="clock-labels"><text x="180" y="15" text-anchor="middle">00</text><text x="354" y="185" text-anchor="end">06</text><text x="180" y="355" text-anchor="middle">12</text><text x="6" y="185">18</text></g>
-          </svg>
-          <div class="clock-readout"><span id="sleepResultLabel">INS BETT</span><output id="sleepResultTime">22:50</output><span id="sleepDayLabel">Am Vorabend</span></div>
-        </div>
-        <div class="clock-legend">
-          <span><i class="legend-sleep"></i> <span id="legendDuration">8 h Schlaf</span></span>
-          <span><i class="legend-latency"></i> <span id="legendLatency">10 min Einschlafen</span></span>
-        </div>
-        <div class="sleep-timeline">
-          <div><span>Ins Bett</span><b id="bedTimeDisplay">22:50</b><small id="bedDay"></small></div>
-          <div><span>Einschlafen</span><b id="onsetTimeDisplay">23:00</b><small id="onsetDay"></small></div>
-          <div><span>Aufstehen</span><b id="wakeTimeDisplay">07:00</b><small id="wakeDay"></small></div>
-        </div>
-        <p class="sr-only" id="sleepSummary" role="status">Am Vorabend ins Bett · 8 h 10 min eingeplant.</p>
-      </section>
-    </div>
-    <div class="sleep-guidance">
-      <div>
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13a8.1 8.1 0 0 1-9-9 8.5 8.5 0 1 0 9 9Z"/></svg>
-        <p><strong>Deine Dauer, nicht ein starres Zyklusmodell.</strong><br>Der Rechner plant mit deinen Angaben. Er sagt nicht voraus, wann du in einer bestimmten Schlafphase bist.</p>
+          <div class="save-row">
+            <label class="check-label switch"><input type="checkbox" id="saveSleep" checked> Auf diesem Gerät speichern</label>
+            <span class="save-status" id="sleepSaveStatus" role="status"></span>
+          </div>
+          <p class="fineprint">Bei unvollständigen Eingaben bleiben die letzten gültigen Zeiten gespeichert. Browserdaten sind kein dauerhaftes Backup.</p>
+        </section>
       </div>
-      <div>
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg>
-        <p><strong>Ein Zeitplan, kein Wecker.</strong><br>Es wird kein Alarm gestellt. Uhrzeiten ohne Datum; Zeitumstellungen werden nicht berücksichtigt.</p>
+
+      <div class="sleep-guidance">
+        <div class="reveal">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13a8.1 8.1 0 0 1-9-9 8.5 8.5 0 1 0 9 9Z"/></svg>
+          <p><strong>Deine Dauer, nicht ein starres Zyklusmodell.</strong><br>Der Rechner plant mit deinen Angaben. Er sagt nicht voraus, wann du in einer bestimmten Schlafphase bist.</p>
+        </div>
+        <div class="reveal">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M5 3.5 2.5 6M19 3.5 21.5 6"/></svg>
+          <p><strong>Ein Zeitplan, kein Wecker.</strong><br>Es wird kein Alarm gestellt. Uhrzeiten ohne Datum; Zeitumstellungen werden nicht berücksichtigt.</p>
+        </div>
       </div>
+      <p class="privacy-line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Keine Konten. Keine Übertragung deiner Zeiten. Alles bleibt in deinem Browser.</p>
+      <div class="sleep-compact compact-bar" id="sleepCompact" hidden><i aria-hidden="true"></i><span aria-hidden="true">Ins Bett 22:50 · Am Vorabend</span><a class="compact-jump" href="#sleep-visual-title" aria-label="Zur Uhr"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></a></div>
     </div>
   </main>
-  <footer class="site-footer wrap">
-    <span>© 2026 Kilian Pfister</span>
-    <span class="footer-note">Kleine Tools. Ohne Umwege.</span>
-    <a href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">GitHub <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a>
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>© 2026 Kilian Pfister</span>
+      <span class="footer-note">Kleine Tools. Ohne Umwege.</span>
+      <a href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">GitHub <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a>
+      <a class="footer-top" href="#main">Nach oben <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></a>
+    </div>
+    <div class="wrap"><svg class="footer-mark" data-spotlight viewBox="0 0 1000 160" aria-hidden="true" focusable="false"><text class="mark-base" x="0" y="132" textLength="1000" lengthAdjust="spacingAndGlyphs">misterpfister</text><text class="mark-lit" x="0" y="132" textLength="1000" lengthAdjust="spacingAndGlyphs">misterpfister</text></svg></div>
   </footer>
 </body>
 </html>

@@ -10,19 +10,46 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
 
 ## Funktionen
 
-- Räumliche Werkzeugkarten ab Tablet-Breite: Die vordere Karte öffnet ihr Tool,
-  die anderen kommen zuerst nach vorne. Auswahl per Tastatur und Touch, Reduced
-  Motion wird respektiert. Auf Handys entfällt die Szene zugunsten der Toolkarten.
+- Startseite «Werkplatz 5 · Liquid Glass Lab»: Ein selbst geschriebenes
+  WebGL-Glasobjekt (Raymarching, kein Framework) morpht zwischen Notenskala,
+  24-Stunden-Ring und Datenwürfel. Es reagiert auf Zeiger, Scrollen, Auswahl und
+  Klick und hört danach ganz auf zu rendern. Im hellen Farbschema wird es zu
+  Porzellan mit irisierender Glasur. Auf Handys läuft es als schmales Band, das
+  beim Scrollen die drei Formen durchläuft.
+- Drei Darstellungsstufen: `live` (Animation mit Grafikkarte), `still` (ein
+  einzelnes gerendertes Standbild bei Software-Rendering, `saveData`, wenigen
+  CPU-Kernen oder Reduced Motion) und `fallback` (statisches SVG, wenn WebGL
+  fehlt, bei Forced Colors oder wenn das Skript nicht startet; nach 4 s greift
+  ein reiner CSS-Failsafe). Ohne JavaScript bleiben alle Texte lesbar; die
+  Rechner zeigen dann einen Hinweis.
+- Räumliche Werkzeugkarten als «Museumsschilder» ab Tablet-Breite: Das vordere
+  Schild öffnet sein Tool, die anderen kommen zuerst nach vorne. Bedienbar ist die
+  Auswahl über das Dock (Pfeiltasten, Home/End) und per Touch; das HUD nennt Kanal
+  und Beispielwerte. Auf Handys entfällt die Szene zugunsten der Toolkarten.
   Die direkten Toollinks funktionieren unabhängig von der Szene.
-- Native Cross-Document View Transitions verbinden die sichtbare Vorschau mit
-  dem Rechner. Bei fehlender Unterstützung bleiben es normale Links.
+- Native Cross-Document View Transitions verbinden Karte oder Schild mit dem
+  Ergebnis des Rechners und das Glasobjekt mit dem Tool-Symbol. Das Farbschema
+  wechselt mit einer Kreisblende. Bei fehlender Unterstützung oder Reduced Motion
+  bleiben es normale Links und ein sofortiger Wechsel.
 - Noten: gewichteter Schnitt, Anzeige-Rundung, Simulation und Zielplanung mit dem
-  Gewicht der nächsten Note, Fächer mit Übersicht und Gesamtschnitt,
-  Prüfungsnamen, Eingabe per Enter, lokale Entwürfe, Undo, JSON-Export/Import und
-  lineare Punkteumrechnung inklusive nötiger Punkte für eine Wunschnote.
+  Gewicht der nächsten Note (Schnellwahl 0.5 / 1 / 2), Fächer mit Übersicht und
+  Gesamtschnitt, Prüfungsnamen, Eingabe per Enter, lokale Entwürfe, Undo,
+  JSON-Export/Import und lineare Punkteumrechnung inklusive nötiger Punkte für
+  eine Wunschnote. Das Ergebnis ist ein 270°-Instrument mit Punkt (aktuell),
+  Ring (Simulation), Dreieck (Ziel) und gestrichelter Marke bei 4.0, dazu ein
+  Balkendiagramm (Breite = Gewicht, Höhe = Note), ein Differenz-Chip (▲/▼/=) und
+  Antwortkarten mit Symbolen. Ab 901 px bleibt das Ergebnis beim Scrollen
+  sichtbar, sofern es in die Fensterhöhe passt; auf schmaleren Bildschirmen
+  erscheint eine kompakte Ergebnisleiste.
 - Schlaf: 24-Stunden-Uhr, frei wählbare Bett-/Aufstehzeit (07:00, 7.00, 700 oder
   7), minutengenaue Dauer mit Schnellwahl 7–9 h, Einschlafzeit (Standard 10 min),
-  «Jetzt ins Bett», eigene Presets mit Undo und lokale Speicherung.
+  «Jetzt ins Bett», eigene Presets mit Undo und lokale Speicherung. Die beiden
+  Griffe am Zifferblatt lassen sich ziehen, antippen oder per Tastatur bewegen
+  (Pfeile ±5 min, mit Shift ±1 min, Bild auf/ab ±60 min, Home/End). Der
+  Anker-Griff setzt die Zeit, der End-Griff die Dauer (1–16 h). Die Eingabefelder
+  bleiben die einzige Quelle; gespeichert wird einmal pro Zug. Ab 901 px (und
+  mindestens 720 px Fensterhöhe) bleibt das Zifferblatt beim Scrollen sichtbar;
+  bis 900 px erscheint stattdessen eine kompakte Ergebnisleiste.
 - SpasstoCSV: Formatillustration mit erfundenen Daten und Verweis auf das
   [lokale Python-Projekt](https://github.com/misterpfister8/spasstocsv).
   Unterstützte Formate laut dessen öffentlicher README: Raw-, Chrome- und
@@ -75,24 +102,70 @@ node tests/math.test.js
 .venv/bin/python tests/persistence_review.py
 .venv/bin/python tests/persistence_review.py --browser webkit
 .venv/bin/python tests/interaction_review.py --headed
+.venv/bin/python tests/interaction_review.py --axe /pfad/zu/axe.min.js
 .venv/bin/python tests/contrast_review.py
 ```
 
+Alle Browserprüfungen akzeptieren `--base-url`, falls der Server nicht auf Port
+8000 läuft (zum Beispiel `--base-url http://127.0.0.1:8810/`).
+
 Die Browserprüfungen benötigen den laufenden HTTP-Server. Sie laden die echten
-externen Dateien und verwenden nativen Browser-Speicher. Speicherfehler-Injektion
+externen Dateien und verwenden nativen Browser-Speicher. `browser_review.py`
+prüft zusätzlich, dass keine Anfrage die eigene Origin verlässt, alle Assets
+den Cache-Parameter `?v=werkplatz-5` tragen, Chromium jede Deklaration, jeden
+Selektor und jede Media-Bedingung der Stylesheets annimmt (ausgenommen bewusst
+browserübergreifende Regeln), jeder Tab-Stopp sichtbar ist und die
+Einblendung der Startseite keinen Text anschneidet. Speicherfehler-Injektion
 ist ein separater Testfall. `persistence_review.py` prüft echte Browser-Neustarts
 und in Chromium zusätzlich nativ deaktivierten Speicher. `interaction_review.py`
-prüft Touch und laufende Übergänge; optional `--axe /pfad/zu/axe.min.js` für einen
-lokal bereitgestellten axe-core-Scan. Testausgaben unter `output/playwright/`
+prüft Touch (inklusive Ziehen am Zifferblatt), das Einschwingen der Szene, die
+Stufen des Glasobjekts, gestoppte Frames im Leerlauf, ausserhalb des Sichtbereichs
+und im Hintergrund, die Obergrenzen für Pixeldichte und Backbuffer (auf einem
+simulierten 3×-Bildschirm), Layout-Verschiebungen beim Laden (CLS ≤ 0.02, bei
+den Rechnern auch mit gespeicherten Daten) sowie die View Transitions samt
+Richtung (`forward`/`back`); optional `--axe /pfad/zu/axe.min.js` für einen
+lokal bereitgestellten axe-core-Scan (WCAG 2.2 AA und Best Practices).
+`contrast_review.py` misst Textkontraste auf allen drei Seiten in beiden
+Farbschemas gegen jede Verlaufsfarbe. Testausgaben unter `output/playwright/`
 bleiben ausserhalb von Git. Das [Prüfprotokoll](docs/REDESIGN_QA.md) trennt
 beobachtete Ergebnisse und offene Geräteprüfungen.
 
+### Darstellungsstufe des Glasobjekts erzwingen
+
+Für QA und Fehlersuche lässt sich die Stufe per URL-Parameter festlegen:
+
+| Parameter | Wirkung |
+|---|---|
+| `/?gl=off` | Statischer SVG-Fallback, kein WebGL-Kontext |
+| `/?gl=still` | Ein Standbild, auch auf schneller Hardware |
+| `/?gl=force` | Live-Stufe auch bei Software-Rendering oder `saveData` |
+
+Reduced Motion gewinnt immer: Auch mit `?gl=force` gibt es dann nur ein Standbild.
+Der aktuelle Zustand steht in `.hero-visual[data-glass-state]` (`boot`,
+`compiling`, `live`, `idle`, `still`, `fallback`) und `[data-glass-tier]`;
+`HeroGL.stats` in der Browserkonsole zeigt Renderer, Frames und
+Backbuffer-Grösse, `HeroGL.render()` erzwingt ein Bild.
+
 ## Dateien und Veröffentlichung
 
-Die drei HTML-Seiten verwenden `assets/site.css` und `assets/theme.js`.
-`tool-math.js` enthält reine Rechenfunktionen, `tool-storage.js` kapselt den
-Browser-Speicher, `grades.js` und `sleep.js` steuern die Rechner. `workbench.js`
-steuert die Vorschauen, `transitions.js` erweitert die native Navigation.
+| Datei | Inhalt |
+|---|---|
+| `assets/core.css` | Farb- und Masstokens, gemeinsame Komponenten, Bewegung, View Transitions (ersetzt `site.css`) |
+| `assets/home.css` | Startseite: Hero-Bühne, Schilder, Dock, Toolkarten, Projekt, Über mich |
+| `assets/grades.css` | Notenrechner: Instrument, Diagramm, Zeilen, Planung, Übersicht, Punkte |
+| `assets/sleep.css` | Schlafrechner: Zifferblatt, Griffe, Nachtbalken, Feintuning |
+| `assets/hero-gl.js` | WebGL-Glasobjekt mit Stufen, Leerlauf-Stopp und Handy-Band |
+| `assets/motion.js` | Scroll-Reveals (mit Fallback), magnetische Buttons, Spotlight, dekorative Zähler |
+| `assets/workbench.js` | Auswahl der Startseiten-Vorschau, HUD, `benchselect`-Ereignis, Formatbeispiel |
+| `assets/theme.js` | Farbschema (gespeichert unter `misterpfister-theme`), Kreisblende |
+| `assets/transitions.js` | Erweitert die native Navigation um benannte View Transitions |
+| `assets/tool-math.js` | Reine Rechenfunktionen, inklusive Zifferblatt-Mathematik |
+| `assets/tool-storage.js` | Kapselt den Browser-Speicher |
+| `assets/grades.js`, `assets/sleep.js` | Steuern die beiden Rechner |
+
+Die Speicherschlüssel und -formate bleiben unverändert
+(`misterpfister-grades-v2`, `misterpfister-sleep-v2` und die zugehörigen
+`-saving`-Schalter). Alte Sicherungen und Browserdaten laden weiter.
 
 Der bestehende Workflow `Workshop regression tests` prüft Rechenlogik, HTTP-
 Bedienung und Browser-Neustarts. Vor dem Push Remote-Änderungen abgleichen, den
