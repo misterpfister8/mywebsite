@@ -103,8 +103,10 @@
     const raw = mode === 'wake' ? anchor - latency - handle : handle - anchor - latency;
     const len = ((raw % 1440) + 1440) % 1440;
     if (len >= 60 && len <= 960) return len;
-    if (len > 960) return previous <= 510 ? 60 : 960; // wrapped past a bound: stay on the side we came from
-    return previous >= 510 ? 960 : 60;
+    // Wrapped past a bound: follow the shortest way round from the previous length, so a
+    // skipped frame (fast flick, busy main thread) still stays on the side we came from.
+    const travelled = previous + ((((len - previous + 720) % 1440) + 1440) % 1440) - 720;
+    return travelled > 960 ? 960 : 60;
   }
   const api = Object.freeze({ decimal, round, summary, neededGrade, parseTime, clock, duration, sleepPlan, points, pointsFor, pointerAngle, dialMinutes, dialDuration });
   globalThis.WorkshopMath = api;

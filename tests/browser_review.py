@@ -725,6 +725,14 @@ def waits(page, expression, timeout=2500):
         return False
 
 
+def set_motion(page, value):
+    # WebKit refreshes MediaQueryList objects a script already holds (grades.js keeps one) only at the
+    # next rendering update; a held query of our own tells when the page sees the new preference.
+    page.evaluate("window.__motionQuery ||= matchMedia('(prefers-reduced-motion: reduce)')")
+    page.emulate_media(reduced_motion=value)
+    page.wait_for_function(f"__motionQuery.matches === {str(value == 'reduce').lower()}", polling=50)
+
+
 def numbers(value):
     return [float(x) for x in re.findall(r'-?\d+(?:\.\d+)?', value or '')]
 
@@ -874,13 +882,13 @@ def instruments(r):
     r.check(p.locator('#targetResult').get_attribute('data-tone') == 'secured' and 'erreicht' in r.text('#targetResult') and p.locator('#entryChart .chart-line.is-need').is_hidden(), 'A target already secured gets the secured tone')
     p.locator('#targetAverage').fill('4.00')
     # The glint appears after discrete events only, never under reduced motion.
-    p.emulate_media(reduced_motion='no-preference')
+    set_motion(p, 'no-preference')
     p.locator('.grade-metric').evaluate("el => { window.__glint = false; new MutationObserver(() => { if (el.classList.contains('is-glint')) window.__glint = true; }).observe(el, {attributes: true, attributeFilter: ['class']}); }")
     p.locator('#scenarioGrade').fill('5')
     r.check(p.evaluate('__glint') is False, 'Typing does not glint the result')
     p.locator('#loadExample').click()
     r.check(waits(p, 'window.__glint === true', 1500) and r.text('#average') == '5.25', 'Beispiel laden glints the result without changing the number')
-    p.emulate_media(reduced_motion='reduce'); p.locator('#closeToast').click()
+    set_motion(p, 'reduce'); p.locator('#closeToast').click()
     p.locator('#addSubject').click(); p.locator('#subjectName').fill('Physik'); p.locator('#subjectForm button[type=submit]').click()
     r.check(p.locator('#resultSubject').text_content() == 'Physik', 'Result instrument follows a new subject')
     summary = p.locator('#subjectSummary')
@@ -897,10 +905,10 @@ def instruments(r):
     opened = p.locator('.settings-details').evaluate_all('els => els.map(el => el.open)')
     r.check(opened == [False, True] and p.evaluate("document.activeElement === document.querySelector('#subjectSettings summary')"), f'Settings button opens "Fach & Datensicherung" and focuses it: {opened}')
     # A subject switch is a discrete event: it glints with motion allowed and never under reduced motion.
-    p.emulate_media(reduced_motion='no-preference'); p.evaluate('window.__glint = false')
+    set_motion(p, 'no-preference'); p.evaluate('window.__glint = false')
     p.locator('#subjectSelect').select_option(index=0)
     r.check(waits(p, 'window.__glint === true', 1500) and r.text('#average') == '5.25' and p.locator('#resultSubject').text_content() == 'Allgemein', 'Switching subjects glints the result and renames the instrument')
-    p.emulate_media(reduced_motion='reduce'); p.evaluate('window.__glint = false')
+    set_motion(p, 'reduce'); p.evaluate('window.__glint = false')
     p.locator('#subjectSelect').select_option(index=1); r.frames()
     r.check(p.evaluate('__glint') is False and p.locator('#resultSubject').text_content() == 'Physik', 'Reduced motion switches subjects without the glint')
     # Row layout (spec §6.3): index and "#" column only from 681px; at 370px and below the name takes its own line.

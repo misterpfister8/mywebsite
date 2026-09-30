@@ -135,6 +135,9 @@ eq(M.dialDuration('bed', 0, 1000, 0, 950), 960);   // bed mode, raw 1000
 eq(M.dialDuration('bed', 1380, 1395, 10, 70), 60); // bed mode, raw 5 across midnight
 eq(M.dialDuration('wake', 420, 360, 0, 480), 60);  // exactly 1 h is kept
 eq(M.dialDuration('wake', 420, 900, 0, 480), 960); // exactly 16 h is kept
+eq(M.dialDuration('wake', 360, 780, 10, 430), 960); // skipped frames: 7 h 10 → past 16 h in one step stays long
+eq(M.dialDuration('wake', 360, 400, 10, 600), 60);  // skipped frames: 10 h → below 1 h in one step stays short
+eq(M.dialDuration('bed', 0, 1010, 0, 500), 960);    // bed mode, 8 h 20 → 16 h 50 in one step
 for (const mode of ['wake', 'bed']) for (let t = 0; t < 1440; t += 35) for (const [h, min] of [[1, 0], [7, 30], [8, 0], [9, 15], [16, 0]]) for (const latency of [0, 10, 180]) {
   const plan = M.sleepPlan(mode, M.clock(t), h, min, latency), wake = ((plan.wake % 1440) + 1440) % 1440, bed = ((plan.bed % 1440) + 1440) % 1440;
   for (const previous of [60, 480, 960]) eq(M.dialDuration(mode, mode === 'wake' ? wake : bed, mode === 'wake' ? bed : wake, latency, previous), h * 60 + min);

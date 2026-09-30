@@ -1,5 +1,32 @@
 # Prüfprotokoll – digitaler Werkplatz
 
+## WebKit-Nachprüfung (2026-09-30)
+
+Playwright-WebKit 26.5 lokal installiert; erster WebKit-Lauf seit dem Neubau.
+`persistence_review.py`, `showcase_review.py` (556 Assertions) und
+`interaction_review.py` bestanden in WebKit. `browser_review.py` war in WebKit
+schon auf `d80ee43` rot (3 von 3 Läufen). Zwei Ursachen behoben:
+
+- **Zifferblatt klemmte bei ausgelassenen Frames auf der falschen Seite**
+  (`assets/tool-math.js`, Produktfehler): `sleep.js` wertet eine Position pro
+  Frame aus. Sprang die Dauer zwischen zwei Frames von unter 8.5 h über 16 h,
+  entschied die alte Regel nach der Mitte (510 min) und setzte 1 h. Jetzt
+  folgt `dialDuration` dem kürzesten Weg vom vorherigen Wert. Drei
+  Regressionsfälle in `tests/math.test.js` schlagen gegen die alte Regel an.
+- **Aufleucht-Prüfung im Notenrechner** (`tests/browser_review.py`, nur
+  Test): WebKit aktualisiert ein bereits gehaltenes `matchMedia`-Objekt erst
+  beim nächsten Rendering (23 von 40 Lesungen direkt nach `emulate_media`
+  veraltet, Chromium 0 von 40). Der Helfer `set_motion()` wartet jetzt darauf.
+
+Danach erreicht `browser_review.py` in WebKit 766 Assertions und scheitert
+erst in der Überlaufprüfung: Nach Grössenwechseln meldet headless WebKit
+teils einen veralteten `scrollWidth` (Schlafrechner, 320 px, 339 statt 320),
+der bei jeder DOM-Änderung verschwindet; frisch geladen bei 320 px kein
+Überlauf. Zusätzlich einmal sporadisch «Sleep compact bar hidden while the dial
+is visible». Beides offen. Chromium: alle Suiten bestanden, `browser_review.py`
+einmal sporadisch rot («Returning from the sleep tool preselects sleep»), in
+zwei Wiederholungen je 804 Assertions grün.
+
 ## Interaktive Showcase-Demos (2026-09-30)
 
 Lokaler Arbeitsstand auf `http://127.0.0.1:8810/`, ohne Veröffentlichung.
