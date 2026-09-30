@@ -15,6 +15,22 @@ ROOT = Path(__file__).resolve().parents[1]
 SETTLED = "['idle','still','fallback'].includes(document.querySelector('.hero-visual')?.dataset.glassState)"
 GLASS = "(() => { const v = document.querySelector('.hero-visual'); const api = globalThis.HeroGL; return {state: v.dataset.glassState, tier: v.dataset.glassTier || null, form: v.dataset.glassForm, api: api ? [api.state, api.tier] : null, frames: api ? api.stats.frames : 0}; })()"
 TWO_FRAMES = '() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))'
+# On slower CI renderers, two RAF callbacks can precede viewport-dependent
+# typography reflow. Wait for stable geometry; persistent overflow still fails.
+RESIZE_SETTLED = '''async ({width, height}) => {
+  const snapshot = () => JSON.stringify([innerWidth, innerHeight,
+    document.documentElement.scrollWidth, document.body.scrollWidth,
+    ...[...document.querySelectorAll('h1')].map(el => [getComputedStyle(el).fontSize, el.getBoundingClientRect().width, el.scrollWidth])]);
+  let previous = null, stable = 0;
+  for (let attempt = 0; attempt < 40; attempt++) {
+    await new Promise(resolve => setTimeout(resolve, 50));
+    const current = snapshot();
+    stable = innerWidth === width && innerHeight === height && current === previous ? stable + 1 : 0;
+    if (stable >= 4) return;
+    previous = current;
+  }
+  throw new Error('Viewport layout did not settle within 2 seconds');
+}'''
 BENCH_EVENTS = "window.__bench = []; addEventListener('benchselect', event => __bench.push(event.detail), true);"
 # Focusable elements must never sit inside aria-hidden or role=img (tabindex=-1 labels in .scene are the documented exception).
 HIDDEN_FOCUSABLES = '''() => [...document.querySelectorAll('a[href], button, input, select, textarea, summary, [tabindex]')]
@@ -454,8 +470,9 @@ def run(review):
                     # With motion allowed the theme lands inside the view-transition callback, one frame later.
                     p.wait_for_function(f"document.documentElement.dataset.theme === '{theme}'", polling=100)
                 for width in [320, 370, 371, 375, 390, 402, 680, 681, 768, 900, 901, 1024, 1025, 1150, 1151, 1440, 1600, 1601, 1920]:
-                    p.set_viewport_size({'width': width, 'height': 874 if width < 681 else 1000})
-                    p.evaluate('() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))')
+                    viewport = {'width': width, 'height': 874 if width < 681 else 1000}
+                    p.set_viewport_size(viewport)
+                    p.evaluate(RESIZE_SETTLED, viewport)
                     overflow = p.evaluate('Math.max(document.documentElement.scrollWidth,document.body.scrollWidth)>innerWidth+1')
                     r.check(not overflow, f'No overflow: {name} {theme} {motion} {width}px' + (f' {p.evaluate(OVERFLOWING)}' if overflow else ''))
                     if width in [320, 402, 768, 1024, 1440] and motion == 'reduce' and name != 'home-fallback':
