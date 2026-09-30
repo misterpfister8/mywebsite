@@ -23,6 +23,21 @@ PAIRS = '''()=>{
   const texts = (root, selector) => [...root.querySelectorAll(selector)].filter(el => el.textContent.trim());
   let pairs=[];
   const add = (label, foreground, backgrounds) => { for (const background of backgrounds) pairs.push({label, foreground, background, page}); };
+  // New components use opaque surfaces. Transparent children inherit the nearest
+  // surface; gradients are checked against every stop rather than one average.
+  const backdrops = (el, root) => {
+    for (let node = el; node; node = node.parentElement) {
+      const css = style(node), stops = rgb(css.backgroundImage);
+      if (stops.length) return stops;
+      if (!['transparent', 'rgba(0, 0, 0, 0)'].includes(css.backgroundColor)) return [css.backgroundColor];
+      if (node === root) break;
+    }
+    return [page];
+  };
+  const componentText = (root, selector, label) => {
+    for (const el of texts(root, selector))
+      if (el.checkVisibility({visibilityProperty: true})) add(label, style(el).color, backdrops(el, root));
+  };
   for(const module of document.querySelectorAll('.module')) {
     const backgrounds=rgb(style(module).backgroundImage);
     for(const foreground of [style(module).color,...[...module.querySelectorAll('.mini-clock')].map(el=>style(el).color)])
@@ -52,6 +67,52 @@ PAIRS = '''()=>{
   // HUD lines around the hero stage sit directly on the page background.
   for (const el of document.querySelectorAll('.scene-hud [data-hud-channel], .scene-hud [data-hud-data]'))
     pairs.push({label: `hud ${el.hasAttribute('data-hud-channel') ? 'channel' : 'data'}`, foreground: style(el).color, background: page, page});
+  const demo = document.querySelector('[data-hero-demo]');
+  if (demo) for (const [selector, label] of [
+    ['.hero-demo-heading > span', 'hero sample heading'],
+    ['.demo-control-label label', 'hero sample label'],
+    ['.demo-control-label output', 'hero sample value'],
+    ['.demo-answer', 'hero sample answer'],
+    ['.demo-answer output', 'hero sample result'],
+    ['.demo-answer > span', 'hero sample detail'],
+    ['.demo-data-intro p', 'hero data description'],
+    ['.demo-data-intro a', 'hero data link'],
+    ['.hero-look summary > span', 'hero look summary'],
+    ['.hero-look-controls label', 'hero look label'],
+    ['.hero-look-controls select', 'hero look select'],
+    ['[data-look-reset]', 'hero look reset'],
+  ]) componentText(demo, selector, label);
+  const conversion = document.querySelector('[data-conversion-demo]');
+  if (conversion) {
+    for (const [selector, label] of [
+      ['.demo-title', 'conversion title'],
+      ['.demo-tag', 'conversion tag'],
+      ['.conversion-file', 'conversion file'],
+      ['.conversion-file small', 'conversion file detail'],
+      ['.conversion-bay > span', 'conversion bay label'],
+      ['.conversion-field-key > span:first-child', 'conversion source key'],
+      ['[data-conversion-key]', 'conversion target key'],
+      ['.conversion-field-value', 'conversion field value'],
+      ['[data-format]', 'conversion format button'],
+      ['[data-conversion-run]', 'conversion play button'],
+      ['[data-conversion-status]', 'conversion status'],
+      ['[data-conversion-example]', 'conversion output'],
+      ['[data-conversion-pending]', 'conversion pending'],
+      ['.fineprint', 'conversion note'],
+    ]) componentText(conversion, selector, label);
+    // Source/target keys and pending text fade between phases. Their full text
+    // colours are checked on their actual backplates, including when opacity is 0.
+    // CSS state snapshots cover all chip colours; showcase_review tests playback.
+    for (const step of conversion.querySelectorAll('[data-conversion-step]')) {
+      const original = step.dataset.state;
+      for (const state of ['waiting', 'current', 'done']) {
+        step.dataset.state = state;
+        add(`conversion step ${state} label`, style(step).color, backdrops(step, conversion));
+        componentText(step, 'span', `conversion step ${state} number`);
+      }
+      step.dataset.state = original;
+    }
+  }
   return pairs;
 }'''
 
@@ -79,8 +140,15 @@ with sync_playwright() as w:
     p = b.new_page(viewport={'width': 1440, 'height': 1000}, reduced_motion='reduce')
     for route in ['', 'sechserrechner/', 'sleepcalculator/']:
         p.goto(BASE + route)
-        states = ['empty', 'example'] if route == 'sechserrechner/' else ['default']
+        states = ['grade', 'sleep', 'code-csv', 'code-json'] if route == '' else ['empty', 'example'] if route == 'sechserrechner/' else ['default']
         for state in states:
+            if route == '':
+                p.locator(f'[data-select="{state.split("-")[0]}"]').click()
+                if state.startswith('code-'):
+                    p.locator(f'[data-format="{state.split("-")[1]}"]').click()
+                look = p.locator('[data-look-panel]')
+                if look.is_visible() and not look.evaluate('el => el.open'):
+                    look.locator('summary').click()
             if state == 'example':
                 p.locator('#loadExample').click(); p.locator('#closeToast').click()
             for theme in ['dark', 'light']:
@@ -93,6 +161,12 @@ with sync_playwright() as w:
                 expected = {'brand', 'film-text stop'} | ({'mini clock', 'grade card h3', 'sleep card cta', 'hud channel', 'hud data', 'grade', 'sleep', 'code'} if route == '' else set())
                 expected |= {'result average', 'result averageDetail', 'result result-title'} if route == 'sechserrechner/' else set()
                 expected |= {'dial-tip', 'midnight', 'sleepResultTime'} if route == 'sleepcalculator/' else set()
+                if route == '':
+                    expected |= {'hero sample heading', 'conversion title', 'conversion tag', 'conversion file', 'conversion file detail', 'conversion bay label', 'conversion source key', 'conversion target key', 'conversion field value', 'conversion format button', 'conversion play button', 'conversion status', 'conversion output', 'conversion pending', 'conversion note'}
+                    expected |= {'hero data description', 'hero data link'} if state.startswith('code-') else {'hero sample label', 'hero sample value', 'hero sample answer', 'hero sample result', 'hero sample detail'}
+                    if p.locator('[data-look-panel]').is_visible():
+                        expected |= {'hero look summary', 'hero look label', 'hero look select', 'hero look reset'}
+                    expected |= {f'conversion step {step} {text}' for step in ['waiting', 'current', 'done'] for text in ['label', 'number']}
                 missing = expected - labels
                 assert not missing, (route, theme, 'pairs not found', missing)
                 for pair in pairs:

@@ -46,6 +46,7 @@
       bench.dispatchEvent(new CustomEvent('benchselect', { detail: { name, source } }));
     }
     bench.querySelectorAll('[data-select]').forEach(button => button.addEventListener('click', () => select(button.dataset.select)));
+    bench.addEventListener('benchform', event => select(event.detail?.name, 'scroll'));
     // Back labels come forward first; the front one is a plain link
     bench.querySelectorAll('[data-module]').forEach(card => card.addEventListener('click', event => {
       if (card.dataset.module === bench.dataset.selection || event.metaKey || event.ctrlKey || event.shiftKey) return;
@@ -95,19 +96,4 @@
     if (n >= 0) { gauge.style.setProperty('--v', Math.min(1, Math.max(0, (n - 1) / 5)).toFixed(4)); gauge.querySelector('.g-value').textContent = mean.textContent; }
   };
   if (mean) { follow(); new MutationObserver(follow).observe(mean, { childList: true }); }
-  const format = document.querySelector('[data-conversion-format]');
-  format?.addEventListener('animationend', () => format.classList.remove('is-flipping'));
-  document.querySelectorAll('[data-format]').forEach(button => button.addEventListener('click', () => {
-    const json = button.dataset.format === 'json';
-    const changed = button.getAttribute('aria-pressed') !== 'true';
-    document.querySelectorAll('[data-format]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-    format.replaceChildren(document.createTextNode(json ? '.json' : '.csv'));
-    const small = document.createElement('small'); small.textContent = 'Dein Format'; format.append(small);
-    document.querySelector('[data-conversion-example]').textContent = json ? '{"name":"Beispiel","login":{"username":"demo"}}' : 'name,url,username\nBeispiel,https://example.com,demo';
-    if (changed && !reduced.matches) {
-      format.classList.remove('is-flipping'); void format.offsetWidth; format.classList.add('is-flipping');
-      // animationend never fires in hidden tabs or when the animation is cancelled; clean up anyway.
-      clearTimeout(format.flipTimer); format.flipTimer = setTimeout(() => format.classList.remove('is-flipping'), 700);
-    }
-  }));
 })();

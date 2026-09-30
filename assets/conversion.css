@@ -1,0 +1,61 @@
+/* SpasstoCSV: finite, user-triggered field transfer. */
+[data-conversion-demo]{--flow-gap:26px}
+[data-conversion-demo] .demo-tag{margin-left:0}
+[data-conversion-demo] .conversion{padding-block:22px 18px}
+[data-conversion-demo] .conversion-line :is(i,svg){animation:none}
+.conversion-progress{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;list-style:none;padding:0;margin:0 var(--demo-pad) 18px}
+.conversion-progress li{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0;padding:10px 4px;border-radius:10px;border:1px solid var(--rule);background:var(--surface-2);color:var(--muted);font:600 12px/1.2 var(--font-sans);transition:color 240ms,border-color 240ms,background 240ms}
+.conversion-progress span{font:500 10px/1 var(--font-mono);color:var(--muted)}
+.conversion-progress [data-state=current]{color:var(--data-text);border-color:color-mix(in srgb,var(--data-gfx) 48%,var(--rule-strong));background:var(--data-soft)}
+.conversion-progress [data-state=done]{color:var(--ink)}
+.conversion-flow{position:relative;height:192px;margin:0 var(--demo-pad) 16px;isolation:isolate}
+.conversion-bays{position:absolute;inset:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--flow-gap)}
+.conversion-bay{min-width:0;padding:15px 12px;border-radius:14px;border:1px dashed var(--rule-strong);background:linear-gradient(150deg,var(--surface-2),var(--field));transition:border-color 420ms,background 420ms}
+.conversion-bay>span{font:500 10px/1.2 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.conversion-bay-target{background:linear-gradient(150deg,var(--data-soft),var(--field))}
+.conversion-fields{position:absolute;inset:0;pointer-events:none}
+.conversion-field{--row:0;position:absolute;left:10px;top:calc(44px + var(--row) * 46px);width:calc((100% - var(--flow-gap)) / 2 - 20px);min-height:40px;padding:7px 9px;border:1px solid var(--rule-strong);border-radius:9px;background:var(--surface);box-shadow:0 4px 12px rgb(0 0 0 / .12);transform:translateX(0);transition:transform 680ms var(--ease-out),border-color 480ms,box-shadow 480ms;transition-delay:calc(var(--row) * 80ms);overflow-wrap:anywhere}
+.conversion-field:nth-child(2){--row:1}
+.conversion-field:nth-child(3){--row:2}
+.conversion-field-key{position:relative;display:grid;grid-template-areas:'key';margin-bottom:4px;font:500 9px/1 var(--font-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.conversion-field-key>span{grid-area:key;transition:opacity 280ms}
+.conversion-field-key [data-conversion-key]{opacity:0;color:var(--data-text)}
+.conversion-field-value{display:block;font:500 11px/1.2 var(--font-mono);color:var(--ink)}
+.conversion-flow::before{content:'→';position:absolute;left:50%;top:50%;translate:-50% -50%;font:400 17px/1 var(--font-mono);color:var(--data-text)}
+[data-conversion-stage=mapping] .conversion-field,[data-conversion-stage=output] .conversion-field{transform:translateX(calc(100% + var(--flow-gap) + 20px));border-color:color-mix(in srgb,var(--data-gfx) 42%,var(--rule-strong));box-shadow:0 4px 16px color-mix(in srgb,var(--data-gfx) 9%,transparent)}
+:is([data-conversion-stage=mapping],[data-conversion-stage=output]) .conversion-field-key>span:first-child{opacity:0}
+:is([data-conversion-stage=mapping],[data-conversion-stage=output]) .conversion-field-key [data-conversion-key]{opacity:1}
+[data-conversion-stage=mapping] .conversion-bay-target{border-color:var(--data-gfx)}
+.conversion-controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-inline:var(--demo-pad)}
+[data-conversion-demo] .demo-tabs{margin:0;max-width:100%}
+[data-conversion-demo] .demo-tabs button{padding-inline:14px;font-size:13px}
+.conversion-run{display:none;flex:1 1 auto;justify-content:center;min-height:44px;padding:10px 14px;border:1px solid var(--control-rule);border-radius:var(--r-pill);background:var(--surface-2);color:var(--ink);font:600 13px/1.2 var(--font-sans);transition:background 200ms,border-color 200ms}
+.js .conversion-run{display:inline-flex}
+@media (hover:hover){.conversion-run:hover{background:var(--data-soft);border-color:var(--data-gfx)}}
+.conversion-status{min-height:2.8em;padding:0;margin:14px var(--demo-pad) 0;color:var(--muted);font:500 11px/1.4 var(--font-mono)}
+.conversion-output{position:relative}
+[data-conversion-demo] .code-example{min-height:120px;margin-top:8px;padding:14px;font-size:12px;line-height:1.6;transition:opacity 280ms,transform 280ms;border-color:color-mix(in srgb,var(--data-gfx) 25%,var(--rule));}
+.conversion-pending{position:absolute;inset:0 var(--demo-pad);display:flex;align-items:center;justify-content:center;padding:18px;text-align:center;font:500 12px/1.5 var(--font-mono);color:var(--muted);opacity:0;transition:opacity 180ms;pointer-events:none}
+[data-conversion-stage=export] .code-example,[data-conversion-stage=mapping] .code-example{opacity:0;transform:translateY(7px)}
+[data-conversion-stage=export] .conversion-pending,[data-conversion-stage=mapping] .conversion-pending{opacity:1}
+[data-conversion-demo] .fineprint{padding-top:12px;font-size:12px}
+@media (max-width:480px){
+[data-conversion-demo]{--demo-pad:14px;--flow-gap:20px}
+.conversion-field{padding:7px 6px}
+.conversion-field-value{font-size:9px}
+.conversion-bay{padding-inline:10px}
+.conversion-bay>span{font-size:9px;letter-spacing:0}
+.conversion-progress li{flex-direction:column;gap:5px;font-size:11px}
+[data-conversion-demo] .demo-tabs{width:100%;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr)}
+[data-conversion-demo] .demo-tabs button{padding-inline:6px;font-size:12px}
+.conversion-run{width:100%}
+.conversion-status{font-size:10px;min-height:4.2em}
+[data-conversion-demo] .code-example{font-size:10.5px;padding:12px;min-height:160px}
+}
+@media (prefers-reduced-motion:reduce){
+[data-conversion-demo] *,[data-conversion-demo] *::before{animation:none !important;transition:none !important}
+}
+@media (forced-colors:active){
+.conversion-field,.conversion-bay,.conversion-progress [data-state=current]{border-color:CanvasText}
+.conversion-field-key [data-conversion-key],.conversion-flow::before{color:CanvasText}
+}

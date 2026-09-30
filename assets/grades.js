@@ -147,6 +147,7 @@
     text('gradeError', invalid ? 'Noten: 1–6. Gewicht: 0.01–100. Jeweils höchstens zwei Dezimalstellen.' : '');
     try { current = invalid ? null : M.summary(s.entries); } catch { current = null; }
     const shown = current && M.round(current.average, Number(s.rounding)).toFixed(2);
+    $('resultExample').hidden = Boolean(current) || invalid;
     $('scalePointer').hidden = !current;
     if (!current) {
       result('average', null); text('averageDetail', invalid ? 'Bitte Eingaben prüfen.' : 'Trage deine erste Note ein.');
@@ -330,6 +331,11 @@
     active().entries = clone(EXAMPLE);
     if (own) populate(); else { renderRows(); compute(); }
     persist(); toast(own ? 'Beispiel als neues Fach «Beispiel» geöffnet.' : 'Beispielnoten eingesetzt.', true); glint();
+  });
+  $('resultExample').addEventListener('click', () => {
+    $('loadExample').click();
+    // The entry action disappears after loading; focus moves to a visible result.
+    $('result-title').setAttribute('tabindex', '-1'); $('result-title').focus({preventScroll: true});
   });
   // Focus never falls back to <body>: keyboard → a grade, pointer → "Note hinzufügen".
   function afterToast(event, index = lastGrade) {

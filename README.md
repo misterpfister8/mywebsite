@@ -15,7 +15,12 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
   24-Stunden-Ring und Datenwürfel. Es reagiert auf Zeiger, Scrollen, Auswahl und
   Klick und hört danach ganz auf zu rendern. Im hellen Farbschema wird es zu
   Porzellan mit irisierender Glasur. Auf Handys läuft es als schmales Band, das
-  beim Scrollen die drei Formen durchläuft.
+  beim Scrollen die drei Formen durchläuft. Auswahlknöpfe und horizontales
+  Wischen halten die gewählte Form fest; vertikales Scrollen bleibt möglich.
+- Kleine Demos im Hero: Eine fiktive nächste Note verändert Schnitt und
+  Glas-Skala, eine Schlafdauer verändert Bettzeit und Ring. «Look anpassen»
+  öffnet Material-, Farb- und Lichtregler direkt in der Vorschau. Diese Werte
+  bleiben in der Sitzung und berühren keine gespeicherten Rechnerdaten.
 - Drei Darstellungsstufen: `live` (Animation mit Grafikkarte), `still` (ein
   einzelnes gerendertes Standbild bei Software-Rendering, `saveData`, wenigen
   CPU-Kernen oder Reduced Motion) und `fallback` (statisches SVG, wenn WebGL
@@ -25,7 +30,7 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
 - Räumliche Werkzeugkarten als «Museumsschilder» ab Tablet-Breite: Das vordere
   Schild öffnet sein Tool, die anderen kommen zuerst nach vorne. Bedienbar ist die
   Auswahl über das Dock (Pfeiltasten, Home/End) und per Touch; das HUD nennt Kanal
-  und Beispielwerte. Auf Handys entfällt die Szene zugunsten der Toolkarten.
+  und Beispielwerte. Auf Handys bleibt die Auswahl neben dem kompakten Glasband.
   Die direkten Toollinks funktionieren unabhängig von der Szene.
 - Native Cross-Document View Transitions verbinden Karte oder Schild mit dem
   Ergebnis des Rechners und das Glasobjekt mit dem Tool-Symbol. Das Farbschema
@@ -38,7 +43,8 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
   eine Wunschnote. Das Ergebnis ist ein 270°-Instrument mit Punkt (aktuell),
   Ring (Simulation), Dreieck (Ziel) und gestrichelter Marke bei 4.0, dazu ein
   Balkendiagramm (Breite = Gewicht, Höhe = Note), ein Differenz-Chip (▲/▼/=) und
-  Antwortkarten mit Symbolen. Ab 901 px bleibt das Ergebnis beim Scrollen
+  Antwortkarten mit Symbolen. Ein leerer Rechner bietet das vorhandene Beispiel
+  direkt im Ergebnis an. Ab 901 px bleibt das Ergebnis beim Scrollen
   sichtbar, sofern es in die Fensterhöhe passt; auf schmaleren Bildschirmen
   erscheint eine kompakte Ergebnisleiste.
 - Schlaf: 24-Stunden-Uhr, frei wählbare Bett-/Aufstehzeit (07:00, 7.00, 700 oder
@@ -50,7 +56,8 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
   bleiben die einzige Quelle; gespeichert wird einmal pro Zug. Ab 901 px (und
   mindestens 720 px Fensterhöhe) bleibt das Zifferblatt beim Scrollen sichtbar;
   bis 900 px erscheint stattdessen eine kompakte Ergebnisleiste.
-- SpasstoCSV: Formatillustration mit erfundenen Daten und Verweis auf das
+- SpasstoCSV: animierter Weg vom Export über drei Feldzuordnungen zur CSV-/JSON-
+  Vorschau mit erfundenen Daten und Verweis auf das
   [lokale Python-Projekt](https://github.com/misterpfister8/spasstocsv).
   Unterstützte Formate laut dessen öffentlicher README: Raw-, Chrome- und
   Proton-CSV sowie Bitwarden JSON. Die Website nimmt keine Passwortdateien an.
@@ -104,6 +111,7 @@ node tests/math.test.js
 .venv/bin/python tests/interaction_review.py --headed
 .venv/bin/python tests/interaction_review.py --axe /pfad/zu/axe.min.js
 .venv/bin/python tests/contrast_review.py
+.venv/bin/python tests/showcase_review.py
 ```
 
 Alle Browserprüfungen akzeptieren `--base-url`, falls der Server nicht auf Port
@@ -112,7 +120,7 @@ Alle Browserprüfungen akzeptieren `--base-url`, falls der Server nicht auf Port
 Die Browserprüfungen benötigen den laufenden HTTP-Server. Sie laden die echten
 externen Dateien und verwenden nativen Browser-Speicher. `browser_review.py`
 prüft zusätzlich, dass keine Anfrage die eigene Origin verlässt, alle Assets
-den Cache-Parameter `?v=werkplatz-5` tragen, Chromium jede Deklaration, jeden
+den Cache-Parameter `?v=werkplatz-5-demo1` tragen, Chromium jede Deklaration, jeden
 Selektor und jede Media-Bedingung der Stylesheets annimmt (ausgenommen bewusst
 browserübergreifende Regeln), jeder Tab-Stopp sichtbar ist und die
 Einblendung der Startseite keinen Text anschneidet. Speicherfehler-Injektion
@@ -126,7 +134,9 @@ den Rechnern auch mit gespeicherten Daten) sowie die View Transitions samt
 Richtung (`forward`/`back`); optional `--axe /pfad/zu/axe.min.js` für einen
 lokal bereitgestellten axe-core-Scan (WCAG 2.2 AA und Best Practices).
 `contrast_review.py` misst Textkontraste auf allen drei Seiten in beiden
-Farbschemas gegen jede Verlaufsfarbe. Testausgaben unter `output/playwright/`
+Farbschemas gegen jede Verlaufsfarbe. `showcase_review.py` prüft die Hero-Demos,
+Look-Regler mit tatsächlicher Bildänderung, Touch-Auswahl, Formatablauf und
+unveränderte gespeicherte Rechnerdaten. Testausgaben unter `output/playwright/`
 bleiben ausserhalb von Git. Das [Prüfprotokoll](docs/REDESIGN_QA.md) trennt
 beobachtete Ergebnisse und offene Geräteprüfungen.
 
@@ -152,11 +162,13 @@ Backbuffer-Grösse, `HeroGL.render()` erzwingt ein Bild.
 |---|---|
 | `assets/core.css` | Farb- und Masstokens, gemeinsame Komponenten, Bewegung, View Transitions (ersetzt `site.css`) |
 | `assets/home.css` | Startseite: Hero-Bühne, Schilder, Dock, Toolkarten, Projekt, Über mich |
+| `assets/hero-demo.js`, `assets/hero-demo.css` | Fiktive Hero-Demos, Material-/Lichtregler und Bedienhinweise |
+| `assets/conversion.js`, `assets/conversion.css` | Endlicher Export-/Zuordnungs-/Formatablauf mit Beispieldaten |
 | `assets/grades.css` | Notenrechner: Instrument, Diagramm, Zeilen, Planung, Übersicht, Punkte |
 | `assets/sleep.css` | Schlafrechner: Zifferblatt, Griffe, Nachtbalken, Feintuning |
 | `assets/hero-gl.js` | WebGL-Glasobjekt mit Stufen, Leerlauf-Stopp und Handy-Band |
 | `assets/motion.js` | Scroll-Reveals (mit Fallback), magnetische Buttons, Spotlight, dekorative Zähler |
-| `assets/workbench.js` | Auswahl der Startseiten-Vorschau, HUD, `benchselect`-Ereignis, Formatbeispiel |
+| `assets/workbench.js` | Auswahl der Startseiten-Vorschau, HUD, `benchselect`-Ereignis |
 | `assets/theme.js` | Farbschema (gespeichert unter `misterpfister-theme`), Kreisblende |
 | `assets/transitions.js` | Erweitert die native Navigation um benannte View Transitions |
 | `assets/tool-math.js` | Reine Rechenfunktionen, inklusive Zifferblatt-Mathematik |
@@ -168,6 +180,7 @@ Die Speicherschlüssel und -formate bleiben unverändert
 `-saving`-Schalter). Alte Sicherungen und Browserdaten laden weiter.
 
 Der bestehende Workflow `Workshop regression tests` prüft Rechenlogik, HTTP-
-Bedienung und Browser-Neustarts. Vor dem Push Remote-Änderungen abgleichen, den
+Bedienung, Browser-Neustarts und Showcase-Demos. Vor dem Push Remote-Änderungen
+abgleichen, den
 geprüften Stand ohne Force-Push nach `main` übernehmen und anschliessend den
 separaten Workflow `pages build and deployment` sowie die Live-Seiten prüfen.

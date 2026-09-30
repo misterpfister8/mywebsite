@@ -13,13 +13,18 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="de_CH">
   <meta property="og:url" content="https://misterpfister.net/">
-  <script src="./assets/transitions.js?v=werkplatz-5"></script>
-  <script src="./assets/theme.js?v=werkplatz-5"></script>
-  <link rel="stylesheet" href="./assets/core.css?v=werkplatz-5">
-  <link rel="stylesheet" href="./assets/home.css?v=werkplatz-5">
-  <script src="./assets/motion.js?v=werkplatz-5" defer></script>
-  <script src="./assets/workbench.js?v=werkplatz-5" defer></script>
-  <script src="./assets/hero-gl.js?v=werkplatz-5" defer></script>
+  <script src="./assets/transitions.js?v=werkplatz-5-demo1"></script>
+  <script src="./assets/theme.js?v=werkplatz-5-demo1"></script>
+  <link rel="stylesheet" href="./assets/core.css?v=werkplatz-5-demo1">
+  <link rel="stylesheet" href="./assets/home.css?v=werkplatz-5-demo1">
+  <link rel="stylesheet" href="./assets/hero-demo.css?v=werkplatz-5-demo1">
+  <link rel="stylesheet" href="./assets/conversion.css?v=werkplatz-5-demo1">
+  <script src="./assets/motion.js?v=werkplatz-5-demo1" defer></script>
+  <script src="./assets/tool-math.js?v=werkplatz-5-demo1" defer></script>
+  <script src="./assets/workbench.js?v=werkplatz-5-demo1" defer></script>
+  <script src="./assets/hero-gl.js?v=werkplatz-5-demo1" defer></script>
+  <script src="./assets/hero-demo.js?v=werkplatz-5-demo1" defer></script>
+  <script src="./assets/conversion.js?v=werkplatz-5-demo1" defer></script>
 </head>
 <body class="home-page">
   <a href="#main" class="skip-link">Zum Inhalt springen</a>
@@ -45,6 +50,32 @@
             <a class="button secondary" data-magnetic href="./sleepcalculator/">Schlaf planen <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13a8.1 8.1 0 0 1-9-9 8.5 8.5 0 1 0 9 9Z"/></svg></a>
           </div>
           <p class="hero-note">Direkt im Browser. Ohne Anmeldung.</p>
+          <div class="hero-demo" data-hero-demo hidden>
+            <div class="hero-demo-heading"><span class="status-dot" aria-hidden="true"></span><span>Selber ausprobieren</span><span class="hero-demo-tag">Beispielwerte</span></div>
+            <div class="hero-demo-body" data-demo-panel="grade">
+              <div class="demo-control-label"><label for="demoGrade">Nächste Note</label><output for="demoGrade" data-demo-grade-value>6.00</output></div>
+              <input class="demo-range" id="demoGrade" data-demo-grade type="range" min="1" max="6" step="0.25" value="6">
+              <p class="demo-answer">Schnitt <span>5.25</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><output for="demoGrade" data-demo-average>5.40</output><span class="demo-answer-note">mit der nächsten Note</span></p>
+            </div>
+            <div class="hero-demo-body" data-demo-panel="sleep" hidden>
+              <div class="demo-control-label"><label for="demoSleep">Schlafdauer</label><output for="demoSleep" data-demo-duration>8 h</output></div>
+              <input class="demo-range" id="demoSleep" data-demo-sleep type="range" min="360" max="540" step="15" value="480">
+              <p class="demo-answer">Ins Bett <output for="demoSleep" data-demo-bed>22:50</output><span class="demo-answer-note">für 07:00 · 10 min Einschlafen</span></p>
+            </div>
+            <div class="hero-demo-body demo-data-intro" data-demo-panel="code" hidden>
+              <p>Ein Datensatz. Zwei Zielformate.<br>Sieh zu, wie die Felder ihren Platz finden.</p>
+              <a class="text-cta" href="#format-demo">Formatwechsel ausprobieren <span aria-hidden="true">↓</span></a>
+            </div>
+            <details class="hero-look" data-look-panel>
+              <summary><span>Look anpassen</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+              <div class="hero-look-controls">
+                <label>Material<select data-look-material><option value="default">Original</option><option value="clear">Glas</option><option value="satin">Matt</option></select></label>
+                <label>Farbspiel<select data-look-palette><option value="original">Original</option><option value="mint">Mint</option><option value="violet">Violett</option></select></label>
+                <label class="look-light">Licht<input class="demo-range" data-look-light type="range" min="-100" max="100" step="10" value="0"><span class="sr-only">Licht von links nach rechts verschieben</span></label>
+                <button class="text-button" type="button" data-look-reset>Zurücksetzen</button>
+              </div>
+            </details>
+          </div>
         </div>
         <div class="hero-visual" data-glass data-glass-state="boot" data-glass-form="grade">
           <div class="glass-stage" aria-hidden="true">
@@ -67,7 +98,7 @@
           <ol class="orb-captions" aria-hidden="true"><li data-form="grade" data-active>01 Noten</li><li data-form="sleep">02 Schlaf</li><li data-form="code">03 Daten</li></ol>
           <div class="workbench" data-workbench data-selection="grade">
             <div class="scene-hud" aria-hidden="true"><span data-hud-channel>CH 01 · NOTEN</span><span data-hud-data>Ø 5.25 · 4 Noten</span></div>
-            <!-- Pointer shortcut: the front label and the object open the selected tool; back labels come forward. The dock is the accessible control. -->
+            <!-- The front label opens its tool; back labels come forward. The dock is the accessible control; the object plays a finite effect. -->
             <div class="scene" aria-hidden="true">
               <div class="scene-stage">
                 <a class="module module-code" href="https://github.com/misterpfister8/spasstocsv" target="_blank" rel="noopener noreferrer" data-module="code" tabindex="-1"><span class="module-kicker">03 · SpasstoCSV</span><span class="file-badge">.spass</span><span class="file-route"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><b>.csv</b></span><span class="module-foot">Lokal. In deinem Format.</span></a>
@@ -83,7 +114,8 @@
               </div>
               <a data-scene-link href="./sechserrechner/" aria-label="Notenrechner öffnen"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a>
             </div>
-            <p class="scene-note" data-scene-note aria-live="polite">Beispiel: (4.5 + 5.5 + 5 + 6) ÷ 4 = 5.25.</p>
+            <p class="scene-note" data-scene-note>Beispiel: (4.5 + 5.5 + 5 + 6) ÷ 4 = 5.25.</p>
+            <p class="object-hint" data-object-hint>Ziehen zum Drehen</p>
           </div>
         </div>
       </div>
@@ -146,20 +178,41 @@
             <a class="button secondary" data-magnetic href="https://github.com/misterpfister8/spasstocsv" target="_blank" rel="noopener noreferrer">Projekt auf GitHub <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a>
             <div class="story-glyph parallax" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke-linecap="round" stroke-linejoin="round" focusable="false"><defs><linearGradient id="storyFilm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--film-0)"/><stop offset=".36" style="stop-color:var(--film-1)"/><stop offset=".68" style="stop-color:var(--film-2)"/><stop offset="1" style="stop-color:var(--film-3)"/></linearGradient></defs><path d="M24 7 38.8 15.6v16.8L24 41 9.2 32.4V15.6Z" stroke="url(#storyFilm)" stroke-width="1.6"/><path d="M9.2 15.6 24 24l14.8-8.4M24 24v17" stroke="url(#storyFilm)" stroke-width="1.6"/><rect x="35" y="4" width="8" height="8" rx="2" fill="var(--data-gfx)"/></svg></div>
           </div>
-          <div class="story-demo reveal">
-            <div class="demo-top"><span class="demo-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="demo-title">spasstocsv — lokal · Beispiel</span><span class="demo-tag"><span class="status-dot"></span> Formatbeispiel mit erfundenen Daten</span></div>
+          <div class="story-demo reveal" id="format-demo" data-conversion-demo data-conversion-stage="output" data-conversion-playing="false">
+            <div class="demo-top"><span class="demo-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="demo-title">spasstocsv · Formatbeispiel</span><span class="demo-tag"><span class="status-dot"></span> Fiktive Beispieldaten</span></div>
             <div class="conversion">
               <span class="conversion-file">.spass<small>Dein Export</small></span>
               <span class="conversion-line" aria-hidden="true"><i></i><svg viewBox="0 0 12 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4 5l7 7-7 7"/></svg></span>
               <span class="conversion-file converted" data-conversion-format>.csv<small>Dein Format</small></span>
             </div>
-            <div class="demo-tabs" role="group" aria-label="Beispiel-Ausgabeformat">
-              <button type="button" data-format="csv" aria-pressed="true">CSV</button>
-              <button type="button" data-format="json" aria-pressed="false">Bitwarden JSON</button>
+            <ol class="conversion-progress" aria-label="Ablauf des Formatbeispiels">
+              <li data-conversion-step="export" data-state="done"><span>01</span>Export</li>
+              <li data-conversion-step="mapping" data-state="done"><span>02</span>Zuordnen</li>
+              <li data-conversion-step="output" data-state="current" aria-current="step"><span>03</span>Ausgabe</li>
+            </ol>
+            <div class="conversion-flow" aria-hidden="true">
+              <div class="conversion-bays"><div class="conversion-bay"><span>Exportfelder</span></div><div class="conversion-bay conversion-bay-target"><span>Zielfelder</span></div></div>
+              <div class="conversion-fields">
+                <div class="conversion-field"><span class="conversion-field-key"><span>Titel</span><span data-conversion-key="name">name</span></span><span class="conversion-field-value">Beispiel 1</span></div>
+                <div class="conversion-field"><span class="conversion-field-key"><span>Adresse</span><span data-conversion-key="url">url</span></span><span class="conversion-field-value">example.com</span></div>
+                <div class="conversion-field"><span class="conversion-field-key"><span>Anmeldung</span><span data-conversion-key="username">username</span></span><span class="conversion-field-value">demo.01</span></div>
+              </div>
             </div>
-            <pre class="code-example" data-conversion-example>name,url,username
-Beispiel,https://example.com,demo</pre>
-            <p class="fineprint">Erfundener, gekürzter Datensatz zur Illustration. Der Konverter läuft lokal, nicht auf dieser Website. Klartext-Exporte enthalten sensible Daten.</p>
+            <div class="conversion-controls">
+              <div class="demo-tabs" role="group" aria-label="Beispiel-Ausgabeformat">
+                <button type="button" data-format="csv" aria-pressed="true">CSV</button>
+                <button type="button" data-format="json" aria-pressed="false">Bitwarden JSON</button>
+              </div>
+              <button class="conversion-run" type="button" data-conversion-run aria-describedby="conversion-note">Beispiel durchspielen</button>
+            </div>
+            <p class="conversion-status" data-conversion-status role="status" aria-live="polite" aria-atomic="true">3 / Ausgabe · zwei Beispieldatensätze als CSV.</p>
+            <div class="conversion-output">
+              <pre class="code-example" data-conversion-example aria-label="Fiktive Beispiel-Ausgabe">name,url,username
+Beispiel 1,https://example.com/1,demo.01
+Beispiel 2,https://example.com/2,demo.02</pre>
+              <span class="conversion-pending" data-conversion-pending aria-hidden="true">Beispiel-Export laden …</span>
+            </div>
+            <p class="fineprint" id="conversion-note">Erfundene, gekürzte Daten zur Illustration; Passwörter ausgelassen. Der echte Konverter läuft lokal auf deinem Computer. Diese Website verarbeitet keine Exporte. Klartext-Exporte enthalten sensible Daten.</p>
           </div>
           <details class="story-details disclosure">
             <summary>Was hinter dem Projekt steckt <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>

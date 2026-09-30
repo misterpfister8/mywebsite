@@ -33,7 +33,7 @@ INFINITE_ANIMATIONS = "document.getAnimations().filter(a => a.effect && a.effect
 BROKEN_REFS = '''() => [...document.querySelectorAll('[aria-labelledby], [aria-describedby], [aria-controls]')]
   .flatMap(el => ['aria-labelledby', 'aria-describedby', 'aria-controls'].flatMap(a => (el.getAttribute(a) || '').split(/\\s+/).filter(Boolean)))
   .filter(id => !document.getElementById(id))'''
-# Spec §8.2: every stylesheet and script is local and carries the werkplatz-5 cache bust.
+# Spec §8.2: every stylesheet and script is local and carries the werkplatz-5-demo1 cache bust.
 ASSET_URLS = "[...document.querySelectorAll('link[rel=stylesheet], script[src]')].map(el => el.getAttribute('href') || el.getAttribute('src'))"
 # The live result of each page; decorative count-ups must refuse it (spec §4.5: result numbers never tween).
 LIVE_RESULT = {'home': '#hero-title', 'home-fallback': '#hero-title', 'grade': '#average', 'sleep': '#sleepResultTime'}
@@ -291,7 +291,8 @@ def run(review):
     p.locator('[data-select="sleep"]').press('ArrowRight')
     r.check(p.locator('[data-select="code"]').get_attribute('aria-pressed') == 'true', 'Hero arrow-key selection')
     p.locator('[data-format="json"]').click()
-    r.check('"username":"demo"' in r.text('[data-conversion-example]'), 'Fictional format demo switches to JSON')
+    example_items = json.loads(r.text('[data-conversion-example]'))['items']
+    r.check(len(example_items) == 2 and example_items[0]['login']['username'] == 'demo.01', 'Fictional format demo switches both sample records to valid JSON')
     r.check(p.locator('[data-motion-toggle]').count() == 0, 'No manual motion toggle; system preference decides')
     theme_state = "() => ({theme: document.documentElement.dataset.theme, meta: document.querySelector('meta[name=theme-color]').content, stored: localStorage.getItem('misterpfister-theme'), label: document.querySelector('[data-theme-toggle]').getAttribute('aria-label'), events: window.__themes || null})"
     r.check(p.evaluate(theme_state) == {'theme': 'dark', 'meta': '#0B0D0F', 'stored': None, 'label': 'Helles Farbschema verwenden', 'events': None}, f'Dark default theme with its theme-color and toggle label: {p.evaluate(theme_state)}')
@@ -440,7 +441,7 @@ def run(review):
         r.check(p.evaluate(HIDDEN_FOCUSABLES) == [], f'No focusable element inside aria-hidden or role=img: {name}')
         r.check(p.evaluate(BROKEN_REFS) == [], f'ARIA id references resolve: {name} {p.evaluate(BROKEN_REFS)}')
         assets = p.evaluate(ASSET_URLS)
-        r.check(assets and all(re.fullmatch(r'\.{1,2}/assets/[\w-]+\.(css|js)\?v=werkplatz-5', url) for url in assets), f'Local assets with the werkplatz-5 cache bust: {name} {assets}')
+        r.check(assets and all(re.fullmatch(r'\.{1,2}/assets/[\w-]+\.(css|js)\?v=werkplatz-5-demo1', url) for url in assets), f'Local assets with the werkplatz-5-demo1 cache bust: {name} {assets}')
         if name in ('grade', 'sleep'):
             r.check(p.evaluate("document.querySelectorAll('canvas').length === 0 && !performance.getEntriesByType('resource').some(e => /hero-gl|workbench/.test(e.name))"), f'No WebGL and no home scripts on the tool page: {name}')
         live, shown = LIVE_RESULT[name], r.text(LIVE_RESULT[name])
@@ -463,14 +464,14 @@ def run(review):
                     if name == 'home' and width in [320, 375, 402]:
                         r.check(p.locator('.main-nav a').evaluate_all('els => els.length === 2 && els.every(el => el.checkVisibility())'), f'Both home links stay in the phone header: {width}')
                         r.check(p.locator('.hero-actions').bounding_box()['y'] < 400, f'Direct links before 400px: {width}')
-                        r.check(p.locator('.tool-card').first.bounding_box()['y'] < 700, f'First project card begins early in the first mobile screen: {width}')
+                        r.check(p.locator('.tool-card').first.bounding_box()['y'] < 950, f'Interactive sample and compact band keep the first tool card within 950px: {width}')
                         band = p.locator('.hero-visual').bounding_box()
                         r.check(p.locator('.glass-stage').is_visible() and band and 0 < band['height'] <= 170, f'Phones keep the glass object as a band of at most 170px: {width}')
                     if width == 402:
                         if name == 'home':
                             r.check(p.locator('.hero-actions').bounding_box()['y'] < 400, 'Direct links before 400px')
-                            r.check(p.locator('[data-workbench]').is_hidden(), 'Phones skip the spatial preview')
-                            r.check(p.locator('.tool-card').first.bounding_box()['y'] < 700, 'First project card begins early in the first mobile screen')
+                            r.check(p.locator('.scene').is_hidden() and p.locator('.scene-dock').is_visible(), 'Phones replace spatial cards with an accessible specimen dock')
+                            r.check(p.locator('.tool-card').first.bounding_box()['y'] < 950, 'Interactive sample and compact band keep the first tool card within 950px')
                         if name == 'grade':
                             r.check(p.locator('.grade-grade').first.bounding_box()['y'] < 700, 'First grade in first mobile screen')
                         if name == 'sleep':
@@ -719,7 +720,7 @@ def hero(r):
     r.check(glass['form'] == 'grade' and p.locator('[data-workbench]').get_attribute('data-selection') == 'grade', 'A fresh visit without referrer starts on grade')
     r.check(p.evaluate('__bench') == [{'name': 'grade', 'source': 'init'}], 'Workbench announces its initial selection once, as init')
     hud = lambda: (p.locator('[data-hud-channel]').text_content(), p.locator('[data-hud-data]').text_content())
-    r.check(hud() == ('CH 01 · NOTEN', 'Ø 5.25 · 4 Noten'), 'HUD starts on the grade channel')
+    r.check(hud() == ('CH 01 · NOTEN', 'Ø 5.40 · nächste 6.00'), 'HUD starts on the grade channel with the projected sample average')
     r.disclosure_is_instant('details.story-details', 'the project story details')
     p.evaluate('scrollTo(0, 0)')
     structure = p.evaluate('''() => ({
@@ -734,7 +735,7 @@ def hero(r):
     frames = glass['frames']
     p.locator('[data-select="code"]').click()
     r.check(p.evaluate('__bench')[-1] == {'name': 'code', 'source': 'user'}, 'A dock selection dispatches benchselect from the user')
-    r.check(hud() == ('CH 03 · DATEN', '.spass → .csv · lokal') and p.locator('.hero-visual').get_attribute('data-glass-form') == 'code', 'HUD and glass form follow the data preview')
+    r.check(hud() == ('CH 03 · DATEN', '.spass → .csv / .json · lokal') and p.locator('.hero-visual').get_attribute('data-glass-form') == 'code', 'HUD and glass form follow the data preview')
     link = p.locator('[data-scene-link]')
     r.check(link.get_attribute('target') == '_blank' and 'noopener' in (link.get_attribute('rel') or '') and link.get_attribute('href').startswith('https://github.com/'), 'The data preview opens GitHub in a new tab without opener access')
     if glass['tier'] == 'still':
@@ -1160,7 +1161,7 @@ def stylesheets(r):
         result = p.evaluate(CSS_CHECK, items)
         rejected = [item for item in result['bad'] if not CSS_ALLOWED.match(item)]
         r.check(result['tested'] > 1000 and not rejected, f'Chromium accepts every stylesheet rule: {route or "home"} ({result["tested"]} declarations, {result["skipped"]} with scoped variables untested) {rejected}')
-    r.check(checked == {'core.css', 'home.css', 'grades.css', 'sleep.css'}, f'All four stylesheets were checked: {sorted(checked)}')
+    r.check(checked == {'core.css', 'home.css', 'hero-demo.css', 'conversion.css', 'grades.css', 'sleep.css'}, f'All six stylesheets were checked: {sorted(checked)}')
 
 
 def static_fallbacks(r):
@@ -1190,6 +1191,7 @@ def static_fallbacks(r):
     r.check(page.locator('.hero-visual').get_attribute('data-glass-state') == 'boot', 'A missing engine leaves the hero in boot')
     page.wait_for_timeout(4300)
     r.check(page.locator('.glass-fallback').evaluate('el => getComputedStyle(el).opacity') == '1' and page.locator('.glass-placeholder').evaluate('el => getComputedStyle(el).opacity') == '0', 'CSS failsafe reveals the specimen when the engine never starts')
+    r.check(page.locator('[data-look-panel]').is_hidden(), 'Material controls stay hidden when the rendering engine is missing')
     page.close()
 
 

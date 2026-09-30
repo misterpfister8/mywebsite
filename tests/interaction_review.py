@@ -123,12 +123,12 @@ with sync_playwright() as pw:
     p = touch.new_page(); p.on('pageerror', lambda error: errors.append(str(error)))
     for width in [320, 375, 402]:
         p.set_viewport_size({'width': width, 'height': 874}); p.goto(args.base_url)
-        assert p.locator('[data-workbench]').is_hidden(), f'Phones skip the spatial preview: {width}'
-        assert p.locator('.tool-card').first.bounding_box()['y'] < 700, f'Tool cards start in the first screen: {width}'
+        assert p.locator('.scene').is_hidden() and p.locator('.scene-dock').is_visible(), f'Phones use the specimen dock without spatial cards: {width}'
+        assert p.locator('.tool-card').first.bounding_box()['y'] < 950, f'Sample and band keep tool cards within 950px: {width}'
         band = p.locator('.hero-visual').bounding_box()
         assert p.locator('.hero-visual').is_visible() and band['height'] <= 170, f'Phones keep the glass object as a band of at most 170px: {width} {band}'
         assert p.locator('.glass-stage').is_visible(), f'Glass stage visible on phones: {width}'
-        report['touch'].append(f'{width}px: spatial preview skipped, glass band {band["height"]:.0f}px, tool cards first')
+        report['touch'].append(f'{width}px: accessible specimen dock, glass band {band["height"]:.0f}px, sample before tool cards')
     # The dial handles follow a finger; the page must not scroll while a handle is dragged (CDP touch: Chromium only).
     p.set_viewport_size({'width': 402, 'height': 874}); p.goto(BASE + 'sleepcalculator/')
     # The load stagger (load-rise) still slides the panels by up to 16px; the finger path is computed from the settled dial.
@@ -387,10 +387,15 @@ with sync_playwright() as pw:
             assert g.evaluate('__frameRequests') == count, 'Hidden tab renders no frames'
         live['hidden_document_observed'] = g.evaluate('document.hidden')
         other.close(); g.bring_to_front()
-        # A click on the object opens the selected tool through the dock link.
+        # The specimen is safe to play with; only its explicit link navigates.
         frames_stop(g, 1200)
-        g.mouse.click(*centre); g.wait_for_url('**/sechserrechner/')
-        live['object_click_opens'] = g.url
+        before = g.evaluate('HeroGL.stats.frames'); home = g.url
+        g.mouse.click(*centre)
+        stopped, gap = frames_stop(g, 1200)
+        assert g.url == home and g.evaluate('HeroGL.stats.frames') > before and stopped, 'Object click plays a finite effect without navigating'
+        live['object_click_stays'] = home
+        g.locator('[data-scene-link]').click(); g.wait_for_url('**/sechserrechner/')
+        live['explicit_link_opens'] = g.url
         report['hero']['gl_force'] = live
     g.close(); dense.close()
 

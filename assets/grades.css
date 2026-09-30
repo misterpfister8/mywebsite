@@ -228,6 +228,9 @@ html[data-grade-multi] #subjectSummary[hidden] { display: inline-flex !important
 .enter-hint { display: none; margin-left: 2px; padding: 3px 7px; border-radius: 6px; border: 1px solid var(--rule-strong); font: 500 11px/1.2 var(--font-mono); color: var(--muted); }
 @media (hover: hover) and (pointer: fine) { .enter-hint { display: inline-block; } }
 .input-limits { margin-top: 12px; }
+.empty-result-example { min-height: 44px; align-self: flex-start; margin-top: 10px; gap: 8px; color: var(--grade-text); font-size: 13px; }
+/* Match the initial saved layout before grades.js removes this bootstrap flag. */
+html[data-grade-filled] .empty-result-example { display: none; }
 #gradeError:not(:empty) { margin-top: 8px; }
 .settings-panel { padding-block: 8px 2px; }
 .settings-panel .save-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; padding-block: 4px; }

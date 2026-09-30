@@ -5,7 +5,7 @@
   if (!cv) return;
   const doc=document,root=doc.documentElement,stage=hv.querySelector('.glass-stage')||hv;
   const bench=doc.querySelector('[data-workbench]'),tiltEl=bench?.querySelector('.scene-stage');
-  const link=bench?.querySelector('[data-scene-link]'),hero=hv.closest('.hero')||hv;
+  const hero=hv.closest('.hero')||hv;
   const caps=hv.querySelectorAll('.orb-captions [data-form]');
   const mq=(q)=>matchMedia(q),RM=mq('(prefers-reduced-motion: reduce)'),BAND=mq('(max-width: 680px)');
   const COARSE=mq('(pointer: coarse)'),flag=new URLSearchParams(location.search).get('gl');
@@ -14,17 +14,20 @@
   const PAL=[['#0B0D0F','#CEF779 #7DF3E1 #C6B9FF #FF9EC7','#C4F46A #A896FF #62E6D2',1],
     ['#F2F3EE','#6E9B2A #1E9488 #7C68C8 #C0508A','#6FA626 #6F58D6 #149C8C',.4]]
     .map(([b,c,e,g])=>({b:hex(b),c:c.split(' ').map(hex),e:e.split(' ').map(hex),g}));
+  const FILM=[['#9EF1D2 #76D9DF #B5E8B8 #B4DFF2','#387A68 #1A8792 #649645 #4B759C'],
+    ['#D4B3FA #A7B8FB #E1A8D5 #BCC4FF','#8A64AF #577DB2 #AC629C #716CA9']]
+    .map((themes)=>themes.map((colors)=>colors.split(' ').map(hex)));
   const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
   const ss=(a,b,x)=>{const t=clamp((x-a)/(b-a)); return t*t*(3-2*t);};
   const mix=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t);
   const now=()=>performance.now(),cap=(v)=>Math.min(2,v);
-  const FS=`precision highp float;uniform vec2 uRes,uOff;uniform float uFov,uTime,uScale,uFormA,uFormB,uMorph,uWob,uTheme,uFilm,uGradeT,uSteps,uShadow,uSweep,uGlow;uniform mat3 uRot;uniform vec4 uReach,uSleep;uniform vec3 uBg,uC0,uC1,uC2,uC3,uEmit;float gE;float smin(float a,float b,float k){float h=max(k-abs(a-b),0.)/k;return min(a,b)-h*h*k*.25;}float smax(float a,float b,float k){return-smin(-a,-b,k);}vec3 rotZ(vec3 p,float a){float c=cos(a),s=sin(a);return vec3(c*p.x-s*p.y,s*p.x+c*p.y,p.z);}float angDeg(vec3 p){return degrees(atan(p.x,abs(p.y)<1e-5?1e-5:p.y));}vec3 onArc(float deg,float R){float a=radians(deg);return vec3(sin(a)*R,cos(a)*R,0.);}float sdCappedTorus(vec3 p,vec2 sc,float ra,float rb){p.x=abs(p.x);float k=(sc.y*p.x>sc.x*p.y)?dot(p.xy,sc):length(p.xy);return sqrt(max(dot(p,p)+ra*ra-2.*ra*k,0.))-rb;}float sdArc(vec3 p,float midDeg,float halfDeg,float R,float r){float h=radians(halfDeg);return sdCappedTorus(rotZ(p,radians(midDeg)),vec2(sin(h),cos(h)),R,r);}float sdTorusXY(vec3 p,float R,float r){vec2 q=vec2(length(p.xy)-R,p.z);return length(q)-r;}float sdCapsule(vec3 p,vec3 a,vec3 b,float r){vec3 pa=p-a,ba=b-a;float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h)-r;}float sdRoundBox(vec3 p,vec3 b,float r){vec3 q=abs(p)-b+r;return length(max(q,0.))+min(max(q.x,max(q.y,q.z)),0.)-r;}float fGauge(vec3 p){float va=-135.+270.*uGradeT;float track=sdArc(p,0.,135.,.74,.045);float fill=sdArc(p,(va-135.)*.5,(va+135.)*.5,.74,.115);float bead=length(p-onArc(va,.74))-.19;float needle=sdCapsule(p,vec3(0.),onArc(va,.5),.034);float hub=length(p)-.1;float i=clamp(floor((angDeg(p)+135.)/27.+.5),0.,10.);vec3 tq=rotZ(p,radians(-135.+27.*i));float tl=mod(i,2.)<.5?.1:.055;float tick=sdCapsule(tq,vec3(0.,.97,0.),vec3(0.,.97+tl,0.),.02);float ref=length(p-onArc(27.,1.17))-.05;gE=min(fill,needle);float d=smin(fill,bead,.08);d=min(d,track);d=smin(d,min(needle,hub),.05);return min(d,min(tick,ref));}float fRing(vec3 p){float track=sdTorusXY(p,.84,.032);float arc=sdArc(p,uSleep.x+uSleep.y*.5,uSleep.y*.5,.84,.085);float wake=length(p-onArc(uSleep.z,.84))-.125;float bed=length(p-onArc(uSleep.w,.84))-.06;float i=floor(angDeg(p)/15.+.5);vec3 tq=rotZ(p,radians(i*15.));float tl=mod(i,6.)<.5?.1:.05;float tick=sdCapsule(tq,vec3(0.,.96,0.),vec3(0.,.96+tl,0.),.017);float moon=smax(length(p)-.44,-(length(p-vec3(.21,.15,0.))-.37),.02);gE=arc;float d=smin(track,arc,.04);d=smin(d,wake,.06);d=min(d,min(bed,tick));return min(d,moon);}float fCube(vec3 p){float blocks=sdRoundBox(abs(p)-vec3(.33),vec3(.26),.06);float ex=sdRoundBox(p-vec3(.84,.72,.3),vec3(.13),.035);gE=ex;return min(blocks,ex);}float form(float id,vec3 p){if(id<.5)return fGauge(p);if(id<1.5)return fRing(p);return fCube(p);}float map(vec3 p){p=(uRot*p)/uScale;float d;if(uMorph<=0.){d=form(uFormA,p);}else{float drop=length(p)-.56;if(uMorph<.5)d=mix(form(uFormA,p),drop,smoothstep(0.,1.,uMorph*2.));else d=mix(drop,form(uFormB,p),smoothstep(0.,1.,uMorph*2.-1.));}float w=uWob+1.6*uMorph*(1.-uMorph);if(w>.001){d+=w*.03*sin(7.*p.x+uTime*5.)*sin(7.*p.y+uTime*4.)*sin(7.*p.z+uTime*6.);d/=1.+.4*w;}if(uReach.w>.01)d=smin(d,length(p-uReach.xyz)-.16*uReach.w,.45*uReach.w);return d*uScale;}vec3 nrm(vec3 p){vec2 e=vec2(.0015,-.0015)*uScale;return normalize(e.xyy*map(p+e.xyy)+e.yyx*map(p+e.yyx)+e.yxy*map(p+e.yxy)+e.xxx*map(p+e.xxx));}vec3 film(float x){x=abs(fract(x*.5)*2.-1.);vec3 a=mix(uC0,uC1,smoothstep(0.,.33,x));a=mix(a,uC2,smoothstep(.33,.66,x));return mix(a,uC3,smoothstep(.66,1.,x));}vec3 env(vec3 d){vec3 c=mix(uBg*.7,uBg*1.3+.03,d.y*.5+.5);float back=smoothstep(.1,-.9,d.z);c+=back*(uC0*smoothstep(.7,-.6,d.x+d.y)*.55+uC2*smoothstep(-.5,.8,d.x+d.y)*.6+uC1*.12)*mix(1.,.55,uTheme);float box1=smoothstep(.55,.5,abs(d.x+.35))*smoothstep(.2,.14,abs(d.y-.55))*step(0.,.4-d.z);float box2=smoothstep(.32,.28,abs(d.x-.62))*smoothstep(.5,.44,abs(d.y+.05));c+=box1*mix(2.6,1.6,uTheme)+box2*uC2*mix(1.5,.8,uTheme)+smoothstep(-.2,-.6,d.y)*uC0*.4;return c;}float softShadow(vec3 ro,vec3 rd){float res=1.,t=.04;for(int i=0;i<18;i++){float h=map(ro+rd*t);res=min(res,10.*h/t);t+=clamp(h,.03,.25);if(res<.02||t>3.)break;}return clamp(res,0.,1.);}void main(){vec2 uv=(gl_FragCoord.xy-.5*uRes)/uRes.y-uOff;vec3 ro=vec3(0.,0.,4.2),rd=normalize(vec3(uv*uFov,-1.));vec3 L=normalize(vec3(-.45,.85,.5));float pix=uFov/uRes.y;vec4 o=vec4(0.);float glow=1e3,t=0.,dmin=1e3,tmin=4.2;bool hit=false;vec3 p=ro;float b=dot(ro,rd),h=b*b-dot(ro,ro)+2.6244;if(h>0.){float sq=sqrt(h),tf=-b+sq;t=max(-b-sq,0.);for(int i=0;i<96;i++){if(float(i)>=uSteps)break;p=ro+rd*t;float d=map(p);glow=min(glow,gE);if(d<dmin){dmin=d;tmin=t;}if(d<.0006*t){hit=true;break;}t+=d*.85;if(t>tf)break;}}float cov=hit?1.:1.-smoothstep(0.,1.6*pix*tmin,dmin);if(cov>0.){if(!hit)p=ro+rd*tmin;map(p);float ge=gE;vec3 n=nrm(p),v=-rd;float nv=clamp(dot(n,v),0.,1.);float F=.04+.96*pow(1.-nv,5.);vec3 q=(uRot*p)/uScale;vec3 fc=film(.55+.3*sin(3.1*q.y+2.3*q.x+uTime*.25+uFilm)+.35*(1.-nv));vec3 refl=env(reflect(rd,n));vec3 refr=vec3(env(refract(rd,n,.704)).r,env(refract(rd,n,.690)).g,env(refract(rd,n,.671)).b);vec3 glass=mix(refr*mix(vec3(1.),fc,.35),refl*mix(vec3(1.),fc,.8),F)+fc*(.1+.75*pow(1.-nv,1.8));float wrap=clamp((dot(n,L)+.5)/1.5,0.,1.);vec3 alb=mix(vec3(.935,.94,.92),fc,.12);vec3 porc=(alb*(.56+.44*wrap)*(.86+.14*nv)+fc*pow(1.-nv,1.4)*.7+refl*F*.35)*(1.-.28*pow(1.-nv,3.));vec3 col=mix(glass,porc,uTheme);col+=uEmit*exp(-max(ge,0.)*30.)*(.2+.55*nv*nv)*mix(1.,.8,uTheme);vec3 hv=normalize(L+v);col+=pow(max(dot(n,hv),0.),mix(220.,90.,uTheme))*mix(3.2,1.3,uTheme);col+=pow(max(dot(n,normalize(normalize(vec3(.8,-.1,.4))+v)),0.),60.)*.6*uC2;col+=exp(-pow((dot(q.xy,vec2(.857,.514))-uSweep)*5.,2.))*(.25+F)*.8;col=mix(col/(1.+col*.55),min(col,vec3(1.)),uTheme);col=pow(col,vec3(.95));o=vec4(col*cov,cov);}else if(rd.y<0.){float tp=(-1.28-ro.y)/rd.y;vec3 g=ro+rd*tp;float r=length(g.xz);if(r<2.4){float fall=smoothstep(2.4,.2,r),sh;if(uShadow>.5)sh=1.-softShadow(g,L);else{vec2 s=(g.xz-vec2(.68,-.75))*vec2(1.,1.6);sh=exp(-dot(s,s)*1.4)*.9;}float a=sh*mix(.5,.44,uTheme)*fall;vec2 cc=g.xz-vec2(.35,.25);float caus=exp(-dot(cc,cc)*5.)*.36*fall*(1.-.5*uTheme);o=vec4(mix(vec3(0.),vec3(.18,.17,.14),uTheme)*a+film(g.x*.8+g.z*.6+.2)*caus,clamp(a+caus*.6,0.,1.));}}float k=exp(-max(glow,0.)*16.)*uGlow*.5;o+=(1.-o.a)*vec4(uEmit,max(uEmit.r,max(uEmit.g,uEmit.b)))*k;o.rgb=min(o.rgb,vec3(o.a));gl_FragColor=o;}`;
+  const FS=`precision highp float;uniform vec2 uRes,uOff,uLamp;uniform float uFov,uTime,uScale,uFormA,uFormB,uMorph,uWob,uTheme,uFilm,uGradeT,uSteps,uShadow,uSweep,uGlow,uClear,uSatin;uniform mat3 uRot;uniform vec4 uReach,uSleep;uniform vec3 uBg,uC0,uC1,uC2,uC3,uEmit;float gE;float smin(float a,float b,float k){float h=max(k-abs(a-b),0.)/k;return min(a,b)-h*h*k*.25;}float smax(float a,float b,float k){return-smin(-a,-b,k);}vec3 rotZ(vec3 p,float a){float c=cos(a),s=sin(a);return vec3(c*p.x-s*p.y,s*p.x+c*p.y,p.z);}vec3 turnLight(vec3 d,float side){float c=uLamp.x,s=uLamp.y*side;return vec3(c*d.x+s*d.z,d.y,-s*d.x+c*d.z);}float angDeg(vec3 p){return degrees(atan(p.x,abs(p.y)<1e-5?1e-5:p.y));}vec3 onArc(float deg,float R){float a=radians(deg);return vec3(sin(a)*R,cos(a)*R,0.);}float sdCappedTorus(vec3 p,vec2 sc,float ra,float rb){p.x=abs(p.x);float k=(sc.y*p.x>sc.x*p.y)?dot(p.xy,sc):length(p.xy);return sqrt(max(dot(p,p)+ra*ra-2.*ra*k,0.))-rb;}float sdArc(vec3 p,float midDeg,float halfDeg,float R,float r){float h=radians(halfDeg);return sdCappedTorus(rotZ(p,radians(midDeg)),vec2(sin(h),cos(h)),R,r);}float sdTorusXY(vec3 p,float R,float r){vec2 q=vec2(length(p.xy)-R,p.z);return length(q)-r;}float sdCapsule(vec3 p,vec3 a,vec3 b,float r){vec3 pa=p-a,ba=b-a;float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h)-r;}float sdRoundBox(vec3 p,vec3 b,float r){vec3 q=abs(p)-b+r;return length(max(q,0.))+min(max(q.x,max(q.y,q.z)),0.)-r;}float fGauge(vec3 p){float va=-135.+270.*uGradeT;float track=sdArc(p,0.,135.,.74,.045);float fill=sdArc(p,(va-135.)*.5,(va+135.)*.5,.74,.115);float bead=length(p-onArc(va,.74))-.19;float needle=sdCapsule(p,vec3(0.),onArc(va,.5),.034);float hub=length(p)-.1;float i=clamp(floor((angDeg(p)+135.)/27.+.5),0.,10.);vec3 tq=rotZ(p,radians(-135.+27.*i));float tl=mod(i,2.)<.5?.1:.055;float tick=sdCapsule(tq,vec3(0.,.97,0.),vec3(0.,.97+tl,0.),.02);float ref=length(p-onArc(27.,1.17))-.05;gE=min(fill,needle);float d=smin(fill,bead,.08);d=min(d,track);d=smin(d,min(needle,hub),.05);return min(d,min(tick,ref));}float fRing(vec3 p){float track=sdTorusXY(p,.84,.032);float arc=sdArc(p,uSleep.x+uSleep.y*.5,uSleep.y*.5,.84,.085);float wake=length(p-onArc(uSleep.z,.84))-.125;float bed=length(p-onArc(uSleep.w,.84))-.06;float i=floor(angDeg(p)/15.+.5);vec3 tq=rotZ(p,radians(i*15.));float tl=mod(i,6.)<.5?.1:.05;float tick=sdCapsule(tq,vec3(0.,.96,0.),vec3(0.,.96+tl,0.),.017);float moon=smax(length(p)-.44,-(length(p-vec3(.21,.15,0.))-.37),.02);gE=arc;float d=smin(track,arc,.04);d=smin(d,wake,.06);d=min(d,min(bed,tick));return min(d,moon);}float fCube(vec3 p){float blocks=sdRoundBox(abs(p)-vec3(.33),vec3(.26),.06);float ex=sdRoundBox(p-vec3(.84,.72,.3),vec3(.13),.035);gE=ex;return min(blocks,ex);}float form(float id,vec3 p){if(id<.5)return fGauge(p);if(id<1.5)return fRing(p);return fCube(p);}float map(vec3 p){p=(uRot*p)/uScale;float d;if(uMorph<=0.){d=form(uFormA,p);}else{float drop=length(p)-.56;if(uMorph<.5)d=mix(form(uFormA,p),drop,smoothstep(0.,1.,uMorph*2.));else d=mix(drop,form(uFormB,p),smoothstep(0.,1.,uMorph*2.-1.));}float w=uWob+1.6*uMorph*(1.-uMorph);if(w>.001){d+=w*.03*sin(7.*p.x+uTime*5.)*sin(7.*p.y+uTime*4.)*sin(7.*p.z+uTime*6.);d/=1.+.4*w;}if(uReach.w>.01)d=smin(d,length(p-uReach.xyz)-.16*uReach.w,.45*uReach.w);return d*uScale;}vec3 nrm(vec3 p){vec2 e=vec2(.0015,-.0015)*uScale;return normalize(e.xyy*map(p+e.xyy)+e.yyx*map(p+e.yyx)+e.yxy*map(p+e.yxy)+e.xxx*map(p+e.xxx));}vec3 film(float x){x=abs(fract(x*.5)*2.-1.);vec3 a=mix(uC0,uC1,smoothstep(0.,.33,x));a=mix(a,uC2,smoothstep(.33,.66,x));return mix(a,uC3,smoothstep(.66,1.,x));}vec3 env(vec3 d){d=turnLight(d,-1.);vec3 c=mix(uBg*.7,uBg*1.3+.03,d.y*.5+.5);float back=smoothstep(.1,-.9,d.z);c+=back*(uC0*smoothstep(.7,-.6,d.x+d.y)*.55+uC2*smoothstep(-.5,.8,d.x+d.y)*.6+uC1*.12)*mix(1.,.55,uTheme);float box1=smoothstep(.55,.5,abs(d.x+.35))*smoothstep(.2,.14,abs(d.y-.55))*step(0.,.4-d.z);float box2=smoothstep(.32,.28,abs(d.x-.62))*smoothstep(.5,.44,abs(d.y+.05));c+=box1*mix(2.6,1.6,uTheme)+box2*uC2*mix(1.5,.8,uTheme)+smoothstep(-.2,-.6,d.y)*uC0*.4;return c;}float softShadow(vec3 ro,vec3 rd){float res=1.,t=.04;for(int i=0;i<18;i++){float h=map(ro+rd*t);res=min(res,10.*h/t);t+=clamp(h,.03,.25);if(res<.02||t>3.)break;}return clamp(res,0.,1.);}void main(){vec2 uv=(gl_FragCoord.xy-.5*uRes)/uRes.y-uOff;vec3 ro=vec3(0.,0.,4.2),rd=normalize(vec3(uv*uFov,-1.));vec3 L=normalize(turnLight(vec3(-.45,.85,.5),1.));float pix=uFov/uRes.y;vec4 o=vec4(0.);float glow=1e3,t=0.,dmin=1e3,tmin=4.2;bool hit=false;vec3 p=ro;float b=dot(ro,rd),h=b*b-dot(ro,ro)+2.6244;if(h>0.){float sq=sqrt(h),tf=-b+sq;t=max(-b-sq,0.);for(int i=0;i<96;i++){if(float(i)>=uSteps)break;p=ro+rd*t;float d=map(p);glow=min(glow,gE);if(d<dmin){dmin=d;tmin=t;}if(d<.0006*t){hit=true;break;}t+=d*.85;if(t>tf)break;}}float cov=hit?1.:1.-smoothstep(0.,1.6*pix*tmin,dmin);if(cov>0.){if(!hit)p=ro+rd*tmin;map(p);float ge=gE;vec3 n=nrm(p),v=-rd;float nv=clamp(dot(n,v),0.,1.);float F=.04+.96*pow(1.-nv,5.);vec3 q=(uRot*p)/uScale;vec3 fc=film(.55+.3*sin(3.1*q.y+2.3*q.x+uTime*.25+uFilm)+.35*(1.-nv));vec3 refl=env(reflect(rd,n));vec3 refr=vec3(env(refract(rd,n,.704)).r,env(refract(rd,n,.690)).g,env(refract(rd,n,.671)).b);vec3 glass=mix(refr*mix(vec3(1.),fc,.35),refl*mix(vec3(1.),fc,.8),F)+fc*(.1+.75*pow(1.-nv,1.8));float wrap=clamp((dot(n,L)+.5)/1.5,0.,1.);vec3 alb=mix(vec3(.935,.94,.92),fc,.12);vec3 porc=(alb*(.56+.44*wrap)*(.86+.14*nv)+fc*pow(1.-nv,1.4)*.7+refl*F*.35)*(1.-.28*pow(1.-nv,3.));float materialTheme=uTheme*(1.-uClear);vec3 col=mix(glass,porc,materialTheme);vec3 satin=mix(mix(vec3(.24,.28,.29),vec3(.91,.92,.9),uTheme),fc,.2)*(.6+.4*wrap)+fc*pow(1.-nv,1.6)*.12+refl*F*.07;col=mix(col,satin,uSatin);col+=uEmit*exp(-max(ge,0.)*30.)*(.2+.55*nv*nv)*mix(1.,.8,materialTheme);vec3 hv=normalize(L+v);col+=pow(max(dot(n,hv),0.),mix(mix(220.,90.,materialTheme),32.,uSatin))*mix(3.2,1.3,materialTheme)*(1.-.78*uSatin);col+=pow(max(dot(n,normalize(normalize(turnLight(vec3(.8,-.1,.4),1.))+v)),0.),60.)*.6*uC2*(1.-.7*uSatin);col+=exp(-pow((dot(q.xy,vec2(.857,.514))-uSweep)*5.,2.))*(.25+F)*.8*(1.-.6*uSatin);col=mix(col/(1.+col*.55),min(col,vec3(1.)),materialTheme);col=pow(col,vec3(.95));o=vec4(col*cov,cov);}else if(rd.y<0.){float tp=(-1.28-ro.y)/rd.y;vec3 g=ro+rd*tp;float r=length(g.xz);if(r<2.4){float fall=smoothstep(2.4,.2,r),sh;if(uShadow>.5)sh=1.-softShadow(g,L);else{vec2 s=(g.xz-vec2(.68,-.75)+1.28*vec2(L.x/L.y+.45/.85,L.z/L.y-.5/.85))*vec2(1.,1.6);sh=exp(-dot(s,s)*1.4)*.9;}float a=sh*mix(.5,.44,uTheme)*fall;vec2 cc=g.xz-vec2(.35,.25)+.6*vec2(L.x/L.y+.45/.85,L.z/L.y-.5/.85);float caus=exp(-dot(cc,cc)*5.)*.36*fall*(1.-.5*uTheme)*(1.-.7*uSatin);o=vec4(mix(vec3(0.),vec3(.18,.17,.14),uTheme)*a+film(g.x*.8+g.z*.6+.2)*caus,clamp(a+caus*.6,0.,1.));}}float k=exp(-max(glow,0.)*16.)*uGlow*.5;o+=(1.-o.a)*vec4(uEmit,max(uEmit.r,max(uEmit.g,uEmit.b)))*k;o.rgb=min(o.rgb,vec3(o.a));gl_FragColor=o;}`;
 
   let gl,prog,U={},ready=false,started=false,soft=false,canLive=false;
   let tier='',state='',raf=0,last=0,lastIn=-1e9,lastScroll=-1e9,visible=true,dirty=false;
   let W=0,H=0,band=BAND.matches,rect=null,heroH=1,bandEnd=1,rT=0;
   let A=0,B=0,m=0,tw=null,sweepT=-1,wob=0,energy=0,time=1.3,shown=-1;
-  let dragYaw=0,dragV=0,drag=null,suppress=false,bandP=0,spin=0,tilt='';
+  let dragYaw=0,dragV=0,drag=null,swipe=null,suppress=false,bandP=0,spin=0,tilt='',manual=false;
   let qAdj=0,stepAdj=0,ema=0,slow=0,fast=0,rolling=false;
   try {[qAdj,stepAdj]=JSON.parse(sessionStorage.getItem('mp-glq'))||[0,0];} catch {/* optional */}
   const stats={tier:'',renderer:'',frames:0,lastFrameMs:0,backing:[0,0],qMove:0};
@@ -33,7 +36,10 @@
   const yaw=S(120,22),pit=S(120,22),px=S(170,26),py=S(170,26);
   const rx=S(200,24),ry=S(200,24),rz=S(200,24,.4),ra=S(200,24);
   const kick=S(90,9.5),base=S(120,16,1),scr=S(140,24),th=S(110,21);
-  const SPR=[yaw,pit,px,py,rx,ry,rz,ra,kick,base,scr,th];
+  const grade=S(120,22,.85),onset=S(120,22,345),length=S(120,22,120),wakeAt=S(120,22,105),bed=S(120,22,342.5);
+  const clear=S(120,22),satin=S(120,22),lamp=S(120,22),mint=S(110,21),violet=S(110,21);
+  const DEMO=[grade,onset,length,wakeAt,bed,clear,satin,lamp,mint,violet];
+  const SPR=[yaw,pit,px,py,rx,ry,rz,ra,kick,base,scr,th,...DEMO];
   const moving=(s)=>Math.abs(s.x-s.t)>1e-3||Math.abs(s.v)>1e-3;
   const snap=(s)=>{s.x=s.t; s.v=0;};
   const bump=(a)=>{kick.v+=a*17;};
@@ -55,11 +61,13 @@
 
   // Band: scroll scrubs the forms; a full turn per morph keeps each hold face-on
   function applyBand() {
+    if (manual) {spin=0; return;}
     const p=live()?bandP:0,w1=ss(.25,.42,p),w2=ss(.58,.75,p);
     spin=6.2832*(w1+w2);
     [A,B,m]=p<.25?[0,0,0]:p<.42?[0,1,w1]:p<.58?[1,1,0]:p<.75?[1,2,w2]:[2,2,0];
     const d=m<.5?A:B;
     setForm(d); pose(d);
+    if (bench&&bench.dataset.selection!==FORMS[d]) bench.dispatchEvent(new CustomEvent('benchform',{detail:{name:FORMS[d]}}));
   }
 
   function draw(fine) {
@@ -84,11 +92,18 @@
     u('uScale',sc); u('uFormA',A); u('uFormB',B); u('uMorph',mm); u('uWob',wob);
     u('uReach',o(0),o(1),o(2),still||tc?0:clamp(ra.x));
     u('uTheme',T); u('uFilm',1.5*scr.x);
+    u('uGradeT',clamp(grade.x)); u('uSleep',onset.x,clamp(length.x,0,360),wakeAt.x,bed.x);
+    const lightAngle=clamp(lamp.x,-1,1)*.8;
+    u('uClear',clamp(clear.x)); u('uSatin',clamp(satin.x)); u('uLamp',Math.cos(lightAngle),Math.sin(lightAngle));
     u('uSteps',fine?(sw?72:96):clamp((tc?48:64)+stepAdj,40,64));
     u('uShadow',fine&&!soft&&(still||!tc)?1:0);
     u('uSweep',sweepT>=0?-1.4+3*clamp((now()-sweepT)/700):-9);
     u('uGlow',P.g+(L.g-P.g)*T); u3('uBg',mix(P.b,L.b,T));
-    for (let i=0; i<4; i++) u3('uC'+i,mix(P.c[i],L.c[i],T));
+    const cm=clamp(mint.x),violetWeight=clamp(violet.x),weight=Math.max(1,cm+violetWeight);
+    for (let i=0; i<4; i++) {
+      const original=mix(P.c[i],L.c[i],T),green=mix(FILM[0][0][i],FILM[0][1][i],T),purple=mix(FILM[1][0][i],FILM[1][1][i],T);
+      u3('uC'+i,original.map((v,j)=>v*(1-(cm+violetWeight)/weight)+(green[j]*cm+purple[j]*violetWeight)/weight));
+    }
     u3('uEmit',mix(P.e[e],L.e[e],T).map((v)=>v*ek));
     gl.drawArrays(gl.TRIANGLES,0,3);
     if (!still&&!band&&tiltEl) {
@@ -147,26 +162,62 @@
   }
 
   // A -> drop -> B; a retarget mirrors through the drop
-  function select(id) {
-    if (band||id<0) return;
+  function select(id,source) {
+    if (id<0) return;
+    if (source==='user') manual=true;
+    if (band&&!manual) return;
+    spin=0;
     if (!canRender()) {show(id); refresh(); return;}
-    if (id===(tw?B:A)) return;
+    if ((tw&&id===B)||(!tw&&m===0&&id===A)) return;
     let u0=0;
-    if (tw) {if (m>=.5) {A=B; m=1-m;} u0=Math.cbrt(m/4);}
+    if (m>0) {if (m>=.5) {A=B; m=1-m;} u0=Math.cbrt(m/4);}
     B=id; tw={t0:now(),dur:700,u0};
     setForm(id); pose(id); bump(-.06); sweepT=now(); energy=cap(energy+1);
     wake();
   }
 
+  function redrawDemo() {
+    if (canRender()) wake();
+    else {DEMO.forEach(snap); refresh();}
+  }
+  const minute=(n)=>((n%1440)+1440)%1440;
+  function clockTarget(s,n) {
+    const angle=minute(n)/4;
+    s.t=s.x+((angle-s.x+180)%360+360)%360-180;
+  }
+  function onDemo({detail={}}) {
+    const {average,length:minutes,wake:at,bed:toBed,onset:asleep}=detail;
+    if (Number.isFinite(average)) {
+      const value=clamp(average,1,6); grade.t=(value-1)/5; hv.dataset.demoAverage=String(value);
+    }
+    if (Number.isFinite(minutes)) {const value=clamp(minutes,0,1440); length.t=value/4; hv.dataset.demoLength=String(value);}
+    for (const [name,s,value] of [['Wake',wakeAt,at],['Bed',bed,toBed],['Onset',onset,asleep]]) {
+      if (Number.isFinite(value)) {clockTarget(s,value); hv.dataset['demo'+name]=String(minute(value));}
+    }
+    redrawDemo();
+  }
+  function onLook({detail={}}) {
+    const {material,light:value,palette}=detail;
+    if (['default','clear','satin'].includes(material)) {
+      clear.t=material==='clear'?1:0; satin.t=material==='satin'?1:0; hv.dataset.lookMaterial=material;
+    }
+    if (Number.isFinite(value)) {lamp.t=clamp(value,-1,1); hv.dataset.lookLight=String(lamp.t);}
+    if (['original','mint','violet'].includes(palette)) {
+      mint.t=palette==='mint'?1:0; violet.t=palette==='violet'?1:0; hv.dataset.lookPalette=palette;
+    }
+    redrawDemo();
+  }
+
   const box=()=>(rect||=hv.getBoundingClientRect());
-  const ui=(e)=>e.target.closest('a,button,.scene-dock');
+  const ui=(e)=>e.target.closest('a,button,input,select,label,summary,details,.scene-dock,[data-hero-demo],[data-look-panel]');
   function hit(e) {
     const r=box(),x=e.clientX-r.left-r.width*(band?.58:.5),y=e.clientY-r.top-r.height*(band?.5:.46);
     return x*x+y*y<(r.height*(band?.378:.306))**2&&!ui(e);
   }
   function onMove(e) {
+    if (swipe?.id===e.pointerId) {swipe.x=e.clientX; swipe.y=e.clientY;}
     if (e.pointerType==='touch'||band) return;
-    hv.classList.toggle('is-over-object',hit(e));
+    hv.classList.toggle('is-over-object',live()&&started&&hit(e));
     if (!live()||!started) return;
     const r=box(),x=e.clientX-r.left,y=e.clientY-r.top;
     if (drag) {
@@ -188,9 +239,24 @@
   const onLeave=()=>{hv.classList.remove('is-over-object'); px.t=py.t=ra.t=0; if (live()) wake();};
   function onDown(e) {
     suppress=false;
+    if (e.pointerType==='touch'&&!ui(e)) {
+      const r=stage.getBoundingClientRect();
+      if (e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom) {
+        swipe={id:e.pointerId,x0:e.clientX,y0:e.clientY,x:e.clientX,y:e.clientY};
+      }
+    }
     if (!e.button&&e.pointerType!=='touch'&&!band&&live()&&hit(e)) drag={id:e.pointerId,x0:e.clientX,x:e.clientX,ts:e.timeStamp};
   }
   function onUp(e) {
+    if (swipe?.id===e.pointerId) {
+      const dx=swipe.x-swipe.x0,dy=swipe.y-swipe.y0;
+      if (e.type!=='pointercancel'&&Math.abs(dx)>=45&&Math.abs(dx)>Math.abs(dy)*1.25) {
+        const id=(Math.max(0,shown)+(dx<0?1:FORMS.length-1))%FORMS.length;
+        bench?.querySelector('[data-select="'+FORMS[id]+'"]')?.click();
+        suppress=true;
+      }
+      swipe=null;
+    }
     if (drag?.on) {suppress=true; if (e.timeStamp-drag.ts>60) dragV=0; wake();}
     drag=null;
   }
@@ -198,7 +264,6 @@
     if (suppress) {suppress=false; return;}
     if (!hit(e)) return;
     if (live()&&started) {wob=1; bump(-.08); energy=cap(energy+1); wake();}
-    if (!band) link?.click();
   }
 
   function measure() {
@@ -211,7 +276,7 @@
   function onScroll() {
     rect=null;
     if (!live()) return;
-    if (band) {bandP=clamp(scrollY/bandEnd); lastScroll=now();} else scr.t=clamp(scrollY/heroH);
+    if (band) {if (manual) return; bandP=clamp(scrollY/bandEnd); lastScroll=now();} else scr.t=clamp(scrollY/heroH);
     energy=cap(energy+.2);
     wake();
   }
@@ -233,7 +298,7 @@
   }
   function fallback(msg) {
     if (msg) console.warn('HeroGL fallback:',msg);
-    halt(); ready=started=false; setTier('fallback'); setState('fallback'); setForm(band?0:selected());
+    halt(); ready=started=false; setTier('fallback'); setState('fallback'); setForm(band&&!manual?0:selected());
   }
 
   // Reveal after the first frame (software JIT ~750 ms)
@@ -251,8 +316,6 @@
     gl.enableVertexAttribArray(0);
     gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
     for (const n of new Set(FS.match(/\bu[A-Z]\w*/g))) U[n]=gl.getUniformLocation(prog,n);
-    gl.uniform1f(U.uGradeT,.85);
-    gl.uniform4f(U.uSleep,345,120,105,342.5); // 23:00, 8 h, 07:00, 22:50
     ready=true;
     if (!W) ({width:W,height:H}=stage.getBoundingClientRect());
     measure();
@@ -304,7 +367,10 @@
     stats,
     render: ()=>{if (ready) {draw(true); dirty=false;}},
   });
-  bench?.addEventListener('benchselect',(e)=>select(FORMS.indexOf(e.detail?.name)));
+  Object.assign(hv.dataset,{demoAverage:'5.25',demoLength:'480',demoWake:'420',demoBed:'1370',demoOnset:'1380',lookMaterial:'default',lookLight:'0',lookPalette:'original'});
+  bench?.addEventListener('benchselect',(e)=>select(FORMS.indexOf(e.detail?.name),e.detail?.source));
+  bench?.addEventListener('benchdemo',onDemo);
+  bench?.addEventListener('benchlook',onLook);
   if (flag==='off'||!cv.getContext||mq('(forced-colors: active)').matches) return fallback();
   setState('compiling');
   const on=(el,type,fn,o={passive:true})=>el.addEventListener(type,fn,o);
@@ -336,8 +402,8 @@
   new MutationObserver(onTheme).observe(root,{attributes:true,attributeFilter:['data-theme']});
   RM.addEventListener?.('change',pickTier);
   BAND.addEventListener?.('change',()=>{
-    band=BAND.matches; halt(); drag=null; px.t=py.t=ra.t=0; settle();
-    if (!band) show(selected());
+    band=BAND.matches; halt(); drag=swipe=null; px.t=py.t=ra.t=0; settle();
+    if (!band||manual) show(selected());
     tilt=''; measure(); refresh();
   });
   th.x=th.t=light();

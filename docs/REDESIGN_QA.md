@@ -1,5 +1,73 @@
 # Prüfprotokoll – digitaler Werkplatz
 
+## Interaktive Showcase-Demos (2026-09-30)
+
+Lokaler Arbeitsstand auf `http://127.0.0.1:8810/`, ohne Veröffentlichung.
+Umgesetzt sind die freigegebenen Hero-Demos, der animierte SpasstoCSV-Ablauf,
+mobile Formauswahl mit Wischen und die Bedienhinweise samt Beispielstart im
+leeren Notenrechner. Die optionale Material-/Farb-/Lichtsteuerung bleibt unter
+«Look anpassen» innerhalb der Vorschau geschlossen. Der ausgeschlossene
+Website-Fallbericht wurde nicht ergänzt; der About-Abschnitt ist bytegleich
+mit `HEAD` vor diesen Änderungen.
+
+Die Demo-Regler verwenden die vorhandene Rechenlogik und verändern tatsächlich
+Glas-Skala bzw. Schlafring. Sie haben keine Speicher- oder Netzwerkzugriffe.
+Der Formatablauf verwendet zwei erfundene Datensätze und nimmt keine Dateien
+entgegen. Alle Asset-URLs tragen konsistent `?v=werkplatz-5-demo1`, damit eine
+spätere Veröffentlichung bestehende Browser-Caches erneuert.
+
+### In dieser Sitzung beobachtete Prüfungen
+
+Python 3.13.0, Node 26.7.0, Playwright 1.62.0 und Chromium headless auf macOS.
+Alle Browser-Suiten liefen nacheinander gegen denselben lokalen Server.
+Das Glasobjekt wurde zusätzlich mit `?gl=force`, `?gl=still`, `?gl=off` und
+Reduced Motion geprüft; Chromium verwendet lokal Software-Rendering.
+
+| Prüfung | Ergebnis |
+|---|---|
+| `node tests/math.test.js` | 77 926 mathematische Assertions bestanden |
+| `tests/browser_review.py` | 804 Assertions bestanden; keine weichen Fehler, Seitenfehler, fehlenden Assets oder externen Anfragen |
+| `tests/persistence_review.py` | Echte Browser-Neustarts, unvollständige Entwürfe, letzte gültige Schlafzeit, Speicher-Opt-out, Zifferblatt und nativ deaktivierter Speicher bestanden |
+| `tests/showcase_review.py` | 561 Assertions über 8 Breiten-/Farbschema-Kombinationen bestanden; echte Bildänderung, Reset, Touch-Wischen, Formatablauf und unveränderte Rechnerentwürfe geprüft |
+| `tests/interaction_review.py` mit lokalem axe-core | Touch-Zifferblatt, endliche Animationen, Glas-Stufen, DPR/Backbuffer, Navigation und 24 axe-Scans bestanden |
+| Zusätzliche Look-Scans | 12 axe-Scans mit geöffneten Look-Reglern, allen drei Formen, beiden Farbschemas und 390/1366 px ohne Verstoss; finale Screenshots erstellt |
+| `tests/contrast_review.py` | 1298 Text-/Flächenpaare bestanden, Mindestkontrast 5.1:1; neue Demo-/Look-/Converter-Texte in beiden Farbschemas eingeschlossen |
+| Syntax und Diff | `node --check`, Python-Compile und `git diff --check` bestanden; Scope und gespeicherte Datenpfade zusätzlich statisch geprüft |
+
+Der grösste gemessene Layoutsprung beim Laden betrug **CLS 0.0034** (Grenze
+0.02), einschliesslich gespeicherter Daten. Der leere Notenrechner und die
+Homepage erreichten auf 320/360/402 px CLS 0. Der Beispielknopf steht bereits
+im leeren HTML unter dem Ergebnishinweis; bei gespeicherten Noten versteckt
+ihn das vorhandene Bootstrap-Flag bis zur Initialisierung.
+
+Korrigierte Layout-/Bedienbefunde: Vorschautext bei 1024×600 bleibt im
+Sichtbereich; das Dock wird bei 320 px nicht mehr um 2 px abgeschnitten;
+Fokus auf einem Demo-Regler hält dessen Form fest; der Greifcursor erscheint
+nur bei tatsächlich drehbarem Glas; fehlende Grafik-Engine blendet die
+Look-Regler aus. Der Klick aufs Objekt spielt einen endlichen Effekt ab,
+der separate Link öffnet das Tool.
+
+Nach der Rückmeldung zum überstehenden Text «8 h 15 min Schlaf» ist der
+gesperrte Umbruch in `.module-meta b` aufgehoben. Alle 13 Viertelstunden-Dauern
+zwischen 6 und 9 h bleiben bei 681/768/1024/1366/1920 px in Front- und beiden
+hinteren Kartenpositionen innerhalb der horizontalen und vertikalen
+Inhaltsgrenzen. Die erweiterte Showcase-Suite bestand 561 Assertions.
+
+Visuell geprüft wurden die geschlossene und geöffnete Vorschau, beide
+Farbschemas sowie der Formatablauf auf Desktop und bei 320/390 px.
+Prüfberichte und Screenshots liegen unter `output/playwright/showcase*` und
+bleiben ausserhalb von Git. Die neue Showcase-Suite ist im bestehenden
+CI-Workflow eingetragen; ein GitHub-CI-Lauf wurde hier nicht ausgelöst.
+
+### Offene Geräteprüfung
+
+Playwright-WebKit fehlt lokal; Safari/iOS und physische Geräte wurden nicht
+geprüft. Der headless Browser meldete beim Fensterwechsel
+`hidden_document_observed: false`; dieser Lauf belegt daher keinen echten
+Hintergrundfenster-Zustand. Das Prüfprotokoll vom 2026-09-29 unten bleibt als
+historischer Stand erhalten; dessen damalige roten Befunde beschreiben
+nicht die aktuellen grünen Regressionsergebnisse.
+
 ## Werkplatz 5 · Liquid Glass Lab (2026-09-29)
 
 Diese Prüfung betrifft den Neubau «Werkplatz 5» im Arbeitsstand des Repositorys
