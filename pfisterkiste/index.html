@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0B0D0F">
+  <title>Pfisterkiste — Zwei Klassiker, eine Kiste · misterpfister.net</title>
+  <meta name="description" content="Pfisterkiste: das 15-Puzzle und Schach zu zweit für iPhone und iPad. Gratis, ohne Werbung, ohne Konto, ohne Tracking und offline spielbar.">
+  <link rel="canonical" href="https://misterpfister.net/pfisterkiste/">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Pfisterkiste — Zwei Klassiker, eine Kiste · misterpfister.net">
+  <meta property="og:description" content="Pfisterkiste: das 15-Puzzle und Schach zu zweit für iPhone und iPad. Gratis, ohne Werbung, ohne Konto, ohne Tracking und offline spielbar.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="de_CH">
+  <meta property="og:url" content="https://misterpfister.net/pfisterkiste/">
+  <script src="../assets/transitions.js?v=werkplatz-5-demo1"></script>
+  <script src="../assets/theme.js?v=werkplatz-5-demo1"></script>
+  <link rel="stylesheet" href="../assets/core.css?v=werkplatz-5-demo1">
+  <link rel="stylesheet" href="../assets/kiste.css?v=werkplatz-5-demo1">
+  <script src="../assets/motion.js?v=werkplatz-5-demo1" defer></script>
+  <script src="../assets/kiste.js?v=werkplatz-5-demo1" defer></script>
+</head>
+<body class="tool-page kiste-page">
+  <a href="#main" class="skip-link">Zum Inhalt springen</a>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="../" aria-label="misterpfister.net – Startseite"><span class="brand-mark">m.</span><span class="brand-word">misterpfister<span>.net</span></span></a>
+      <a href="../" class="back-link"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg><span>Werkplatz</span></a>
+      <nav class="main-nav" aria-label="Hauptnavigation">
+        <a href="./" aria-current="page">App</a>
+        <a href="./datenschutz/">Datenschutz</a>
+      </nav>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Farbschema wechseln"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" data-theme-icon aria-hidden="true"></svg><span class="sr-only" data-theme-label>Hell</span></button>
+    </div>
+  </header>
+  <main id="main" class="tool-main">
+    <div class="wrap">
+      <section class="kiste-hero" aria-labelledby="kiste-title">
+        <div class="kiste-copy">
+          <div class="kiste-title load-rise" style="--i:0">
+            <img class="app-icon" data-transition-target="kiste" src="../assets/pfisterkiste-icon.webp" width="88" height="88" alt="">
+            <p class="eyebrow">iOS-App<span class="eyebrow-extra"> · iPhone und iPad</span></p>
+          </div>
+          <h1 id="kiste-title" class="load-rise" style="--i:1">Pfisterkiste.<br><span class="film-text">Zwei Klassiker.</span></h1>
+          <p class="kiste-lead load-rise" style="--i:2">Das 15-Puzzle und Schach zu zweit, gemacht für Familie und Freunde. Gratis, ohne Werbung, ohne Konto. Läuft auch offline.</p>
+          <p class="kiste-status load-rise" style="--i:3"><strong><span class="status-dot" aria-hidden="true"></span>In der Testphase über TestFlight</strong><span>Danach erscheint die App gratis im App Store.</span></p>
+          <div class="kiste-actions load-rise" style="--i:4">
+            <a class="button primary" data-magnetic href="mailto:pfisterkiste@misterpfister.net?subject=Pfisterkiste">Mitspielen? Schreib mir <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a class="button secondary" data-magnetic href="#spiele">Die Spiele</a>
+          </div>
+        </div>
+        <div class="kiste-play load-rise" style="--i:2" data-kiste-puzzle>
+          <div class="kiste-board" role="group" aria-label="Schiebepuzzle 3 × 3 zum Ausprobieren" aria-describedby="kiste-play-status">
+            <div class="kiste-well">
+              <button class="kiste-tile" type="button" data-tile="1" style="--x:0;--y:0" disabled>1</button>
+              <button class="kiste-tile" type="button" data-tile="2" style="--x:1;--y:0" disabled>2</button>
+              <button class="kiste-tile" type="button" data-tile="3" style="--x:2;--y:0" disabled>3</button>
+              <button class="kiste-tile" type="button" data-tile="4" style="--x:0;--y:1" disabled>4</button>
+              <button class="kiste-tile" type="button" data-tile="5" style="--x:1;--y:1" disabled>5</button>
+              <button class="kiste-tile" type="button" data-tile="6" style="--x:2;--y:1" disabled>6</button>
+              <button class="kiste-tile" type="button" data-tile="7" style="--x:0;--y:2" disabled>7</button>
+              <button class="kiste-tile" type="button" data-tile="8" style="--x:2;--y:2" disabled>8</button>
+            </div>
+          </div>
+          <div class="kiste-play-bar">
+            <p class="kiste-play-status" id="kiste-play-status" role="status" aria-live="polite" data-kiste-status>Ein Zug bis zur Lösung, wie auf dem App-Icon.</p>
+            <button class="button small secondary" type="button" data-kiste-shuffle>Mischen</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="kiste-section" id="spiele" aria-labelledby="games-title">
+        <p class="eyebrow reveal">Zwei Spiele</p>
+        <h2 id="games-title" class="reveal">Klein, aber mit Liebe gemacht.</h2>
+        <div class="kiste-games">
+          <article class="kiste-game panel reveal">
+            <svg viewBox="0 0 120 120" fill="none" aria-hidden="true" focusable="false"><rect x="4" y="4" width="112" height="112" rx="22" fill="var(--surface-3)"/><g fill="var(--panel-top)" stroke="var(--rule-strong)"><rect x="14" y="14" width="21" height="21" rx="5"/><rect x="38" y="14" width="21" height="21" rx="5"/><rect x="62" y="14" width="21" height="21" rx="5"/><rect x="86" y="14" width="21" height="21" rx="5"/><rect x="14" y="38" width="21" height="21" rx="5"/><rect x="38" y="38" width="21" height="21" rx="5"/><rect x="62" y="38" width="21" height="21" rx="5"/><rect x="86" y="38" width="21" height="21" rx="5"/><rect x="14" y="62" width="21" height="21" rx="5"/><rect x="38" y="62" width="21" height="21" rx="5"/><rect x="62" y="62" width="21" height="21" rx="5"/><rect x="86" y="62" width="21" height="21" rx="5"/><rect x="14" y="86" width="21" height="21" rx="5"/><rect x="38" y="86" width="21" height="21" rx="5"/></g><rect x="74" y="86" width="21" height="21" rx="5" fill="var(--warm)"/><path d="M64 96.5h4" stroke="var(--warm)" stroke-width="2" stroke-linecap="round"/></svg>
+            <p class="eyebrow">01 / 15-Puzzle</p>
+            <h3>Ziehen wie beim echten Schiebepuzzle.</h3>
+            <p>Steine folgen dem Finger und rasten mit hartem Anschlag und feinem Klick ein. Eine laufende Partie geht beim nächsten Öffnen weiter.</p>
+            <ul class="kiste-chips" aria-label="Funktionen"><li>3 × 3 bis 5 × 5</li><li>Bestzeit</li><li>Wenigste Züge</li><li>Fortsetzen</li></ul>
+          </article>
+          <article class="kiste-game panel reveal">
+            <svg viewBox="0 0 120 120" fill="none" aria-hidden="true" focusable="false"><rect x="4" y="4" width="112" height="112" rx="22" fill="var(--surface-3)"/><g fill="var(--rule-strong)"><rect x="16" y="16" width="22" height="22"/><rect x="60" y="16" width="22" height="22"/><rect x="38" y="38" width="22" height="22"/><rect x="82" y="38" width="22" height="22"/><rect x="16" y="60" width="22" height="22"/><rect x="60" y="60" width="22" height="22"/><rect x="38" y="82" width="22" height="22"/><rect x="82" y="82" width="22" height="22"/></g><rect x="16" y="16" width="88" height="88" stroke="var(--rule-strong)" stroke-width="1.5"/><path d="M49 31.5v-7M45.5 28h7M44 44.5h10l-1.5-12h-7Z" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M71 99a10 10 0 0 0 0-20" stroke="var(--warm)" stroke-width="2.4" stroke-linecap="round"/><path d="m67 76 4 3-3 4" stroke="var(--warm)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <p class="eyebrow">02 / Schach zu zweit</p>
+            <h3>Ein Gerät. Zwei Seiten.</h3>
+            <p>«Weiterreichen» dreht das Brett nach jedem Zug zu der Seite, die am Zug ist. «Gegenüber» ist fürs iPad flach auf dem Tisch. Alle Regeln, Zug zurück und Remis-Erkennung inklusive.</p>
+            <ul class="kiste-chips" aria-label="Funktionen"><li>Weiterreichen</li><li>Gegenüber</li><li>Rochade &amp; en passant</li><li>Zug zurück</li></ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="kiste-section" aria-labelledby="looks-title">
+        <p class="eyebrow reveal">Drei Looks</p>
+        <h2 id="looks-title" class="reveal">Ein Griff, alles neu.</h2>
+        <ul class="kiste-looks">
+          <li class="kiste-look reveal"><span class="look-swatch look-classic" aria-hidden="true"><span>1</span></span><div><h3>Klassisch</h3><p>Schwarzer Klavierlack, Messing und glänzendes Elfenbein im warmen Spotlicht.</p></div></li>
+          <li class="kiste-look reveal"><span class="look-swatch look-acrylic" aria-hidden="true"><span>1</span></span><div><h3>Acryl</h3><p>Klare Steine über einem langsam fliessenden Farbverlauf von Indigo bis Türkis.</p></div></li>
+          <li class="kiste-look reveal"><span class="look-swatch look-minimal" aria-hidden="true"><span>1</span></span><div><h3>Minimal</h3><p>Warmes Papier, matte Steine, Schweizer Typografie und Signal-Orange.</p></div></li>
+        </ul>
+      </section>
+
+      <section class="kiste-section" aria-labelledby="facts-title">
+        <h2 id="facts-title" class="sr-only">Was die App nicht macht</h2>
+        <ul class="kiste-facts reveal">
+          <li><strong>Gratis</strong><span>Kein Abo, keine Käufe.</span></li>
+          <li><strong>Ohne Werbung</strong><span>Nur die Spiele.</span></li>
+          <li><strong>Ohne Konto</strong><span>Öffnen und loslegen.</span></li>
+          <li><strong>Ohne Tracking</strong><span>Keine Analyse, kein Server.</span></li>
+          <li><strong>Offline</strong><span>Spielt überall, auch im Flugmodus.</span></li>
+        </ul>
+      </section>
+
+      <section class="kiste-section" id="support" aria-labelledby="support-title">
+        <div class="kiste-support panel reveal">
+          <div class="kiste-support-copy">
+            <p class="eyebrow">Support</p>
+            <h2 id="support-title">Fragen, Fehler, Wünsche?</h2>
+            <p>Schreib mir eine E-Mail. Hilfreich sind dein Gerät, die iOS-Version und was du gerade gespielt hast.</p>
+            <a class="button secondary kiste-mail" href="mailto:pfisterkiste@misterpfister.net?subject=Pfisterkiste%20Support">pfisterkiste@misterpfister.net</a>
+          </div>
+          <dl class="kiste-specs">
+            <div><dt>Geräte</dt><dd>iPhone und iPad mit iOS bzw. iPadOS 26 oder neuer</dd></div>
+            <div><dt>Bedienung</dt><dd>Dunkelmodus, grosse Schrift, VoiceOver, «Bewegung reduzieren»; Haptik im Spiel abschaltbar</dd></div>
+            <div><dt>Sprache</dt><dd>Deutsch</dd></div>
+            <div><dt>Datenschutz</dt><dd>Die App erfasst keine Daten. <a href="./datenschutz/">Datenschutzerklärung lesen</a></dd></div>
+          </dl>
+        </div>
+      </section>
+      <p class="privacy-line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Spielstände, Bestwerte und Einstellungen bleiben auf deinem Gerät.</p>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>© 2026 Kilian Pfister</span>
+      <span class="footer-note">Kleine Tools. Ohne Umwege.</span>
+      <a href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">GitHub <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a>
+      <a class="footer-top" href="#main">Nach oben <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></a>
+    </div>
+    <div class="wrap"><svg class="footer-mark" data-spotlight viewBox="0 0 1000 160" aria-hidden="true" focusable="false"><text class="mark-base" x="0" y="132" textLength="1000" lengthAdjust="spacingAndGlyphs">misterpfister</text><text class="mark-lit" x="0" y="132" textLength="1000" lengthAdjust="spacingAndGlyphs">misterpfister</text></svg></div>
+  </footer>
+</body>
+</html>

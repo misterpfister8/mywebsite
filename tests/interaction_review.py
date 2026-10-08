@@ -78,9 +78,9 @@ def layout_shift(browser):
                            ('360', {'viewport': {'width': 360, 'height': 800}, 'has_touch': True, 'is_mobile': True}), ('320', {'viewport': {'width': 320, 'height': 640}, 'has_touch': True, 'is_mobile': True})]:
         ctx = browser.new_context(locale='de-CH', timezone_id='Europe/Zurich', reduced_motion='no-preference', **options); ctx.add_init_script(CLS)
         # Deferred scripts arrive after the first paint, as on a phone network; this makes late DOM building measurable.
-        ctx.route(re.compile(r'/assets/(motion|tool-storage|tool-math|grades|sleep|workbench|hero-gl|wisper)\.js'), lambda route: (time.sleep(.2), route.continue_()))
+        ctx.route(re.compile(r'/assets/(motion|tool-storage|tool-math|grades|sleep|workbench|hero-gl|wisper|kiste)\.js'), lambda route: (time.sleep(.2), route.continue_()))
         page = ctx.new_page(); page.on('pageerror', lambda error: errors.append(str(error)))
-        for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/']:
+        for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/', 'pfisterkiste/datenschutz/']:
             page.goto(BASE + route, wait_until='networkidle'); page.wait_for_timeout(1500)
             out[f'{route or "home"} {label}px'] = {'cls': round(page.evaluate('__cls'), 4), 'shifts': page.evaluate('__shifts')}
         seed(page)

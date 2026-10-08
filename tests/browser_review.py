@@ -52,7 +52,7 @@ BROKEN_REFS = '''() => [...document.querySelectorAll('[aria-labelledby], [aria-d
 # Spec §8.2: every stylesheet and script is local and carries the werkplatz-5-demo1 cache bust.
 ASSET_URLS = "[...document.querySelectorAll('link[rel=stylesheet], script[src]')].map(el => el.getAttribute('href') || el.getAttribute('src'))"
 # The live result of each page; decorative count-ups must refuse it (spec §4.5: result numbers never tween).
-LIVE_RESULT = {'home': '#hero-title', 'home-fallback': '#hero-title', 'grade': '#average', 'sleep': '#sleepResultTime', 'wisper': '[data-wisper-status]'}
+LIVE_RESULT = {'home': '#hero-title', 'home-fallback': '#hero-title', 'grade': '#average', 'sleep': '#sleepResultTime', 'wisper': '[data-wisper-status]', 'kiste': '#kiste-title', 'privacy': 'h1'}
 # Touch targets on phones: at least 44px high; icon-only controls also 44px wide.
 SMALL_TARGETS = '''() => {
   const icon = '.icon-button, .theme-toggle, .brand, [data-scene-link], .dial-handle';
@@ -444,12 +444,13 @@ def run(review):
     card_counts(r)
     wisper_page(r)
     reveals(r)
+    kiste(r)
     if args.browser == 'chromium':  # WebKit on macOS skips links on Tab by default; the CSS check is about Chromium's parser
         tab_order(r)
         stylesheets(r)
     # Both motion modes, both themes and every relevant layout boundary (plus the hero without WebGL).
     small_targets = {}  # collected across the sweep, asserted once so every layout is still checked
-    for route, name in [('', 'home'), ('?gl=off', 'home-fallback'), ('sechserrechner/', 'grade'), ('sleepcalculator/', 'sleep'), ('wisperpfister/', 'wisper')]:
+    for route, name in [('', 'home'), ('?gl=off', 'home-fallback'), ('sechserrechner/', 'grade'), ('sleepcalculator/', 'sleep'), ('wisperpfister/', 'wisper'), ('pfisterkiste/', 'kiste'), ('pfisterkiste/datenschutz/', 'privacy')]:
         p = r.open(route)
         if name == 'grade':
             p.locator('#loadExample').click(); p.locator('#closeToast').click()
@@ -458,8 +459,8 @@ def run(review):
         r.check(p.evaluate(HIDDEN_FOCUSABLES) == [], f'No focusable element inside aria-hidden or role=img: {name}')
         r.check(p.evaluate(BROKEN_REFS) == [], f'ARIA id references resolve: {name} {p.evaluate(BROKEN_REFS)}')
         assets = p.evaluate(ASSET_URLS)
-        r.check(assets and all(re.fullmatch(r'\.{1,2}/assets/[\w-]+\.(css|js)\?v=werkplatz-5-demo1', url) for url in assets), f'Local assets with the werkplatz-5-demo1 cache bust: {name} {assets}')
-        if name in ('grade', 'sleep', 'wisper'):
+        r.check(assets and all(re.fullmatch(r'(?:\./|(?:\.\./)+)assets/[\w-]+\.(css|js)\?v=werkplatz-5-demo1', url) for url in assets), f'Local assets with the werkplatz-5-demo1 cache bust: {name} {assets}')
+        if name in ('grade', 'sleep', 'wisper', 'kiste', 'privacy'):
             r.check(p.evaluate("document.querySelectorAll('canvas').length === 0 && !performance.getEntriesByType('resource').some(e => /hero-gl|workbench/.test(e.name))"), f'No WebGL and no home scripts on the tool page: {name}')
         live, shown = LIVE_RESULT[name], r.text(LIVE_RESULT[name])
         r.check(p.evaluate(f"Motion.countUp(document.querySelector('{live}'), {{to: 9}})") is False and r.text(live) == shown, f'Decorative count-up refuses the live result: {name}')
@@ -1185,7 +1186,7 @@ def wisper_page(r):
 
 def reveals(r):
     """Scroll reveals have settled once their block is fully in view (spec §4.4)."""
-    for route in ['', 'sleepcalculator/', 'wisperpfister/']:
+    for route in ['', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/']:
         for viewport in [{'width': 1440, 'height': 900}, {'width': 390, 'height': 844}]:
             p = r.open(route, media={'reduced_motion': 'no-preference'}, viewport=viewport)
             count = p.evaluate("document.querySelectorAll('.reveal').length")
@@ -1193,9 +1194,28 @@ def reveals(r):
             r.check(count > 0 and moving == [], f'Reveals have settled once fully in view: {route or "home"} {viewport["width"]}x{viewport["height"]} {moving}')
 
 
+def kiste(r):
+    """Pfisterkiste page: the home teaser links to it, the 3 x 3 puzzle starts one move from solved, slides, solves and shuffles."""
+    p = r.open()
+    r.check(p.locator('.app-slab').get_attribute('href') == './pfisterkiste/', 'The home teaser links to the Pfisterkiste page')
+    p = r.open('pfisterkiste/')
+    tiles = "[...document.querySelectorAll('[data-tile]')]"
+    enabled = lambda: p.evaluate(f"{tiles}.filter(b => !b.disabled).map(b => b.textContent)")
+    r.check(sorted(enabled()) == ['2', '5', '7', '8'], f'Only tiles in line with the gap can move: {enabled()}')
+    p.locator('[data-tile="8"]').click()
+    r.check(p.locator('[data-kiste-status]').inner_text().startswith('Gelöst!') and enabled() == [], 'One move solves the icon position and locks the board')
+    r.check(p.evaluate("document.activeElement.matches('[data-kiste-shuffle]')"), 'Focus moves to the shuffle button once the board is solved')
+    p.locator('[data-kiste-shuffle]').click()
+    places = f"new Set({tiles}.map(b => b.style.getPropertyValue('--x') + b.style.getPropertyValue('--y'))).size"
+    r.check(p.evaluate(places) == 8 and len(enabled()) == 4 and not p.locator('[data-kiste-status]').inner_text().startswith('Gelöst'), 'Shuffling gives eight distinct places and an unsolved board')
+    p.locator(f'[data-tile="{enabled()[0]}"]').focus(); p.keyboard.press('ArrowLeft'); p.keyboard.press('ArrowUp')
+    r.check(p.evaluate(places) == 8, 'Arrow keys keep every tile on its own place')
+    r.check(p.locator('.privacy-line').is_visible() and p.locator('.main-nav a[href="./datenschutz/"]').count() == 1, 'The app page links its privacy policy')
+
+
 def tab_order(r):
     """Every Tab stop is visible, at least 8x8 px and scrolled into view: no invisible focus targets (spec §9)."""
-    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/']:
+    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/', 'pfisterkiste/datenschutz/']:
         for viewport in [{'width': 1440, 'height': 1000}, {'width': 390, 'height': 844}]:
             p = r.open(route, viewport=viewport)
             if route == 'sechserrechner/':
@@ -1208,14 +1228,14 @@ def tab_order(r):
                     break
                 stops += 1
                 if stop['bad']: bad.append(stop['name'])
-            # The Wisperpfister page has no form: 11 stops on phones (the back link is hidden there).
-            r.check(stops >= (10 if route == 'wisperpfister/' else 12) and not bad, f'Every Tab stop is visible: {route or "home"} {viewport["width"]}px, {stops} stops {bad}')
+            # Wisperpfister and the privacy policy have no form: 11 stops on phones (the back link is hidden there).
+            r.check(stops >= (10 if route in ('wisperpfister/', 'pfisterkiste/datenschutz/') else 12) and not bad, f'Every Tab stop is visible: {route or "home"} {viewport["width"]}px, {stops} stops {bad}')
 
 
 def stylesheets(r):
     """Chromium accepts every declaration, selector and condition of the site's stylesheets (apart from deliberate cross-engine CSS)."""
     checked = set()
-    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/']:
+    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/']:
         p = r.open(route)
         items = []
         for href in p.evaluate("[...document.querySelectorAll('link[rel=stylesheet]')].map(link => link.href)"):
@@ -1224,7 +1244,7 @@ def stylesheets(r):
         result = p.evaluate(CSS_CHECK, items)
         rejected = [item for item in result['bad'] if not CSS_ALLOWED.match(item)]
         r.check(result['tested'] > 1000 and not rejected, f'Chromium accepts every stylesheet rule: {route or "home"} ({result["tested"]} declarations, {result["skipped"]} with scoped variables untested) {rejected}')
-    r.check(checked == {'core.css', 'home.css', 'hero-demo.css', 'conversion.css', 'grades.css', 'sleep.css', 'wisper.css'}, f'All seven stylesheets were checked: {sorted(checked)}')
+    r.check(checked == {'core.css', 'home.css', 'hero-demo.css', 'conversion.css', 'grades.css', 'sleep.css', 'wisper.css', 'kiste.css'}, f'All eight stylesheets were checked: {sorted(checked)}')
 
 
 def static_fallbacks(r):

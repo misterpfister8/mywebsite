@@ -2,8 +2,9 @@
 
 Digitaler Werkplatz von Kilian Pfister: [Startseite](https://misterpfister.net/),
 [Notenrechner](https://misterpfister.net/sechserrechner/),
-[Schlafrechner](https://misterpfister.net/sleepcalculator/) und die Seite zur App
-[Wisperpfister](https://misterpfister.net/wisperpfister/).
+[Schlafrechner](https://misterpfister.net/sleepcalculator/) und die Seiten zu den Apps
+[Wisperpfister](https://misterpfister.net/wisperpfister/) und
+[Pfisterkiste](https://misterpfister.net/pfisterkiste/).
 
 Statisches HTML, CSS und JavaScript. Keine Laufzeitpakete, externen Schriftdateien,
 Konten oder Tracking-Skripte. GitHub Pages veröffentlicht `main` aus dem Repository-
@@ -62,6 +63,14 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
   [lokale Python-Projekt](https://github.com/misterpfister8/spasstocsv).
   Unterstützte Formate laut dessen öffentlicher README: Raw-, Chrome- und
   Proton-CSV sowie Bitwarden JSON. Die Website nimmt keine Passwortdateien an.
+
+- Pfisterkiste (`/pfisterkiste/`): Seite zur iOS-App (15-Puzzle und Schach zu
+  zweit), verlinkt über einen Teaser auf der Startseite, dessen Icon per View
+  Transition ins Seiten-Icon übergeht. Ein spielbares 3 × 3-Schiebepuzzle startet
+  in der Stellung des App-Icons (ein Zug bis zur Lösung); Steine sind Buttons,
+  Pfeiltasten schieben den Nachbarn der Lücke. Dazu Looks, Support-Kontakt
+  (`pfisterkiste@misterpfister.net`) und unter `/pfisterkiste/datenschutz/` die
+  Datenschutzerklärung der App (Support- und Datenschutz-URL für den App Store).
 
 - Wisperpfister (`/wisperpfister/`): Kurzvorstellung der Diktier-App für Mac
   und iPhone (Beta), verlinkt über einen Teaser auf der Startseite. Ein
@@ -185,6 +194,7 @@ Backbuffer-Grösse, `HeroGL.render()` erzwingt ein Bild.
 | `assets/tool-math.js` | Reine Rechenfunktionen, inklusive Zifferblatt-Mathematik |
 | `assets/tool-storage.js` | Kapselt den Browser-Speicher |
 | `assets/grades.js`, `assets/sleep.js` | Steuern die beiden Rechner |
+| `assets/kiste.css`, `assets/kiste.js`, `assets/pfisterkiste-icon.webp` | Pfisterkiste-Seiten: Schiebepuzzle, Spiele, Looks, Support, Datenschutz |
 | `assets/wisper.css`, `assets/wisper.js` | Wisperpfister-Seite: Beispielablauf, Plattformen, Datenschutz, Beta |
 
 Die Speicherschlüssel und -formate bleiben unverändert

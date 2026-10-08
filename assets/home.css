@@ -400,6 +400,23 @@ padding:1px;background:radial-gradient(300px circle at var(--mx,-999px) var(--my
 .app-teaser .round-arrow{grid-area:1 / 2}
 }
 
+/* 7c. App teaser: links to the Pfisterkiste page; the icon morphs into the page icon (transitions.js) */
+.app-story{padding-top:calc(var(--section-gap) * .5)}
+.app-slab{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:18px 20px;border-radius:28px;padding:clamp(20px,3.4vw,40px);color:var(--ink);text-decoration:none;transition:transform var(--t-ui) var(--ease-out),box-shadow var(--t-ui) var(--ease-out)}
+.app-slab .app-icon{display:block;flex:none;width:64px;height:64px;border-radius:22.5%;box-shadow:0 1px 0 var(--glass-hi) inset,var(--shadow-float)}
+.app-slab-copy{display:grid;gap:8px;min-width:0}
+.app-slab-copy .eyebrow{color:var(--warm)}
+.app-slab-copy h2{font-size:clamp(30px,4.2vw,60px)}
+.app-slab-copy p:not(.eyebrow){max-width:34em;color:var(--muted)}
+.app-slab .text-cta{grid-column:1 / -1;min-height:44px}
+.app-slab:active{transform:scale(.99)}
+@media (min-width:761px){
+.app-slab{grid-template-columns:auto minmax(0,1fr) auto;gap:32px}
+.app-slab .app-icon{width:112px;height:112px}
+.app-slab .text-cta{grid-column:auto}
+}
+@media (hover:hover){.app-slab:hover{transform:translateY(-4px);box-shadow:var(--shadow-panel),var(--shadow-float)} .app-slab:hover .text-cta .icon{translate:4px 0}}
+
 /* 8. About */
 .about-grid{position:relative;display:grid;gap:20px;padding-bottom:88px}
 .about-head .eyebrow{margin-bottom:16px}
