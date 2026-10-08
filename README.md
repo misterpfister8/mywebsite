@@ -73,12 +73,12 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
   Datenschutzerklärung der App (Support- und Datenschutz-URL für den App Store).
 
 - Wisperpfister (`/wisperpfister/`): Kurzvorstellung der Diktier-App für Mac
-  und iPhone (Beta), verlinkt über einen Teaser auf der Startseite. Ein
+  und iPhone («Bald im App Store»), verlinkt über einen Teaser auf der Startseite. Ein
   endliches Beispiel zeigt Halten, Sprechen und Loslassen und die Bereinigung
   («ähm der Termin ist am Dienstag, äh, nein, am Mittwoch» → «Der Termin ist am
   Mittwoch.», ein Regressionsfall der App). Die Mac/iPhone-Auswahl funktioniert
-  ohne JavaScript; Reduced Motion zeigt sofort das Ergebnis. Beta-Anfragen per
-  E-Mail an die Projektadresse. Die Datenschutzsätze fassen den freigegebenen
+  ohne JavaScript; Reduced Motion zeigt sofort das Ergebnis. Am Schluss steht,
+  wann es kommt: iPhone im App Store, Mac als Download. Die Datenschutzsätze fassen den freigegebenen
   Wortlaut der App zusammen; eine Datenschutzerklärung ist hier nicht
   veröffentlicht.
 
@@ -195,7 +195,7 @@ Backbuffer-Grösse, `HeroGL.render()` erzwingt ein Bild.
 | `assets/tool-storage.js` | Kapselt den Browser-Speicher |
 | `assets/grades.js`, `assets/sleep.js` | Steuern die beiden Rechner |
 | `assets/kiste.css`, `assets/kiste.js`, `assets/pfisterkiste-icon.webp` | Pfisterkiste-Seiten: Schiebepuzzle, Spiele, Looks, Support, Datenschutz |
-| `assets/wisper.css`, `assets/wisper.js` | Wisperpfister-Seite: Beispielablauf, Plattformen, Datenschutz, Beta |
+| `assets/wisper.css`, `assets/wisper.js` | Wisperpfister-Seite: Beispielablauf, Plattformen, Datenschutz, Verfügbarkeit |
 
 Die Speicherschlüssel und -formate bleiben unverändert
 (`misterpfister-grades-v2`, `misterpfister-sleep-v2` und die zugehörigen

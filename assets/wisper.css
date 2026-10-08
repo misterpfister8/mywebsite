@@ -114,14 +114,18 @@ html:not(.js) [data-wisper-play] { display: none; }
 .wisper-chips li { padding: 6px 10px; border-radius: var(--r-pill); border: 1px solid var(--rule-strong); font: 500 12px/1.2 var(--font-mono); color: var(--muted); }
 .platform-needs { margin-top: 4px; padding-top: 12px; width: 100%; border-top: 1px solid var(--rule); color: var(--ink); }
 
-/* 4. Privacy + beta */
+/* 4. Privacy + availability */
 .wisper-pair { display: grid; gap: 12px; margin-top: clamp(12px, 2vw, 20px); }
 @media (min-width: 901px) { .wisper-pair { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; } }
-.wisper-privacy, .wisper-beta { display: grid; gap: 16px; align-content: start; justify-items: start; }
-.wisper-beta h2 { font-size: clamp(30px, 3.6vw, 48px); }
-.wisper-beta > p:not(.eyebrow, .fineprint, .wisper-mail) { max-width: 30em; font-size: 16px; line-height: 1.55; color: var(--muted); }
-.wisper-beta .status-dot { background: var(--wisper-gfx); box-shadow: 0 0 0 4px color-mix(in srgb, var(--wisper-gfx) 18%, transparent); }
-.wisper-mail { color: var(--ink); overflow-wrap: anywhere; }
+.wisper-privacy, .wisper-soon { display: grid; gap: 16px; align-content: start; justify-items: start; }
+.wisper-soon h2 { font-size: clamp(30px, 3.6vw, 48px); }
+.wisper-soon > p:not(.eyebrow) { max-width: 30em; font-size: 16px; line-height: 1.55; color: var(--muted); }
+.wisper-soon .status-dot { background: var(--wisper-gfx); box-shadow: 0 0 0 4px color-mix(in srgb, var(--wisper-gfx) 18%, transparent); }
+.wisper-availability { display: grid; width: 100%; margin: 4px 0 0; padding: 0; list-style: none; }
+.wisper-availability li { display: flex; align-items: center; gap: 12px; min-height: 52px; border-top: 1px solid var(--rule); font-size: 15px; color: var(--muted); }
+.wisper-availability li > span:first-of-type { flex: 1; min-width: 0; }
+.wisper-availability b { margin-right: 6px; color: var(--ink); font-weight: 600; }
+.wisper-availability .icon { width: 20px; height: 20px; color: var(--wisper-text); }
 
 @media (max-width: 680px) {
   .wisper-page .privacy-line { display: block; padding-inline: 8px; }

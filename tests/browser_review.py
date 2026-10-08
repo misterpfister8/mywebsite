@@ -1158,8 +1158,7 @@ def wisper_page(r):
     demo = p.locator('[data-wisper-demo]')
     r.check(demo.get_attribute('data-phase') == 'done' and p.locator('.wisper-final').inner_text() == 'Der Termin ist am Mittwoch.', 'The sample rests on its result')
     r.check(p.locator('.wisper-raw del').evaluate_all('els => els.map(el => el.textContent)') == ['ähm', 'am', 'Dienstag,', 'äh,', 'nein,'], 'The spoken line marks exactly the removed words')
-    mail = p.locator('.wisper-beta a.button')
-    r.check(mail.get_attribute('href') == 'mailto:wisperpfister@misterpfister.net?subject=Wisperpfister%20Beta', 'Beta request goes to the project address')
+    r.check(p.locator('#soon-title').inner_text() == 'Bald im App Store.' and p.locator('a[href^="mailto:"]').count() == 0, 'The page announces the App Store and asks for no beta request')
     # Reduced motion (the review default): playing jumps straight to the result.
     play = p.locator('[data-wisper-play]')
     r.check(play.is_visible(), 'With JavaScript the sample can be played')
@@ -1178,7 +1177,7 @@ def wisper_page(r):
     context = r.context.browser.new_context(java_script_enabled=False, viewport={'width': 390, 'height': 844}, locale='de-CH', reduced_motion='reduce')
     page = context.new_page(); r.watch_requests(page)
     page.goto(args.base_url.rstrip('/') + '/wisperpfister/', wait_until='networkidle')
-    r.check(page.locator('[data-wisper-play]').is_hidden() and page.locator('.wisper-final').is_visible() and page.locator('#beta').is_visible(), 'Without JavaScript the Wisperpfister page is complete')
+    r.check(page.locator('[data-wisper-play]').is_hidden() and page.locator('.wisper-final').is_visible() and page.locator('#verfuegbar').is_visible(), 'Without JavaScript the Wisperpfister page is complete')
     page.locator('.wisper-switch label').nth(1).click()
     r.check(page.locator('[data-step=listen] [data-only=iphone]').is_visible(), 'Without JavaScript the platform switch still works')
     context.close()

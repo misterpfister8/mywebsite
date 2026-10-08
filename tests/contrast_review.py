@@ -116,7 +116,7 @@ PAIRS = '''()=>{
   // Wisperpfister: teaser on home, panels on its page, each against the gradient stops behind it.
   const teaser = document.querySelector('.app-teaser');
   if (teaser) componentText(teaser, '.tool-number, h2, p, .text-cta', 'wisper teaser');
-  for (const [selector, label] of [['.wisper-demo', 'wisper demo'], ['.wisper-facts', 'wisper facts'], ['.platform-card', 'wisper platform'], ['.wisper-privacy', 'wisper privacy'], ['.wisper-beta', 'wisper beta']])
+  for (const [selector, label] of [['.wisper-demo', 'wisper demo'], ['.wisper-facts', 'wisper facts'], ['.platform-card', 'wisper platform'], ['.wisper-privacy', 'wisper privacy'], ['.wisper-soon', 'wisper availability']])
     for (const panel of document.querySelectorAll(selector))
       componentText(panel, 'h2, h3, p, li span, li b, .tag, .wisper-label, .wisper-step-num, kbd, del, .wisper-chips li, .button', label);
   // Pfisterkiste pages: every text on its nearest opaque surface; the home teaser on its panel gradient.
@@ -172,7 +172,7 @@ with sync_playwright() as w:
                 expected = {'brand'} | ({'film-text stop'} if route != 'pfisterkiste/datenschutz/' else set()) | ({'mini clock', 'grade card h3', 'sleep card cta', 'hud channel', 'hud data', 'grade', 'sleep', 'code', 'wisper teaser'} if route == '' else set())
                 expected |= {'result average', 'result averageDetail', 'result result-title'} if route == 'sechserrechner/' else set()
                 expected |= {'dial-tip', 'midnight', 'sleepResultTime'} if route == 'sleepcalculator/' else set()
-                expected |= {'wisper demo', 'wisper facts', 'wisper platform', 'wisper privacy', 'wisper beta'} if route == 'wisperpfister/' else set()
+                expected |= {'wisper demo', 'wisper facts', 'wisper platform', 'wisper privacy', 'wisper availability'} if route == 'wisperpfister/' else set()
                 expected |= {'kiste text'} if route.startswith('pfisterkiste/') else set()
                 expected |= {'app teaser'} if route == '' else set()
                 if route == '':
