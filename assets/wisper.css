@@ -1,0 +1,138 @@
+/* Wisperpfister page. Page-scoped; loads after core.css. */
+.wisper-page { --accent-text: var(--wisper-text); }
+.wisper-page .tool-main { padding-top: 16px; }
+.wisper-page .film-text { background-position: 100% 0; }
+@media (min-width: 681px) { .wisper-page .tool-main { padding-top: 28px; } }
+
+/* Demo + facts; DOM order = visual order */
+.wisper-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-items: start; }
+@media (min-width: 681px) { .wisper-layout { gap: 20px; } }
+@media (min-width: 901px) { .wisper-layout { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); } }
+
+/* 1. Dictation sample */
+.wisper-demo { display: grid; gap: 16px; }
+.wisper-demo .panel-heading { margin-bottom: 0; }
+.wisper-switch { max-width: 300px; }
+/* The platform choice works without JavaScript */
+[data-only=iphone] { display: none; }
+.wisper-demo:has(input[value=iphone]:checked) [data-only=iphone] { display: inline-flex; }
+.wisper-demo:has(input[value=iphone]:checked) [data-only=mac] { display: none; }
+[data-only] { align-items: center; gap: 6px; }
+[data-only=mac] { display: inline-flex; }
+
+.wisper-steps { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.wisper-steps li {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 14px 0 6px; border-radius: var(--r-pill);
+  border: 1px solid var(--rule-strong); background: var(--surface-2); color: var(--muted); font-size: 14px; font-weight: 600; line-height: 1.2;
+  transition: color var(--t-ui), background-color var(--t-ui), border-color var(--t-ui);
+}
+.wisper-steps .icon { width: 16px; height: 16px; }
+.wisper-step-num {
+  display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--surface-3);
+  font: 500 var(--fs-label)/1 var(--font-mono); letter-spacing: .04em; color: var(--muted);
+  transition: background-color var(--t-ui), color var(--t-ui);
+}
+.wisper-steps kbd {
+  display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 6px; border-radius: 7px;
+  border: 1px solid var(--control-rule); background: var(--panel-top); color: var(--ink); box-shadow: inset 0 -2px 0 var(--rule-strong);
+  font: 600 14px/1 var(--font-sans);
+  transition: transform var(--t-press) var(--ease-out), box-shadow var(--t-press);
+}
+.wisper-demo:is([data-phase=listen], [data-phase=clean]) [data-step=listen],
+.wisper-demo[data-phase=clean] [data-step=clean] { color: var(--ink); border-color: var(--wisper-gfx); background: var(--wisper-soft); }
+.wisper-demo:is([data-phase=listen], [data-phase=clean]) [data-step=listen] .wisper-step-num,
+.wisper-demo[data-phase=clean] [data-step=clean] .wisper-step-num { background: var(--wisper-fill); color: var(--wisper-on); }
+.wisper-demo[data-phase=listen] kbd { transform: translateY(1px); box-shadow: inset 0 -1px 0 var(--rule-strong); }
+
+/* Level meter: quiet at rest, a finite run while the sample listens */
+.wisper-meter { display: flex; align-items: center; justify-content: space-between; gap: 3px; height: 44px; padding-inline: 2px; }
+.wisper-meter i {
+  flex: 0 1 6px; height: calc(var(--h) * 100%); min-height: 4px; border-radius: 3px;
+  background: linear-gradient(180deg, var(--wisper-gfx), color-mix(in srgb, var(--wisper-gfx) 45%, transparent));
+  transform: scaleY(.16); transform-origin: 50% 50%; transition: transform var(--t-move) var(--ease-out);
+}
+.wisper-demo[data-phase=listen] .wisper-meter i { animation: wisper-level 300ms var(--ease-in-out) calc(var(--k) * -41ms) 7 alternate both; }
+@keyframes wisper-level { from { transform: scaleY(.22); } to { transform: scaleY(1); } }
+
+.wisper-label { display: block; margin-bottom: 6px; font: 500 var(--fs-label)/1.4 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.wisper-said { padding: 14px 16px; border-radius: var(--r-md); border: 1px dashed var(--rule-strong); }
+.wisper-raw { min-height: 3.1em; font-size: 17px; line-height: 1.55; color: var(--muted); }
+.wisper-raw [data-word] { transition: opacity 180ms var(--ease-out), color var(--t-ui); }
+.wisper-demo[data-phase=listen] .wisper-raw [data-word]:not([data-on]) { opacity: 0; }
+.wisper-raw del { position: relative; text-decoration: none; color: var(--faint); }
+.wisper-raw del::after {
+  content: ""; position: absolute; left: -2px; right: -2px; top: 54%; height: 2px; border-radius: 1px; background: var(--wisper-gfx);
+  transform-origin: left center; transition: transform var(--t-move) var(--ease-out) calc(var(--k, 0) * 90ms);
+}
+.wisper-demo[data-phase=listen] .wisper-raw del { color: var(--muted); }
+.wisper-demo[data-phase=listen] .wisper-raw del::after { transform: scaleX(0); transition: none; }
+
+.wisper-field {
+  position: relative; padding: 0 16px 16px; border-radius: var(--r-md); border: 1px solid var(--control-rule);
+  background: var(--field); box-shadow: var(--shadow-press); overflow: clip;
+}
+.wisper-field-bar {
+  display: flex; align-items: center; gap: 6px; margin: 0 -16px 14px; padding: 10px 16px; border-bottom: 1px solid var(--rule);
+  font-size: 13px; font-weight: 600; color: var(--muted);
+}
+.wisper-field-bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--surface-3); }
+.wisper-field-bar span { margin-left: 8px; }
+.wisper-final { min-height: 1.5em; font-size: 20px; font-weight: 600; line-height: 1.5; letter-spacing: -.01em; color: var(--ink); transition: opacity 240ms var(--ease-out), translate 420ms var(--ease-out); }
+.wisper-demo:is([data-phase=listen], [data-phase=clean]) .wisper-final { opacity: 0; translate: 0 6px; transition: none; }
+.wisper-caret { display: inline-block; width: 2px; height: 1.1em; margin-left: 3px; vertical-align: -.16em; border-radius: 1px; background: var(--wisper-gfx); }
+.wisper-demo[data-phase=done] .wisper-caret { animation: wisper-caret 1s steps(1) 3; }
+@keyframes wisper-caret { 50% { opacity: 0; } }
+
+/* theme.js sets .js in <head>: the button is there from the first paint, no shift */
+html:not(.js) [data-wisper-play] { display: none; }
+.wisper-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.wisper-status { flex: 1 1 14em; min-height: 1.45em; font-size: 14px; line-height: 1.45; color: var(--muted); }
+.wisper-demo .fineprint { margin-top: -4px; }
+
+/* 2. Facts */
+.wisper-facts { display: grid; gap: 18px; justify-items: start; }
+.wisper-facts h2, .wisper-privacy h2 { font-size: var(--fs-h3); font-weight: 600; line-height: 1.15; letter-spacing: -.02em; }
+.wisper-facts .text-cta { min-height: 44px; text-decoration: none; }
+.wisper-list { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
+.wisper-list li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 14px; align-items: start; font-size: 15px; line-height: 1.55; color: var(--muted); }
+.wisper-list .icon { width: 36px; height: 36px; padding: 8px; border-radius: 50%; color: var(--wisper-text); background: var(--wisper-soft); }
+.wisper-list b { color: var(--ink); font-weight: 600; }
+.wisper-list span { padding-top: 6px; }
+
+/* 3. Platforms */
+.wisper-section { padding-top: clamp(56px, 8vw, 112px); }
+.wisper-heading { margin-bottom: clamp(20px, 3vw, 40px); }
+.wisper-heading .eyebrow { margin-bottom: 12px; }
+.wisper-heading h2 { font-size: clamp(30px, 4.2vw, 60px); }
+.platform-grid { display: grid; gap: 12px; }
+@media (min-width: 681px) { .platform-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; } }
+.platform-card { display: grid; gap: 12px; align-content: start; justify-items: start; }
+.platform-icon { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 8px; border-radius: 14px; color: var(--wisper-on); background: var(--wisper-fill); box-shadow: inset 0 -3px 0 rgb(0 0 0 / .14), inset 0 1px 0 rgb(255 255 255 / .35); }
+.platform-card h3 { font-size: clamp(22px, 2.2vw, 30px); line-height: 1.08; letter-spacing: -.03em; }
+.platform-card > p:not(.eyebrow, .platform-needs) { max-width: 34em; font-size: 15px; line-height: 1.55; color: var(--muted); }
+.wisper-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 0; padding: 0; list-style: none; }
+.wisper-chips li { padding: 6px 10px; border-radius: var(--r-pill); border: 1px solid var(--rule-strong); font: 500 12px/1.2 var(--font-mono); color: var(--muted); }
+.platform-needs { margin-top: 4px; padding-top: 12px; width: 100%; border-top: 1px solid var(--rule); color: var(--ink); }
+
+/* 4. Privacy + beta */
+.wisper-pair { display: grid; gap: 12px; margin-top: clamp(12px, 2vw, 20px); }
+@media (min-width: 901px) { .wisper-pair { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; } }
+.wisper-privacy, .wisper-beta { display: grid; gap: 16px; align-content: start; justify-items: start; }
+.wisper-beta h2 { font-size: clamp(30px, 3.6vw, 48px); }
+.wisper-beta > p:not(.eyebrow, .fineprint, .wisper-mail) { max-width: 30em; font-size: 16px; line-height: 1.55; color: var(--muted); }
+.wisper-beta .status-dot { background: var(--wisper-gfx); box-shadow: 0 0 0 4px color-mix(in srgb, var(--wisper-gfx) 18%, transparent); }
+.wisper-mail { color: var(--ink); overflow-wrap: anywhere; }
+
+@media (max-width: 680px) {
+  .wisper-page .privacy-line { display: block; padding-inline: 8px; }
+  .wisper-page .privacy-line .icon { display: inline-block; margin: 0 2px -2px 0; }
+  .wisper-raw { font-size: 16px; }
+  .wisper-final { font-size: 18px; }
+}
+
+@media (forced-colors: active) {
+  .wisper-meter i, .wisper-caret, .wisper-raw del::after { background: CanvasText; }
+  .wisper-demo:is([data-phase=listen], [data-phase=clean]) [data-step=listen],
+  .wisper-demo[data-phase=clean] [data-step=clean] { forced-color-adjust: none; background: Highlight; color: HighlightText; border-color: Highlight; }
+  .platform-icon { border: 1px solid CanvasText; }
+}

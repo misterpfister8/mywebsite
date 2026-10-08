@@ -52,7 +52,7 @@ BROKEN_REFS = '''() => [...document.querySelectorAll('[aria-labelledby], [aria-d
 # Spec §8.2: every stylesheet and script is local and carries the werkplatz-5-demo1 cache bust.
 ASSET_URLS = "[...document.querySelectorAll('link[rel=stylesheet], script[src]')].map(el => el.getAttribute('href') || el.getAttribute('src'))"
 # The live result of each page; decorative count-ups must refuse it (spec §4.5: result numbers never tween).
-LIVE_RESULT = {'home': '#hero-title', 'home-fallback': '#hero-title', 'grade': '#average', 'sleep': '#sleepResultTime'}
+LIVE_RESULT = {'home': '#hero-title', 'home-fallback': '#hero-title', 'grade': '#average', 'sleep': '#sleepResultTime', 'wisper': '[data-wisper-status]'}
 # Touch targets on phones: at least 44px high; icon-only controls also 44px wide.
 SMALL_TARGETS = '''() => {
   const icon = '.icon-button, .theme-toggle, .brand, [data-scene-link], .dial-handle';
@@ -442,13 +442,14 @@ def run(review):
     hero_load(r)
     home_layout(r)
     card_counts(r)
+    wisper_page(r)
     reveals(r)
     if args.browser == 'chromium':  # WebKit on macOS skips links on Tab by default; the CSS check is about Chromium's parser
         tab_order(r)
         stylesheets(r)
     # Both motion modes, both themes and every relevant layout boundary (plus the hero without WebGL).
     small_targets = {}  # collected across the sweep, asserted once so every layout is still checked
-    for route, name in [('', 'home'), ('?gl=off', 'home-fallback'), ('sechserrechner/', 'grade'), ('sleepcalculator/', 'sleep')]:
+    for route, name in [('', 'home'), ('?gl=off', 'home-fallback'), ('sechserrechner/', 'grade'), ('sleepcalculator/', 'sleep'), ('wisperpfister/', 'wisper')]:
         p = r.open(route)
         if name == 'grade':
             p.locator('#loadExample').click(); p.locator('#closeToast').click()
@@ -458,7 +459,7 @@ def run(review):
         r.check(p.evaluate(BROKEN_REFS) == [], f'ARIA id references resolve: {name} {p.evaluate(BROKEN_REFS)}')
         assets = p.evaluate(ASSET_URLS)
         r.check(assets and all(re.fullmatch(r'\.{1,2}/assets/[\w-]+\.(css|js)\?v=werkplatz-5-demo1', url) for url in assets), f'Local assets with the werkplatz-5-demo1 cache bust: {name} {assets}')
-        if name in ('grade', 'sleep'):
+        if name in ('grade', 'sleep', 'wisper'):
             r.check(p.evaluate("document.querySelectorAll('canvas').length === 0 && !performance.getEntriesByType('resource').some(e => /hero-gl|workbench/.test(e.name))"), f'No WebGL and no home scripts on the tool page: {name}')
         live, shown = LIVE_RESULT[name], r.text(LIVE_RESULT[name])
         r.check(p.evaluate(f"Motion.countUp(document.querySelector('{live}'), {{to: 9}})") is False and r.text(live) == shown, f'Decorative count-up refuses the live result: {name}')
@@ -1146,9 +1147,45 @@ def card_counts(r):
     r.soft(counts and not below, f'Card grades count up from data-count-from and never show a value below the 1-6 scale ({len(counts)} frames, below: {below[:4]})')
 
 
+def wisper_page(r):
+    """Wisperpfister page: the home teaser leads there, the sample plays once and settles, the platform switch needs no JavaScript."""
+    p = r.open()
+    teaser = p.locator('.app-teaser')
+    r.check(teaser.get_attribute('href') == './wisperpfister/' and teaser.get_attribute('data-transition-card') == 'wisper', 'Home teaser links to the Wisperpfister page')
+    teaser.scroll_into_view_if_needed(); teaser.click(); p.wait_for_url('**/wisperpfister/')
+    r.check(p.locator('h1').inner_text() == 'Sprechen. Fertig.', 'Teaser opens the Wisperpfister page')
+    demo = p.locator('[data-wisper-demo]')
+    r.check(demo.get_attribute('data-phase') == 'done' and p.locator('.wisper-final').inner_text() == 'Der Termin ist am Mittwoch.', 'The sample rests on its result')
+    r.check(p.locator('.wisper-raw del').evaluate_all('els => els.map(el => el.textContent)') == ['ähm', 'am', 'Dienstag,', 'äh,', 'nein,'], 'The spoken line marks exactly the removed words')
+    mail = p.locator('.wisper-beta a.button')
+    r.check(mail.get_attribute('href') == 'mailto:wisperpfister@misterpfister.net?subject=Wisperpfister%20Beta', 'Beta request goes to the project address')
+    # Reduced motion (the review default): playing jumps straight to the result.
+    play = p.locator('[data-wisper-play]')
+    r.check(play.is_visible(), 'With JavaScript the sample can be played')
+    play.click(); r.frames()
+    r.check(demo.get_attribute('data-phase') == 'done' and r.text('[data-wisper-status]') == 'Im Feld: Der Termin ist am Mittwoch.', 'Reduced motion settles the sample at once')
+    set_motion(p, 'no-preference')
+    p.locator('.wisper-switch label').nth(1).click()
+    r.check(p.locator('[data-step=clean] [data-only=iphone]').is_visible() and p.locator('[data-step=clean] [data-only=mac]').is_hidden(), 'The platform switch shows the iPhone steps')
+    play.click()
+    r.check(demo.get_attribute('data-phase') == 'listen' and 'Mikrofon getippt' in r.text('[data-wisper-status]'), 'Playing starts listening with the chosen device')
+    r.check(waits(p, "document.querySelector('[data-wisper-demo]').dataset.phase === 'clean'", 4000), 'The sample moves on to the cleanup')
+    r.check(waits(p, "document.querySelector('[data-wisper-demo]').dataset.phase === 'done'", 3000), 'The sample ends on its result')
+    r.check(waits(p, "getComputedStyle(document.querySelector('.wisper-final')).opacity === '1'", 1000) and p.evaluate(INFINITE_ANIMATIONS) == 0, 'After the sample the result is shown and nothing keeps running')
+    set_motion(p, 'reduce')
+    # Without JavaScript: all text is there, the switch still works, nothing invites a play that cannot run.
+    context = r.context.browser.new_context(java_script_enabled=False, viewport={'width': 390, 'height': 844}, locale='de-CH', reduced_motion='reduce')
+    page = context.new_page(); r.watch_requests(page)
+    page.goto(args.base_url.rstrip('/') + '/wisperpfister/', wait_until='networkidle')
+    r.check(page.locator('[data-wisper-play]').is_hidden() and page.locator('.wisper-final').is_visible() and page.locator('#beta').is_visible(), 'Without JavaScript the Wisperpfister page is complete')
+    page.locator('.wisper-switch label').nth(1).click()
+    r.check(page.locator('[data-step=listen] [data-only=iphone]').is_visible(), 'Without JavaScript the platform switch still works')
+    context.close()
+
+
 def reveals(r):
     """Scroll reveals have settled once their block is fully in view (spec §4.4)."""
-    for route in ['', 'sleepcalculator/']:
+    for route in ['', 'sleepcalculator/', 'wisperpfister/']:
         for viewport in [{'width': 1440, 'height': 900}, {'width': 390, 'height': 844}]:
             p = r.open(route, media={'reduced_motion': 'no-preference'}, viewport=viewport)
             count = p.evaluate("document.querySelectorAll('.reveal').length")
@@ -1158,7 +1195,7 @@ def reveals(r):
 
 def tab_order(r):
     """Every Tab stop is visible, at least 8x8 px and scrolled into view: no invisible focus targets (spec §9)."""
-    for route in ['', 'sechserrechner/', 'sleepcalculator/']:
+    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/']:
         for viewport in [{'width': 1440, 'height': 1000}, {'width': 390, 'height': 844}]:
             p = r.open(route, viewport=viewport)
             if route == 'sechserrechner/':
@@ -1171,13 +1208,14 @@ def tab_order(r):
                     break
                 stops += 1
                 if stop['bad']: bad.append(stop['name'])
-            r.check(stops >= 12 and not bad, f'Every Tab stop is visible: {route or "home"} {viewport["width"]}px, {stops} stops {bad}')
+            # The Wisperpfister page has no form: 11 stops on phones (the back link is hidden there).
+            r.check(stops >= (10 if route == 'wisperpfister/' else 12) and not bad, f'Every Tab stop is visible: {route or "home"} {viewport["width"]}px, {stops} stops {bad}')
 
 
 def stylesheets(r):
     """Chromium accepts every declaration, selector and condition of the site's stylesheets (apart from deliberate cross-engine CSS)."""
     checked = set()
-    for route in ['', 'sechserrechner/', 'sleepcalculator/']:
+    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/']:
         p = r.open(route)
         items = []
         for href in p.evaluate("[...document.querySelectorAll('link[rel=stylesheet]')].map(link => link.href)"):
@@ -1186,7 +1224,7 @@ def stylesheets(r):
         result = p.evaluate(CSS_CHECK, items)
         rejected = [item for item in result['bad'] if not CSS_ALLOWED.match(item)]
         r.check(result['tested'] > 1000 and not rejected, f'Chromium accepts every stylesheet rule: {route or "home"} ({result["tested"]} declarations, {result["skipped"]} with scoped variables untested) {rejected}')
-    r.check(checked == {'core.css', 'home.css', 'hero-demo.css', 'conversion.css', 'grades.css', 'sleep.css'}, f'All six stylesheets were checked: {sorted(checked)}')
+    r.check(checked == {'core.css', 'home.css', 'hero-demo.css', 'conversion.css', 'grades.css', 'sleep.css', 'wisper.css'}, f'All seven stylesheets were checked: {sorted(checked)}')
 
 
 def static_fallbacks(r):

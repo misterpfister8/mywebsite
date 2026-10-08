@@ -1,7 +1,7 @@
 """Check gradient-endpoint text contrasts that automated axe reports as incomplete.
 
 Every text colour is compared with every opaque gradient stop behind it (and with solid
-backgrounds where the gradient sits on one). Runs on all three pages in both themes.
+backgrounds where the gradient sits on one). Runs on all four pages in both themes.
 """
 import argparse
 import json
@@ -113,6 +113,12 @@ PAIRS = '''()=>{
       step.dataset.state = original;
     }
   }
+  // Wisperpfister: teaser on home, panels on its page, each against the gradient stops behind it.
+  const teaser = document.querySelector('.app-teaser');
+  if (teaser) componentText(teaser, '.tool-number, h2, p, .text-cta', 'wisper teaser');
+  for (const [selector, label] of [['.wisper-demo', 'wisper demo'], ['.wisper-facts', 'wisper facts'], ['.platform-card', 'wisper platform'], ['.wisper-privacy', 'wisper privacy'], ['.wisper-beta', 'wisper beta']])
+    for (const panel of document.querySelectorAll(selector))
+      componentText(panel, 'h2, h3, p, li span, li b, .tag, .wisper-label, .wisper-step-num, kbd, del, .wisper-chips li, .button', label);
   return pairs;
 }'''
 
@@ -138,7 +144,7 @@ seen = {}
 with sync_playwright() as w:
     b = w.chromium.launch()
     p = b.new_page(viewport={'width': 1440, 'height': 1000}, reduced_motion='reduce')
-    for route in ['', 'sechserrechner/', 'sleepcalculator/']:
+    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/']:
         p.goto(BASE + route)
         states = ['grade', 'sleep', 'code-csv', 'code-json'] if route == '' else ['empty', 'example'] if route == 'sechserrechner/' else ['default']
         for state in states:
@@ -158,9 +164,10 @@ with sync_playwright() as w:
                 p.wait_for_timeout(100)
                 pairs = p.evaluate(PAIRS)
                 labels = {pair['label'] for pair in pairs}
-                expected = {'brand', 'film-text stop'} | ({'mini clock', 'grade card h3', 'sleep card cta', 'hud channel', 'hud data', 'grade', 'sleep', 'code'} if route == '' else set())
+                expected = {'brand', 'film-text stop'} | ({'mini clock', 'grade card h3', 'sleep card cta', 'hud channel', 'hud data', 'grade', 'sleep', 'code', 'wisper teaser'} if route == '' else set())
                 expected |= {'result average', 'result averageDetail', 'result result-title'} if route == 'sechserrechner/' else set()
                 expected |= {'dial-tip', 'midnight', 'sleepResultTime'} if route == 'sleepcalculator/' else set()
+                expected |= {'wisper demo', 'wisper facts', 'wisper platform', 'wisper privacy', 'wisper beta'} if route == 'wisperpfister/' else set()
                 if route == '':
                     expected |= {'hero sample heading', 'conversion title', 'conversion tag', 'conversion file', 'conversion file detail', 'conversion bay label', 'conversion source key', 'conversion target key', 'conversion field value', 'conversion format button', 'conversion play button', 'conversion status', 'conversion output', 'conversion pending', 'conversion note'}
                     expected |= {'hero data description', 'hero data link'} if state.startswith('code-') else {'hero sample label', 'hero sample value', 'hero sample answer', 'hero sample result', 'hero sample detail'}

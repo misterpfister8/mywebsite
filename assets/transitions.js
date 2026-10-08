@@ -1,7 +1,7 @@
 /* Cross-document view transitions; links stay native. */
 (() => {
   'use strict';
-  const root = document.documentElement, order = { home: 0, grade: 1, sleep: 2 };
+  const root = document.documentElement, order = { home: 0, grade: 1, sleep: 2, wisper: 3 };
   let clicked = null;
   document.addEventListener('click', (e) => {
     if (!(e.metaKey || e.ctrlKey || e.shiftKey || e.button)) clicked = e.target.closest?.('a[href]');
@@ -10,7 +10,7 @@
     try {
       const { origin, pathname: p } = new URL(url, location.href);
       if (!url || origin !== location.origin) return null;
-      return p.includes('/sechserrechner/') ? 'grade' : p.includes('/sleepcalculator/') ? 'sleep' : 'home';
+      return p.includes('/sechserrechner/') ? 'grade' : p.includes('/sleepcalculator/') ? 'sleep' : p.includes('/wisperpfister/') ? 'wisper' : 'home';
     } catch { return null; }
   };
   const inView = (el) => {

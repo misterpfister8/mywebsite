@@ -365,6 +365,41 @@ border:1px solid var(--rule-strong);background:var(--surface-2);box-shadow:var(-
 .story-steps>div::before{left:0;top:20px}
 }
 
+/* 7b. App teaser: one compact link to the Wisperpfister page */
+.app-teaser-section{padding-top:calc(var(--section-gap) * .5)}
+.app-teaser{
+--tool:var(--wisper-gfx);position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 1fr;gap:20px 32px;
+padding:clamp(20px,3.4vw,44px);overflow:clip;border-radius:24px;border:1px solid var(--glass-edge);background-color:var(--surface);
+background-image:linear-gradient(120deg,var(--tint-wisper),var(--surface) 72%);box-shadow:var(--shadow-panel);color:var(--ink);text-decoration:none;
+transition:transform var(--t-ui) var(--ease-out),box-shadow var(--t-ui) var(--ease-out);
+}
+.app-teaser::before,.app-teaser::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity var(--t-ui) var(--ease-out)}
+.app-teaser::before{z-index:-1;background:radial-gradient(440px circle at var(--mx,-999px) var(--my,-999px),color-mix(in srgb,var(--tool) 16%,transparent),transparent 62%)}
+.app-teaser::after{
+padding:1px;background:radial-gradient(300px circle at var(--mx,-999px) var(--my,-999px),var(--tool),transparent 60%);
+-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
+}
+.teaser-copy{grid-area:1 / 1 / 3 / 2;display:grid;gap:12px;justify-items:start;align-content:start}
+.teaser-copy h2{font-size:clamp(28px,3.6vw,52px)}
+.teaser-copy p{max-width:34em;font-size:15px;line-height:1.55;color:var(--muted)}
+.teaser-copy .text-cta{margin-top:4px}
+.app-teaser .round-arrow{grid-area:1 / 2;justify-self:end}
+.teaser-wave{grid-area:2 / 2;align-self:end;display:flex;align-items:center;gap:clamp(6px,.8vw,10px);height:clamp(72px,9vw,120px)}
+.teaser-wave i{width:clamp(8px,1vw,13px);height:calc(var(--h) * 100%);border-radius:var(--r-pill);background:linear-gradient(180deg,var(--film-2),var(--film-3));transform-origin:50% 50%;transition:scale var(--t-ui) var(--spring-pop)}
+@media (hover:hover) and (pointer:fine){
+.app-teaser:hover{transform:translateY(-4px);box-shadow:var(--shadow-panel),var(--shadow-float)}
+.app-teaser:hover::before,.app-teaser:hover::after{opacity:1}
+.app-teaser:hover .teaser-wave i:nth-child(odd){scale:1 1.18}
+.app-teaser:hover .teaser-wave i:nth-child(even){scale:1 .82}
+}
+@media (min-width:681px){.app-teaser{border-radius:28px}}
+@media (max-width:680px){
+.app-teaser{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;gap:16px}
+.teaser-copy{grid-area:2 / 1 / 3 / 3}
+.teaser-wave{grid-area:1 / 1;align-self:center;height:44px}
+.app-teaser .round-arrow{grid-area:1 / 2}
+}
+
 /* 8. About */
 .about-grid{position:relative;display:grid;gap:20px;padding-bottom:88px}
 .about-head .eyebrow{margin-bottom:16px}
@@ -435,6 +470,7 @@ border:1px solid var(--rule-strong);background:var(--surface-2);box-shadow:var(-
 .conversion-line i{background:CanvasText}
 .scene-switches [aria-pressed=true]{forced-color-adjust:none;background:Highlight;color:HighlightText}
 .about-signature{color:CanvasText;background:none}
+.teaser-wave i{background:CanvasText}
 }
 @media (prefers-contrast:more){.about-signature{color:var(--accent-text);background:none}}
 @media print{.hero-visual{display:none}}

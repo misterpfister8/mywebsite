@@ -1,8 +1,9 @@
 # misterpfister.net
 
 Digitaler Werkplatz von Kilian Pfister: [Startseite](https://misterpfister.net/),
-[Notenrechner](https://misterpfister.net/sechserrechner/) und
-[Schlafrechner](https://misterpfister.net/sleepcalculator/).
+[Notenrechner](https://misterpfister.net/sechserrechner/),
+[Schlafrechner](https://misterpfister.net/sleepcalculator/) und die Seite zur App
+[Wisperpfister](https://misterpfister.net/wisperpfister/).
 
 Statisches HTML, CSS und JavaScript. Keine Laufzeitpakete, externen Schriftdateien,
 Konten oder Tracking-Skripte. GitHub Pages veröffentlicht `main` aus dem Repository-
@@ -61,6 +62,16 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
   [lokale Python-Projekt](https://github.com/misterpfister8/spasstocsv).
   Unterstützte Formate laut dessen öffentlicher README: Raw-, Chrome- und
   Proton-CSV sowie Bitwarden JSON. Die Website nimmt keine Passwortdateien an.
+
+- Wisperpfister (`/wisperpfister/`): Kurzvorstellung der Diktier-App für Mac
+  und iPhone (Beta), verlinkt über einen Teaser auf der Startseite. Ein
+  endliches Beispiel zeigt Halten, Sprechen und Loslassen und die Bereinigung
+  («ähm der Termin ist am Dienstag, äh, nein, am Mittwoch» → «Der Termin ist am
+  Mittwoch.», ein Regressionsfall der App). Die Mac/iPhone-Auswahl funktioniert
+  ohne JavaScript; Reduced Motion zeigt sofort das Ergebnis. Beta-Anfragen per
+  E-Mail an die Projektadresse. Die Datenschutzsätze fassen den freigegebenen
+  Wortlaut der App zusammen; eine Datenschutzerklärung ist hier nicht
+  veröffentlicht.
 
 ## Rechenregeln und Datensicherung
 
@@ -174,6 +185,7 @@ Backbuffer-Grösse, `HeroGL.render()` erzwingt ein Bild.
 | `assets/tool-math.js` | Reine Rechenfunktionen, inklusive Zifferblatt-Mathematik |
 | `assets/tool-storage.js` | Kapselt den Browser-Speicher |
 | `assets/grades.js`, `assets/sleep.js` | Steuern die beiden Rechner |
+| `assets/wisper.css`, `assets/wisper.js` | Wisperpfister-Seite: Beispielablauf, Plattformen, Datenschutz, Beta |
 
 Die Speicherschlüssel und -formate bleiben unverändert
 (`misterpfister-grades-v2`, `misterpfister-sleep-v2` und die zugehörigen

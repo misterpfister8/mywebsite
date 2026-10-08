@@ -20,6 +20,7 @@
   --grade-text: #CEF779; --grade-gfx: #CEF779; --grade-fill: #CEF779; --grade-on: #142006; --grade-soft: #1C2A12;
   --sleep-text: #C6B9FF; --sleep-gfx: #C6B9FF; --sleep-fill: #C6B9FF; --sleep-on: #1A1530; --sleep-soft: #221E3A;
   --data-text: #7DF3E1; --data-gfx: #7DF3E1; --data-soft: #0F2A26;
+  --wisper-text: #FF9EC7; --wisper-gfx: #FF9EC7; --wisper-fill: #FF9EC7; --wisper-on: #2B0F1D; --wisper-soft: #2E1724; --tint-wisper: #2A1520;
   --rose: #FF9EC7;
   --danger: #FFB3A2; --danger-soft: #2C1714;
   --warm: #FFCF8A;
@@ -56,6 +57,7 @@
   --grade-text: #3F6212; --grade-gfx: #5A8A1A; --grade-fill: #CEF779; --grade-on: #142006; --grade-soft: #EAF4D2;
   --sleep-text: #56459A; --sleep-gfx: #6A55C8; --sleep-fill: #56459A; --sleep-on: #FFFFFF; --sleep-soft: #ECE8FF;
   --data-text: #0B665D; --data-gfx: #12897C; --data-soft: #DDF2EE;
+  --wisper-text: #9E2F66; --wisper-gfx: #B8487F; --wisper-fill: #9E2F66; --wisper-on: #FFFFFF; --wisper-soft: #F7E4EE; --tint-wisper: #FAE8F1;
   --rose: #9E2F66;
   --danger: #A3281A; --danger-soft: #FBE7E3;
   --warm: #7F4800;
@@ -95,7 +97,7 @@
   --stagger: 60ms;
   --z-stage: 0; --z-scene: 2; --z-hud: 3; --z-dock: 4; --z-header: 50; --z-compact: 55; --z-toast: 60;
   --z-skip: 100;
-  /* .sleep-page swaps these */
+  /* .sleep-page and .wisper-page swap these */
   --tool-text: var(--grade-text); --tool-gfx: var(--grade-gfx); --tool-fill: var(--grade-fill);
   --tool-on: var(--grade-on); --tool-soft: var(--grade-soft);
   --mag-t: 500ms var(--spring-pop);
@@ -117,6 +119,7 @@
 @media (min-width: 1151px) { :root { --gutter: 48px; } }
 @media (min-width: 1600px) { :root { --wrap-max: 1360px; } }
 .sleep-page { --tool-text: var(--sleep-text); --tool-gfx: var(--sleep-gfx); --tool-fill: var(--sleep-fill); --tool-on: var(--sleep-on); --tool-soft: var(--sleep-soft); }
+.wisper-page { --tool-text: var(--wisper-text); --tool-gfx: var(--wisper-gfx); --tool-fill: var(--wisper-fill); --tool-on: var(--wisper-on); --tool-soft: var(--wisper-soft); }
 
 /* 2. Base */
 *, *::before, *::after { box-sizing: border-box; }
@@ -491,6 +494,7 @@ html:not(.js) .theme-toggle { display: none; }
 .panel.tint-grade { --panel-a: var(--tint-grade); }
 .panel.tint-sleep { --panel-a: var(--tint-sleep); }
 .panel.tint-code { --panel-a: var(--tint-code); }
+.panel.tint-wisper { --panel-a: var(--tint-wisper); }
 .panel:focus-within { border-color: transparent; background: linear-gradient(180deg, var(--panel-a), var(--surface)) padding-box, var(--film) border-box; }
 .panel-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
 .panel-heading :is(h2, h3) { font-size: var(--fs-h3); font-weight: 600; line-height: 1.15; letter-spacing: -.02em; }
@@ -628,6 +632,7 @@ html:is(.vt-arrival, .vt-arrived) .load-rise { animation: none; }
 @view-transition { navigation: auto; }
 [data-transition-target=grade] { view-transition-name: grade-tool; }
 [data-transition-target=sleep] { view-transition-name: sleep-tool; }
+[data-transition-target=wisper] { view-transition-name: wisper-tool; }
 ::view-transition-group(*) { animation-duration: var(--t-vt); animation-timing-function: var(--ease-out); }
 /* Roots fade through, never both at half opacity */
 ::view-transition-old(root) { animation: vt-root-out 160ms var(--ease-in) both; }
@@ -635,12 +640,12 @@ html:is(.vt-arrival, .vt-arrived) .load-rise { animation: none; }
 ::view-transition-old(site-header) { animation: none; opacity: 0; }
 ::view-transition-new(site-header) { animation: none; }
 /* Only the box morphs: snapshots stay 1:1, pinned top left, clipped by the box */
-::view-transition-group(grade-tool), ::view-transition-group(sleep-tool) { animation-duration: 560ms; }
-::view-transition-image-pair(grade-tool), ::view-transition-image-pair(sleep-tool) { overflow: clip; border-radius: var(--r-panel); }
-::view-transition-old(grade-tool), ::view-transition-old(sleep-tool) {
+::view-transition-group(grade-tool), ::view-transition-group(sleep-tool), ::view-transition-group(wisper-tool) { animation-duration: 560ms; }
+::view-transition-image-pair(grade-tool), ::view-transition-image-pair(sleep-tool), ::view-transition-image-pair(wisper-tool) { overflow: clip; border-radius: var(--r-panel); }
+::view-transition-old(grade-tool), ::view-transition-old(sleep-tool), ::view-transition-old(wisper-tool) {
   animation: vt-fade-out 120ms linear both; height: 100%; object-fit: none; object-position: top left;
 }
-::view-transition-new(grade-tool), ::view-transition-new(sleep-tool) {
+::view-transition-new(grade-tool), ::view-transition-new(sleep-tool), ::view-transition-new(wisper-tool) {
   animation: vt-fade-in 300ms var(--ease-out) 90ms both; height: 100%; object-fit: none; object-position: top left;
 }
 html.vt-out .home-page .module::after { display: none; }
