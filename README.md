@@ -68,7 +68,7 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
   zweit), verlinkt über einen Teaser auf der Startseite, dessen Icon per View
   Transition ins Seiten-Icon übergeht. Ein spielbares 3 × 3-Schiebepuzzle startet
   in der Stellung des App-Icons (ein Zug bis zur Lösung); Steine sind Buttons,
-  Pfeiltasten schieben den Nachbarn der Lücke. Dazu Looks, Support-Kontakt
+  Pfeiltasten schieben den Nachbarn der Lücke. Status «Bald im App Store» (ohne Beta-Aufruf), dazu Looks, Support-Kontakt
   (`pfisterkiste@misterpfister.net`) und unter `/pfisterkiste/datenschutz/` die
   Datenschutzerklärung der App (Support- und Datenschutz-URL für den App Store).
 
@@ -140,7 +140,7 @@ Alle Browserprüfungen akzeptieren `--base-url`, falls der Server nicht auf Port
 Die Browserprüfungen benötigen den laufenden HTTP-Server. Sie laden die echten
 externen Dateien und verwenden nativen Browser-Speicher. `browser_review.py`
 prüft zusätzlich, dass keine Anfrage die eigene Origin verlässt, alle Assets
-den Cache-Parameter `?v=werkplatz-5-demo1` tragen, Chromium jede Deklaration, jeden
+den Cache-Parameter `?v=werkplatz-5-apps1` tragen, Chromium jede Deklaration, jeden
 Selektor und jede Media-Bedingung der Stylesheets annimmt (ausgenommen bewusst
 browserübergreifende Regeln), jeder Tab-Stopp sichtbar ist und die
 Einblendung der Startseite keinen Text anschneidet. Speicherfehler-Injektion
@@ -200,6 +200,10 @@ Backbuffer-Grösse, `HeroGL.render()` erzwingt ein Bild.
 Die Speicherschlüssel und -formate bleiben unverändert
 (`misterpfister-grades-v2`, `misterpfister-sleep-v2` und die zugehörigen
 `-saving`-Schalter). Alte Sicherungen und Browserdaten laden weiter.
+
+Wer eine Datei unter `assets/` ändert, zählt den Cache-Parameter `?v=` auf allen
+Seiten und in `tests/browser_review.py` hoch. Sonst laden Browser bis zu vier
+Stunden die alte CSS-Datei zu neuem HTML.
 
 Der bestehende Workflow `Workshop regression tests` prüft Rechenlogik, HTTP-
 Bedienung, Browser-Neustarts und Showcase-Demos. Vor dem Push Remote-Änderungen
