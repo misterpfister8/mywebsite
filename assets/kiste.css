@@ -108,7 +108,6 @@ html:not(.js) .kiste-play-bar .button { visibility: hidden; }
 .kiste-support { display: grid; gap: 28px; border-radius: 28px; padding: clamp(20px, 4vw, 48px); }
 .kiste-support-copy { display: grid; justify-items: start; gap: 16px; }
 .kiste-support-copy p { max-width: 30em; color: var(--muted); }
-.kiste-mail { white-space: normal; overflow-wrap: anywhere; }
 .kiste-specs { display: grid; gap: 0; margin: 0; }
 .kiste-specs > div { display: grid; gap: 2px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
 .kiste-specs > div:last-child { border-bottom: 0; }

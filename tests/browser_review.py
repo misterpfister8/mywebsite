@@ -49,7 +49,7 @@ INFINITE_ANIMATIONS = "document.getAnimations().filter(a => a.effect && a.effect
 BROKEN_REFS = '''() => [...document.querySelectorAll('[aria-labelledby], [aria-describedby], [aria-controls]')]
   .flatMap(el => ['aria-labelledby', 'aria-describedby', 'aria-controls'].flatMap(a => (el.getAttribute(a) || '').split(/\\s+/).filter(Boolean)))
   .filter(id => !document.getElementById(id))'''
-# Spec §8.2: every stylesheet and script is local and carries the werkplatz-5-apps1 cache bust.
+# Spec §8.2: every stylesheet and script is local and carries the werkplatz-5-apps2 cache bust.
 ASSET_URLS = "[...document.querySelectorAll('link[rel=stylesheet], script[src]')].map(el => el.getAttribute('href') || el.getAttribute('src'))"
 # The live result of each page; decorative count-ups must refuse it (spec §4.5: result numbers never tween).
 LIVE_RESULT = {'home': '#hero-title', 'home-fallback': '#hero-title', 'grade': '#average', 'sleep': '#sleepResultTime', 'wisper': '[data-wisper-status]', 'kiste': '#kiste-title', 'privacy': 'h1'}
@@ -459,7 +459,7 @@ def run(review):
         r.check(p.evaluate(HIDDEN_FOCUSABLES) == [], f'No focusable element inside aria-hidden or role=img: {name}')
         r.check(p.evaluate(BROKEN_REFS) == [], f'ARIA id references resolve: {name} {p.evaluate(BROKEN_REFS)}')
         assets = p.evaluate(ASSET_URLS)
-        r.check(assets and all(re.fullmatch(r'(?:\./|(?:\.\./)+)assets/[\w-]+\.(css|js)\?v=werkplatz-5-apps1', url) for url in assets), f'Local assets with the werkplatz-5-apps1 cache bust: {name} {assets}')
+        r.check(assets and all(re.fullmatch(r'(?:\./|(?:\.\./)+)assets/[\w-]+\.(css|js)\?v=werkplatz-5-apps2', url) for url in assets), f'Local assets with the werkplatz-5-apps2 cache bust: {name} {assets}')
         if name in ('grade', 'sleep', 'wisper', 'kiste', 'privacy'):
             r.check(p.evaluate("document.querySelectorAll('canvas').length === 0 && !performance.getEntriesByType('resource').some(e => /hero-gl|workbench/.test(e.name))"), f'No WebGL and no home scripts on the tool page: {name}')
         live, shown = LIVE_RESULT[name], r.text(LIVE_RESULT[name])
