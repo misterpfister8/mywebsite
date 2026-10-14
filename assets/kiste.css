@@ -75,7 +75,8 @@ html:not(.js) .kiste-play-bar .button { visibility: hidden; }
 .kiste-game svg { width: 120px; height: 120px; margin-bottom: 6px; }
 .kiste-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 0; padding: 0; list-style: none; }
 .kiste-chips li { padding: 6px 10px; border-radius: var(--r-pill); border: 1px solid var(--rule-strong); font: 500 12px/1.2 var(--font-mono); color: var(--muted); }
-@media (min-width: 761px) { .kiste-games { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 761px) { .kiste-games { grid-template-columns: repeat(2, minmax(0, 1fr)); } .kiste-game:last-child:nth-child(odd) { grid-column: 1 / -1; } }
+@media (min-width: 1101px) { .kiste-games { grid-template-columns: repeat(3, minmax(0, 1fr)); } .kiste-game:last-child:nth-child(odd) { grid-column: auto; } }
 
 /* 5. Looks */
 .kiste-looks { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
@@ -108,6 +109,7 @@ html:not(.js) .kiste-play-bar .button { visibility: hidden; }
 .kiste-support { display: grid; gap: 28px; border-radius: 28px; padding: clamp(20px, 4vw, 48px); }
 .kiste-support-copy { display: grid; justify-items: start; gap: 16px; }
 .kiste-support-copy p { max-width: 30em; color: var(--muted); }
+.kiste-mail { white-space: normal; overflow-wrap: anywhere; }
 .kiste-specs { display: grid; gap: 0; margin: 0; }
 .kiste-specs > div { display: grid; gap: 2px; padding: 12px 0; border-bottom: 1px solid var(--rule); }
 .kiste-specs > div:last-child { border-bottom: 0; }
