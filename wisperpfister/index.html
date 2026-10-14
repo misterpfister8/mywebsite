@@ -16,6 +16,7 @@
   <script src="../assets/transitions.js?v=werkplatz-5-apps3"></script>
   <script src="../assets/theme.js?v=werkplatz-5-apps3"></script>
   <link rel="stylesheet" href="../assets/core.css?v=werkplatz-5-apps3">
+  <link rel="stylesheet" href="../assets/kiste.css?v=werkplatz-5-apps3">
   <link rel="stylesheet" href="../assets/wisper.css?v=werkplatz-5-apps3">
   <script src="../assets/motion.js?v=werkplatz-5-apps3" defer></script>
   <script src="../assets/wisper.js?v=werkplatz-5-apps3" defer></script>
@@ -27,8 +28,8 @@
       <a class="brand" href="../" aria-label="misterpfister.net – Startseite"><span class="brand-mark">m.</span><span class="brand-word">misterpfister<span>.net</span></span></a>
       <a href="../" class="back-link"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg><span>Werkplatz</span></a>
       <nav class="main-nav" aria-label="Hauptnavigation">
-        <a href="../sechserrechner/">Noten</a>
-        <a href="../sleepcalculator/">Schlaf</a>
+        <a href="./" aria-current="page">App</a>
+        <a href="./datenschutz/">Datenschutz</a>
       </nav>
       <button type="button" class="theme-toggle" data-theme-toggle aria-label="Farbschema wechseln"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" data-theme-icon aria-hidden="true"></svg><span class="sr-only" data-theme-label>Hell</span></button>
     </div>
@@ -126,6 +127,7 @@
             <li><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></svg><span>Ins Internet geht nur der Download von Sprachmodellen: Apples Sprachmodell kommt von Apple, Parakeet von Hugging Face, wenn du ihn startest.</span></li>
             <li><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg><span>Kein Konto, keine Anmeldung.</span></li>
           </ul>
+          <p><a href="./datenschutz/">Datenschutzerklärung lesen</a></p>
         </section>
         <section class="panel tint-wisper wisper-soon reveal" id="verfuegbar" aria-labelledby="soon-title">
           <p class="eyebrow"><span class="status-dot"></span> Demnächst</p>
@@ -137,6 +139,22 @@
           </ul>
         </section>
       </div>
+
+      <section class="kiste-section" id="support" aria-labelledby="support-title">
+        <div class="kiste-support panel reveal">
+          <div class="kiste-support-copy">
+            <p class="eyebrow">Support</p>
+            <h2 id="support-title">Fragen, Fehler, Wünsche?</h2>
+            <p>Schreib mir eine E-Mail. Hilfreich sind dein Gerät, die Systemversion und was du gerade diktiert hast (ohne den Text, wenn er privat ist).</p>
+            <a class="button secondary kiste-mail" href="mailto:wisperpfister@misterpfister.net?subject=Wisperpfister%20Support">wisperpfister@misterpfister.net</a>
+          </div>
+          <dl class="kiste-specs">
+            <div><dt>Geräte</dt><dd>iPhone und iPad mit iOS bzw. iPadOS 26, Mac mit macOS 27</dd></div>
+            <div><dt>Sprache</dt><dd>Oberfläche Deutsch; Diktat Deutsch (Schweiz, Deutschland) und Englisch (USA)</dd></div>
+            <div><dt>Datenschutz</dt><dd>Erkennung auf dem Gerät, kein Konto, kein Tracking. <a href="./datenschutz/">Datenschutzerklärung lesen</a></dd></div>
+          </dl>
+        </div>
+      </section>
 
       <p class="privacy-line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> Diese Seite lädt nichts von Dritten. Gespeichert wird höchstens dein Farbschema, in deinem Browser.</p>
     </div>

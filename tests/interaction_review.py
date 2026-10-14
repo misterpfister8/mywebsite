@@ -80,7 +80,7 @@ def layout_shift(browser):
         # Deferred scripts arrive after the first paint, as on a phone network; this makes late DOM building measurable.
         ctx.route(re.compile(r'/assets/(motion|tool-storage|tool-math|grades|sleep|workbench|hero-gl|wisper|kiste)\.js'), lambda route: (time.sleep(.2), route.continue_()))
         page = ctx.new_page(); page.on('pageerror', lambda error: errors.append(str(error)))
-        for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/', 'pfisterkiste/datenschutz/']:
+        for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/', 'pfisterkiste/datenschutz/', 'wisperpfister/datenschutz/']:
             page.goto(BASE + route, wait_until='networkidle'); page.wait_for_timeout(1500)
             out[f'{route or "home"} {label}px'] = {'cls': round(page.evaluate('__cls'), 4), 'shifts': page.evaluate('__shifts')}
         seed(page)
