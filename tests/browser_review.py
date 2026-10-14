@@ -52,7 +52,7 @@ BROKEN_REFS = '''() => [...document.querySelectorAll('[aria-labelledby], [aria-d
 # Spec §8.2: every stylesheet and script is local and carries the werkplatz-5-apps3 cache bust.
 ASSET_URLS = "[...document.querySelectorAll('link[rel=stylesheet], script[src]')].map(el => el.getAttribute('href') || el.getAttribute('src'))"
 # The live result of each page; decorative count-ups must refuse it (spec §4.5: result numbers never tween).
-LIVE_RESULT = {'home': '#hero-title', 'home-fallback': '#hero-title', 'grade': '#average', 'sleep': '#sleepResultTime', 'wisper': '[data-wisper-status]', 'kiste': '#kiste-title', 'privacy': 'h1'}
+LIVE_RESULT = {'home': '#hero-title', 'home-fallback': '#hero-title', 'grade': '#average', 'sleep': '#sleepResultTime', 'wisper': '[data-wisper-status]', 'kiste': '#kiste-title', 'privacy': 'h1', 'wisper-privacy': 'h1'}
 # Touch targets on phones: at least 44px high; icon-only controls also 44px wide.
 SMALL_TARGETS = '''() => {
   const icon = '.icon-button, .theme-toggle, .brand, [data-scene-link], .dial-handle';
@@ -450,7 +450,7 @@ def run(review):
         stylesheets(r)
     # Both motion modes, both themes and every relevant layout boundary (plus the hero without WebGL).
     small_targets = {}  # collected across the sweep, asserted once so every layout is still checked
-    for route, name in [('', 'home'), ('?gl=off', 'home-fallback'), ('sechserrechner/', 'grade'), ('sleepcalculator/', 'sleep'), ('wisperpfister/', 'wisper'), ('pfisterkiste/', 'kiste'), ('pfisterkiste/datenschutz/', 'privacy')]:
+    for route, name in [('', 'home'), ('?gl=off', 'home-fallback'), ('sechserrechner/', 'grade'), ('sleepcalculator/', 'sleep'), ('wisperpfister/', 'wisper'), ('pfisterkiste/', 'kiste'), ('pfisterkiste/datenschutz/', 'privacy'), ('wisperpfister/datenschutz/', 'wisper-privacy')]:
         p = r.open(route)
         if name == 'grade':
             p.locator('#loadExample').click(); p.locator('#closeToast').click()
@@ -1158,7 +1158,11 @@ def wisper_page(r):
     demo = p.locator('[data-wisper-demo]')
     r.check(demo.get_attribute('data-phase') == 'done' and p.locator('.wisper-final').inner_text() == 'Der Termin ist am Mittwoch.', 'The sample rests on its result')
     r.check(p.locator('.wisper-raw del').evaluate_all('els => els.map(el => el.textContent)') == ['ähm', 'am', 'Dienstag,', 'äh,', 'nein,'], 'The spoken line marks exactly the removed words')
-    r.check(p.locator('#soon-title').inner_text() == 'Bald im App Store.' and p.locator('a[href^="mailto:"]').count() == 0, 'The page announces the App Store and asks for no beta request')
+    r.check(p.locator('#soon-title').inner_text() == 'Bald im App Store.', 'The page announces the App Store')
+    # The App Store needs a support contact and a privacy policy (MIS-313): one mail address, no beta request.
+    mails = p.locator('a[href^="mailto:"]')
+    r.check(mails.count() == 1 and mails.first.get_attribute('href').startswith('mailto:wisperpfister@misterpfister.net'), 'The page names the support address, once')
+    r.check(p.locator('.main-nav a[href="./datenschutz/"]').count() == 1, 'The navigation leads to the privacy policy')
     # Reduced motion (the review default): playing jumps straight to the result.
     play = p.locator('[data-wisper-play]')
     r.check(play.is_visible(), 'With JavaScript the sample can be played')
@@ -1173,6 +1177,10 @@ def wisper_page(r):
     r.check(waits(p, "document.querySelector('[data-wisper-demo]').dataset.phase === 'done'", 3000), 'The sample ends on its result')
     r.check(waits(p, "getComputedStyle(document.querySelector('.wisper-final')).opacity === '1'", 1000) and p.evaluate(INFINITE_ANIMATIONS) == 0, 'After the sample the result is shown and nothing keeps running')
     set_motion(p, 'reduce')
+    p.locator('.main-nav a[href="./datenschutz/"]').click(); p.wait_for_url('**/wisperpfister/datenschutz/')
+    r.check(p.locator('h1').inner_text() == 'Datenschutz.' and p.locator('.kiste-legal h2').count() >= 10
+            and p.locator('.kiste-legal a[href="mailto:wisperpfister@misterpfister.net"]').count() == 1, 'The privacy policy has its sections and the contact')
+    p.go_back()
     # Without JavaScript: all text is there, the switch still works, nothing invites a play that cannot run.
     context = r.context.browser.new_context(java_script_enabled=False, viewport={'width': 390, 'height': 844}, locale='de-CH', reduced_motion='reduce')
     page = context.new_page(); r.watch_requests(page)
@@ -1215,7 +1223,7 @@ def kiste(r):
 
 def tab_order(r):
     """Every Tab stop is visible, at least 8x8 px and scrolled into view: no invisible focus targets (spec §9)."""
-    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/', 'pfisterkiste/datenschutz/']:
+    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/', 'pfisterkiste/datenschutz/', 'wisperpfister/datenschutz/']:
         for viewport in [{'width': 1440, 'height': 1000}, {'width': 390, 'height': 844}]:
             p = r.open(route, viewport=viewport)
             if route == 'sechserrechner/':
@@ -1229,7 +1237,7 @@ def tab_order(r):
                 stops += 1
                 if stop['bad']: bad.append(stop['name'])
             # Wisperpfister and the privacy policy have no form: 11 stops on phones (the back link is hidden there).
-            r.check(stops >= (10 if route in ('wisperpfister/', 'pfisterkiste/datenschutz/') else 12) and not bad, f'Every Tab stop is visible: {route or "home"} {viewport["width"]}px, {stops} stops {bad}')
+            r.check(stops >= (10 if route in ('wisperpfister/', 'pfisterkiste/datenschutz/') else 6 if route == 'wisperpfister/datenschutz/' else 12) and not bad, f'Every Tab stop is visible: {route or "home"} {viewport["width"]}px, {stops} stops {bad}')
 
 
 def stylesheets(r):

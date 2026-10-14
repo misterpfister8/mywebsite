@@ -149,7 +149,7 @@ seen = {}
 with sync_playwright() as w:
     b = w.chromium.launch()
     p = b.new_page(viewport={'width': 1440, 'height': 1000}, reduced_motion='reduce')
-    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/', 'pfisterkiste/datenschutz/']:
+    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/', 'pfisterkiste/datenschutz/', 'wisperpfister/datenschutz/']:
         p.goto(BASE + route)
         states = ['grade', 'sleep', 'code-csv', 'code-json'] if route == '' else ['empty', 'example'] if route == 'sechserrechner/' else ['default']
         for state in states:
@@ -169,7 +169,7 @@ with sync_playwright() as w:
                 p.wait_for_timeout(100)
                 pairs = p.evaluate(PAIRS)
                 labels = {pair['label'] for pair in pairs}
-                expected = {'brand'} | ({'film-text stop'} if route != 'pfisterkiste/datenschutz/' else set()) | ({'mini clock', 'grade card h3', 'sleep card cta', 'hud channel', 'hud data', 'grade', 'sleep', 'code', 'wisper teaser'} if route == '' else set())
+                expected = {'brand'} | ({'film-text stop'} if route not in ('pfisterkiste/datenschutz/', 'wisperpfister/datenschutz/') else set()) | ({'mini clock', 'grade card h3', 'sleep card cta', 'hud channel', 'hud data', 'grade', 'sleep', 'code', 'wisper teaser'} if route == '' else set())
                 expected |= {'result average', 'result averageDetail', 'result result-title'} if route == 'sechserrechner/' else set()
                 expected |= {'dial-tip', 'midnight', 'sleepResultTime'} if route == 'sleepcalculator/' else set()
                 expected |= {'wisper demo', 'wisper facts', 'wisper platform', 'wisper privacy', 'wisper availability'} if route == 'wisperpfister/' else set()
