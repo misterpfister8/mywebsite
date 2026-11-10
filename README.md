@@ -82,6 +82,12 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
   Wortlaut der App zusammen; eine Datenschutzerklärung ist hier nicht
   veröffentlicht.
 
+- Auffindbarkeit: Jede Seite trägt ein 1200 × 630-Vorschaubild (`assets/og-*.jpg`,
+  `og:image` und `twitter:card`). `404.html` ersetzt die GitHub-Pages-Fehlerseite
+  und verwendet root-absolute Pfade, weil sie für jeden unbekannten Pfad
+  ausgeliefert wird. `sitemap.xml` und `robots.txt` liegen im Root. Die
+  Startseiten-Navigation führt zu Werkzeugen, Apps und «Über mich».
+
 ## Rechenregeln und Datensicherung
 
 Noten liegen zwischen 1 und 6, Gewichte zwischen 0.01 und 100; maximal zwei
@@ -140,7 +146,7 @@ Alle Browserprüfungen akzeptieren `--base-url`, falls der Server nicht auf Port
 Die Browserprüfungen benötigen den laufenden HTTP-Server. Sie laden die echten
 externen Dateien und verwenden nativen Browser-Speicher. `browser_review.py`
 prüft zusätzlich, dass keine Anfrage die eigene Origin verlässt, alle Assets
-den Cache-Parameter `?v=werkplatz-5-apps3` tragen, Chromium jede Deklaration, jeden
+den Cache-Parameter `?v=werkplatz-5-apps4` tragen, Chromium jede Deklaration, jeden
 Selektor und jede Media-Bedingung der Stylesheets annimmt (ausgenommen bewusst
 browserübergreifende Regeln), jeder Tab-Stopp sichtbar ist und die
 Einblendung der Startseite keinen Text anschneidet. Speicherfehler-Injektion

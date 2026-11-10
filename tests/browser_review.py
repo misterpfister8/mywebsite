@@ -49,7 +49,7 @@ INFINITE_ANIMATIONS = "document.getAnimations().filter(a => a.effect && a.effect
 BROKEN_REFS = '''() => [...document.querySelectorAll('[aria-labelledby], [aria-describedby], [aria-controls]')]
   .flatMap(el => ['aria-labelledby', 'aria-describedby', 'aria-controls'].flatMap(a => (el.getAttribute(a) || '').split(/\\s+/).filter(Boolean)))
   .filter(id => !document.getElementById(id))'''
-# Spec §8.2: every stylesheet and script is local and carries the werkplatz-5-apps3 cache bust.
+# Spec §8.2: every stylesheet and script is local and carries the werkplatz-5-apps4 cache bust.
 ASSET_URLS = "[...document.querySelectorAll('link[rel=stylesheet], script[src]')].map(el => el.getAttribute('href') || el.getAttribute('src'))"
 # The live result of each page; decorative count-ups must refuse it (spec §4.5: result numbers never tween).
 LIVE_RESULT = {'home': '#hero-title', 'home-fallback': '#hero-title', 'grade': '#average', 'sleep': '#sleepResultTime', 'wisper': '[data-wisper-status]', 'kiste': '#kiste-title', 'privacy': 'h1', 'wisper-privacy': 'h1'}
@@ -459,7 +459,7 @@ def run(review):
         r.check(p.evaluate(HIDDEN_FOCUSABLES) == [], f'No focusable element inside aria-hidden or role=img: {name}')
         r.check(p.evaluate(BROKEN_REFS) == [], f'ARIA id references resolve: {name} {p.evaluate(BROKEN_REFS)}')
         assets = p.evaluate(ASSET_URLS)
-        r.check(assets and all(re.fullmatch(r'(?:\./|(?:\.\./)+)assets/[\w-]+\.(css|js)\?v=werkplatz-5-apps3', url) for url in assets), f'Local assets with the werkplatz-5-apps3 cache bust: {name} {assets}')
+        r.check(assets and all(re.fullmatch(r'(?:\./|(?:\.\./)+)assets/[\w-]+\.(css|js)\?v=werkplatz-5-apps4', url) for url in assets), f'Local assets with the werkplatz-5-apps4 cache bust: {name} {assets}')
         if name in ('grade', 'sleep', 'wisper', 'kiste', 'privacy'):
             r.check(p.evaluate("document.querySelectorAll('canvas').length === 0 && !performance.getEntriesByType('resource').some(e => /hero-gl|workbench/.test(e.name))"), f'No WebGL and no home scripts on the tool page: {name}')
         live, shown = LIVE_RESULT[name], r.text(LIVE_RESULT[name])
@@ -481,7 +481,7 @@ def run(review):
                         r.screenshot(f'{name}-{theme}-{width}.png')
                         p.screenshot(path=str(OUT / f'{name}-{theme}-{width}-viewport.png'))
                     if name == 'home' and width in [320, 375, 402]:
-                        r.check(p.locator('.main-nav a').evaluate_all('els => els.length === 2 && els.every(el => el.checkVisibility())'), f'Both home links stay in the phone header: {width}')
+                        r.check(p.locator('.main-nav a').evaluate_all('els => els.length === 3 && els.every(el => el.checkVisibility())'), f'All three home links stay in the phone header: {width}')
                         r.check(p.locator('.hero-actions').bounding_box()['y'] < 400, f'Direct links before 400px: {width}')
                         r.check(p.locator('.tool-card').first.bounding_box()['y'] < 950, f'Interactive sample and compact band keep the first tool card within 950px: {width}')
                         band = p.locator('.hero-visual').bounding_box()

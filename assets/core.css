@@ -232,12 +232,16 @@ html:not(.js) .theme-toggle { display: none; }
   .theme-toggle:hover { transform: translateY(-1px); background: var(--surface-3); }
 }
 @media (max-width: 680px) { .back-link { display: none; } .brand { margin-inline: -4px; padding-inline: 4px; } }
-/* Phones keep both home links; the brand word gives way first */
-@media (max-width: 520px) { .home-page .brand-word { display: none; } }
+/* Phones keep all three home links; the brand word gives way first, then the link padding */
+@media (max-width: 520px) {
+  .home-page .brand-word { display: none; } .home-page .main-nav { gap: 2px; }
+  .home-page .main-nav a { padding-inline: 8px; } .home-page .main-nav a::after { left: 8px; right: 8px; }
+}
 @media (max-width: 440px) { .tool-page .brand-word { display: none; } }
 @media (max-width: 360px) {
   .brand-word { display: none; } .main-nav a { padding-inline: 12px; } .main-nav a::after { left: 12px; right: 12px; }
-  .home-page .main-nav a { padding-inline: 8px; } .home-page .main-nav a::after { left: 8px; right: 8px; }
+  .home-page .main-nav { gap: 0; }
+  .home-page .main-nav a { padding-inline: 4px; font-size: 13px; } .home-page .main-nav a::after { left: 4px; right: 4px; }
 }
 
 /* 5. Buttons */
