@@ -1219,7 +1219,7 @@ def kiste(r):
     p.locator(f'[data-tile="{enabled()[0]}"]').focus(); p.keyboard.press('ArrowLeft'); p.keyboard.press('ArrowUp')
     r.check(p.evaluate(places) == 8, 'Arrow keys keep every tile on its own place')
     r.check(p.locator('.privacy-line').is_visible() and p.locator('.main-nav a[href="./datenschutz/"]').count() == 1, 'The app page links its privacy policy')
-    r.check(p.locator('#support a[href^="mailto:pfisterkiste@misterpfister.net"]').is_visible() and p.locator('.kiste-game').count() == 3, 'The app page shows the support address and the three game sections')
+    r.check(p.locator('#support a[href^="mailto:pfisterkiste@misterpfister.net"]').is_visible() and p.locator('.kiste-game').count() == 5, 'The app page shows the support address and the five game sections')
 
 
 def tab_order(r):
