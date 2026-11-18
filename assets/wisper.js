@@ -5,11 +5,15 @@
   if (!demo) return;
   const words = [...demo.querySelectorAll('[data-word]')];
   const play = demo.querySelector('[data-wisper-play]'), status = demo.querySelector('[data-wisper-status]');
-  const lines = {
+  const EN = document.documentElement.lang.startsWith('en');
+  const lines = EN ? {
+    mac: { listen: 'Right ⌘ held · Wisperpfister is listening …', clean: 'Released · cleaning up …' },
+    iphone: { listen: 'Mic tapped · Wisperpfister is listening …', clean: '“Fertig” tapped · cleaning up …' },
+  } : {
     mac: { listen: 'Rechte ⌘ gehalten · Wisperpfister hört zu …', clean: 'Losgelassen · wird bereinigt …' },
     iphone: { listen: 'Mikrofon getippt · Wisperpfister hört zu …', clean: '«Fertig» getippt · wird bereinigt …' },
   };
-  const done = 'Im Feld: Der Termin ist am Mittwoch.';
+  const done = EN ? 'In the field: Der Termin ist am Mittwoch.' : 'Im Feld: Der Termin ist am Mittwoch.';
   const WORD = 190, START = 240, RELEASE = 260, CLEAN = 900;
   let timers = [];
   const later = (ms, fn) => timers.push(setTimeout(fn, ms));

@@ -27,13 +27,14 @@
 
   function syncControls() {
     const next = current() === 'light' ? 'dark' : 'light';
-    const label = next === 'light' ? 'Helles Farbschema verwenden' : 'Dunkles Farbschema verwenden';
+    const en = root.lang.startsWith('en');
+    const label = en ? `Use ${next} theme` : next === 'light' ? 'Helles Farbschema verwenden' : 'Dunkles Farbschema verwenden';
     syncMeta();
     document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
       button.setAttribute('aria-label', label);
       button.setAttribute('title', label);
       const text = button.querySelector('[data-theme-label]');
-      if (text) text.textContent = next === 'light' ? 'Hell' : 'Dunkel';
+      if (text) text.textContent = en ? (next === 'light' ? 'Light' : 'Dark') : next === 'light' ? 'Hell' : 'Dunkel';
       const icon = button.querySelector('[data-theme-icon]');
       if (icon) icon.innerHTML = themeIcons[next];
     });

@@ -5,6 +5,7 @@
   const panel = doc.querySelector('[data-hero-demo]'), bench = doc.querySelector('[data-workbench]');
   const visual = doc.querySelector('[data-glass]');
   if (!panel || !bench || !M) return;
+  const EN = document.documentElement.lang.startsWith('en');
   const grade = panel.querySelector('[data-demo-grade]'), sleep = panel.querySelector('[data-demo-sleep]');
   const material = panel.querySelector('[data-look-material]'), palette = panel.querySelector('[data-look-palette]');
   const light = panel.querySelector('[data-look-light]'), look = panel.querySelector('[data-look-panel]');
@@ -24,8 +25,8 @@
     write('[data-demo-average]', M.round(average, .01).toFixed(2));
     write('[data-demo-duration]', M.duration(length));
     write('[data-demo-bed]', M.clock(night.bed));
-    grade.setAttribute('aria-valuetext', `${next.toFixed(2)}; neuer Schnitt ${M.round(average, .01).toFixed(2)}`);
-    sleep.setAttribute('aria-valuetext', `${M.duration(length)}; um ${M.clock(night.bed)} ins Bett`);
+    grade.setAttribute('aria-valuetext', EN ? `${next.toFixed(2)}; new average ${M.round(average, .01).toFixed(2)}` : `${next.toFixed(2)}; neuer Schnitt ${M.round(average, .01).toFixed(2)}`);
+    sleep.setAttribute('aria-valuetext', EN ? `${M.duration(length)}; bed at ${M.clock(night.bed)}` : `${M.duration(length)}; um ${M.clock(night.bed)} ins Bett`);
     grade.style.setProperty('--progress', `${(next - 1) / 5 * 100}%`);
     sleep.style.setProperty('--progress', `${(length - 360) / 180 * 100}%`);
 
@@ -33,14 +34,14 @@
     score.dataset.demoModuleAverage = '';
     const decimal = doc.createElement('span'); decimal.textContent = '.' + M.round(average, .01).toFixed(2).split('.')[1];
     score.replaceChildren(doc.createTextNode(String(Math.floor(M.round(average, .01)))), decimal);
-    write('.module-grade-label', 'Beispiel · mit nächster Note', bench);
+    write('.module-grade-label', EN ? 'Example · with next grade' : 'Beispiel · mit nächster Note', bench);
     const t = (average - 1) / 5;
     bench.querySelector('.mini-scale > i').style.insetInlineEnd = `${(1 - t) * 100}%`;
     bench.querySelector('.mini-scale > b').style.left = `${t * 100}%`;
     const bed = bench.querySelector('.mini-clock-read b');
     bed.dataset.demoModuleBed = ''; bed.textContent = M.clock(night.bed);
     const duration = bench.querySelector('.module-meta b');
-    duration.dataset.demoModuleDuration = ''; duration.textContent = `${M.duration(length)} Schlaf`;
+    duration.dataset.demoModuleDuration = ''; duration.textContent = EN ? `${M.duration(length)} sleep` : `${M.duration(length)} Schlaf`;
     const arc = bench.querySelector('.module-sleep circle[pathLength="100"]');
     arc.setAttribute('stroke-dasharray', `${length / 1440 * 100} ${100 - length / 1440 * 100}`);
     arc.setAttribute('transform', `rotate(${modulo(night.onset) / 4 - 90} 80 80)`);
@@ -65,7 +66,12 @@
     panel.querySelectorAll('[data-demo-panel]').forEach(el => { el.hidden = el.dataset.demoPanel !== name; });
     if (!sample) return;
     const {average, length, bed} = sample;
-    const texts = name === 'grade'
+    const texts = EN ? (name === 'grade'
+      ? [`Ø ${M.round(average, .01).toFixed(2)} · next ${Number(grade.value).toFixed(2)}`, `Example: 4 grades averaging 5.25 + a ${Number(grade.value).toFixed(2)} → ${M.round(average, .01).toFixed(2)}.`]
+      : name === 'sleep'
+        ? [`${M.clock(bed)} → 07:00 · ${M.duration(length)}`, `Example: bed at ${M.clock(bed)}, 10 min to fall asleep, ${M.duration(length)} sleep until 07:00.`]
+        : ['.spass → .csv / .json · local', 'Made-up data. Try the format switch further down.'])
+      : name === 'grade'
       ? [`Ø ${M.round(average, .01).toFixed(2)} · nächste ${Number(grade.value).toFixed(2)}`, `Beispiel: 4 Noten mit Schnitt 5.25 + eine ${Number(grade.value).toFixed(2)} → ${M.round(average, .01).toFixed(2)}.`]
       : name === 'sleep'
         ? [`${M.clock(bed)} → 07:00 · ${M.duration(length)}`, `Beispiel: ${M.clock(bed)} ins Bett, 10 min Einschlafen, ${M.duration(length)} Schlaf bis 07:00.`]
@@ -75,7 +81,7 @@
   }
   function appearance() {
     light.style.setProperty('--progress', `${(Number(light.value) + 100) / 2}%`);
-    light.setAttribute('aria-valuetext', Number(light.value) === 0 ? 'Licht mittig' : `Licht ${Math.abs(Number(light.value))} % ${Number(light.value) < 0 ? 'links' : 'rechts'}`);
+    light.setAttribute('aria-valuetext', EN ? (Number(light.value) === 0 ? 'Light centred' : `Light ${Math.abs(Number(light.value))} % ${Number(light.value) < 0 ? 'left' : 'right'}`) : Number(light.value) === 0 ? 'Licht mittig' : `Licht ${Math.abs(Number(light.value))} % ${Number(light.value) < 0 ? 'links' : 'rechts'}`);
     bench.dispatchEvent(new CustomEvent('benchlook', {detail: {material: material.value, palette: palette.value, light: Number(light.value) / 100}}));
   }
   const input = name => { bench.querySelector(`[data-select="${name}"]`).click(); sync(); };
@@ -97,6 +103,6 @@
   visual.addEventListener('pointerup', () => { start = null; }, {passive: true});
   visual.addEventListener('pointercancel', () => { start = null; }, {passive: true});
   const open = bench.querySelector('[data-scene-link]');
-  const openText = doc.createElement('span'); openText.className = 'scene-open-label'; openText.textContent = 'Tool öffnen'; open.prepend(openText);
+  const openText = doc.createElement('span'); openText.className = 'scene-open-label'; openText.textContent = EN ? 'Open tool' : 'Tool öffnen'; open.prepend(openText);
   sync(); appearance(); availability(); panel.hidden = false;
 })();

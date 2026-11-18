@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0B0D0F">
+  <title>Kilian Pfister — Ideas become tools</title>
+  <meta name="description" content="Small browser tools and side projects by Kilian Pfister: plan grades, work out sleep times, move data locally, plus two apps for iPhone and Mac.">
+  <link rel="canonical" href="https://misterpfister.net/en/">
+  <link rel="alternate" hreflang="de" href="https://misterpfister.net/">
+  <link rel="alternate" hreflang="en" href="https://misterpfister.net/en/">
+  <link rel="alternate" hreflang="x-default" href="https://misterpfister.net/">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Kilian Pfister — Ideas become tools">
+  <meta property="og:description" content="Small browser tools and side projects by Kilian Pfister: plan grades, work out sleep times, move data locally, plus two apps for iPhone and Mac.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:locale:alternate" content="de_CH">
+  <meta property="og:url" content="https://misterpfister.net/en/">
+  <meta property="og:image" content="https://misterpfister.net/assets/og-home.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="misterpfister.net: Small ideas. Real tools.">
+  <meta name="twitter:card" content="summary_large_image">
+  <script src="../assets/transitions.js?v=werkplatz-5-apps5"></script>
+  <script src="../assets/theme.js?v=werkplatz-5-apps5"></script>
+  <link rel="stylesheet" href="../assets/core.css?v=werkplatz-5-apps5">
+  <link rel="stylesheet" href="../assets/home.css?v=werkplatz-5-apps5">
+  <link rel="stylesheet" href="../assets/hero-demo.css?v=werkplatz-5-apps5">
+  <link rel="stylesheet" href="../assets/conversion.css?v=werkplatz-5-apps5">
+  <script src="../assets/motion.js?v=werkplatz-5-apps5" defer></script>
+  <script src="../assets/tool-math.js?v=werkplatz-5-apps5" defer></script>
+  <script src="../assets/workbench.js?v=werkplatz-5-apps5" defer></script>
+  <script src="../assets/hero-gl.js?v=werkplatz-5-apps5" defer></script>
+  <script src="../assets/hero-demo.js?v=werkplatz-5-apps5" defer></script>
+  <script src="../assets/conversion.js?v=werkplatz-5-apps5" defer></script>
+</head>
+<body class="home-page">
+  <a href="#main" class="skip-link">Skip to content</a>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="./" aria-label="misterpfister.net – Home"><span class="brand-mark">m.</span><span class="brand-word">misterpfister<span>.net</span></span></a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#tools">Tools</a>
+        <a href="#apps">Apps</a>
+        <a href="#about">About</a>
+        <a href="../" lang="de" hreflang="de" class="lang-link" aria-label="DE – Deutsche Version">DE</a>
+      </nav>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Change theme"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" data-theme-icon aria-hidden="true"></svg><span class="sr-only" data-theme-label>Light</span></button>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-dot"></span> Kilian Pfister <span class="eyebrow-extra">· Digital workshop</span></p>
+          <h1 id="hero-title"><span class="line"><span>Small ideas.</span></span><br><span class="line"><span class="film-text">Real tools.</span></span></h1>
+          <p class="hero-description">I build things I like to use myself.<br class="desktop-break"> For everyday life. For learning. Out of curiosity.</p>
+          <div class="hero-actions">
+            <a class="button primary" data-magnetic href="../sechserrechner/">Calculate grades <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <a class="button secondary" data-magnetic href="../sleepcalculator/">Plan your sleep <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13a8.1 8.1 0 0 1-9-9 8.5 8.5 0 1 0 9 9Z"/></svg></a>
+          </div>
+          <p class="hero-note">Right in your browser. No sign-up. The calculators are in German.</p>
+          <div class="hero-demo" data-hero-demo hidden>
+            <div class="hero-demo-heading"><span class="status-dot" aria-hidden="true"></span><span>Try it yourself</span><span class="hero-demo-tag">Sample values</span></div>
+            <div class="hero-demo-body" data-demo-panel="grade">
+              <div class="demo-control-label"><label for="demoGrade">Next grade</label><output for="demoGrade" data-demo-grade-value>6.00</output></div>
+              <input class="demo-range" id="demoGrade" data-demo-grade type="range" min="1" max="6" step="0.25" value="6">
+              <p class="demo-answer">Average <span>5.25</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><output for="demoGrade" data-demo-average>5.40</output><span class="demo-answer-note">with the next grade</span></p>
+            </div>
+            <div class="hero-demo-body" data-demo-panel="sleep" hidden>
+              <div class="demo-control-label"><label for="demoSleep">Sleep</label><output for="demoSleep" data-demo-duration>8 h</output></div>
+              <input class="demo-range" id="demoSleep" data-demo-sleep type="range" min="360" max="540" step="15" value="480">
+              <p class="demo-answer">Bed at <output for="demoSleep" data-demo-bed>22:50</output><span class="demo-answer-note">for 07:00 · 10 min to fall asleep</span></p>
+            </div>
+            <div class="hero-demo-body demo-data-intro" data-demo-panel="code" hidden>
+              <p>One record. Two target formats.<br>Watch the fields find their place.</p>
+              <a class="text-cta" href="#format-demo">Try the format switch <span aria-hidden="true">↓</span></a>
+            </div>
+            <details class="hero-look" data-look-panel>
+              <summary><span>Adjust the look</span><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+              <div class="hero-look-controls">
+                <label>Material<select data-look-material><option value="default">Original</option><option value="clear">Glass</option><option value="satin">Satin</option></select></label>
+                <label>Colours<select data-look-palette><option value="original">Original</option><option value="mint">Mint</option><option value="violet">Violet</option></select></label>
+                <label class="look-light">Light<input class="demo-range" data-look-light type="range" min="-100" max="100" step="10" value="0"><span class="sr-only">Move the light from left to right</span></label>
+                <button class="text-button" type="button" data-look-reset>Reset</button>
+              </div>
+            </details>
+          </div>
+        </div>
+        <div class="hero-visual" data-glass data-glass-state="boot" data-glass-form="grade">
+          <div class="glass-stage" aria-hidden="true">
+            <div class="stage-glow"></div>
+            <div class="stage-grid"></div>
+            <svg class="lab-reticle" viewBox="0 0 400 400" focusable="false">
+              <circle class="rt-ring" cx="200" cy="184" r="176" pathLength="1" stroke-width="1" vector-effect="non-scaling-stroke" stroke-dasharray="1"/>
+              <circle class="rt-ticks" cx="200" cy="184" r="169" pathLength="72" transform="rotate(-90.3 200 184)" stroke-width="5" stroke-dasharray=".07 .93"/>
+              <circle class="rt-major" cx="200" cy="184" r="167" pathLength="12" transform="rotate(-90.4 200 184)" stroke-width="9" stroke-dasharray=".012 .988"/>
+              <g class="index" stroke-width="2" stroke-linecap="round"><path d="M200 11v16"/><circle cx="200" cy="8" r="3.2"/></g>
+            </svg>
+            <div class="glass-placeholder"></div>
+            <div class="glass-fallback">
+              <svg data-form="grade" viewBox="0 0 48 48" fill="none" stroke-linecap="round" focusable="false"><defs><linearGradient id="fbFilmG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--film-0)"/><stop offset=".36" style="stop-color:var(--film-1)"/><stop offset=".68" style="stop-color:var(--film-2)"/><stop offset="1" style="stop-color:var(--film-3)"/></linearGradient></defs><path class="fb-ticks" stroke="var(--faint)" stroke-width="1.1" d="M10.71 37.29L8.87 39.13M6.12 29.81L4.69 30.27M5.43 21.06L2.86 20.65M8.79 12.95L7.58 12.07M15.46 7.25L14.28 4.93M24 5.2L24 3.7M32.54 7.25L33.72 4.93M39.21 12.95L40.42 12.07M42.57 21.06L45.14 20.65M41.88 29.81L43.31 30.27M37.29 37.29L39.13 39.13"/><path d="M12.69 35.31A16 16 0 1 1 35.31 35.31" stroke="var(--rule-strong)" stroke-width="2"/><path d="M12.69 35.31A16 16 0 1 1 39.95 25.26" stroke="url(#fbFilmG)" stroke-width="5"/><path d="M24 24 33.97 24.78" stroke="var(--ink)" stroke-width="2"/><circle cx="39.95" cy="25.26" r="3.2" fill="url(#fbFilmG)"/><circle cx="24" cy="24" r="2.4" fill="var(--ink)"/><circle cx="34.26" cy="3.86" r=".9" fill="var(--faint)"/></svg>
+              <svg data-form="sleep" viewBox="0 0 48 48" fill="none" stroke-linecap="round" focusable="false"><defs><linearGradient id="fbFilmS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--film-0)"/><stop offset=".36" style="stop-color:var(--film-1)"/><stop offset=".68" style="stop-color:var(--film-2)"/><stop offset="1" style="stop-color:var(--film-3)"/></linearGradient><mask id="fbCrescent"><rect width="48" height="48" fill="#fff"/><circle cx="27.8" cy="21.3" r="6.7" fill="#000"/></mask></defs><circle cx="24" cy="24" r="20.4" pathLength="24" stroke="var(--faint)" stroke-dasharray=".06 .94" stroke-width="1.8" stroke-linecap="butt"/><circle cx="24" cy="24" r="17" stroke="var(--rule-strong)" stroke-width="2"/><path d="M19.6 7.58A17 17 0 0 1 40.42 28.4" stroke="url(#fbFilmS)" stroke-width="5"/><circle cx="40.42" cy="28.4" r="3.2" fill="url(#fbFilmS)"/><circle cx="24" cy="24" r="8" fill="url(#fbFilmS)" mask="url(#fbCrescent)"/></svg>
+              <svg data-form="code" viewBox="0 0 48 48" fill="none" stroke-linecap="round" stroke-linejoin="round" focusable="false"><defs><linearGradient id="fbFilmC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--film-0)"/><stop offset=".36" style="stop-color:var(--film-1)"/><stop offset=".68" style="stop-color:var(--film-2)"/><stop offset="1" style="stop-color:var(--film-3)"/></linearGradient></defs><path d="M24 7 38.8 15.6v16.8L24 41 9.2 32.4V15.6Z" stroke="url(#fbFilmC)" stroke-width="2.4"/><path d="M9.2 15.6 24 24l14.8-8.4M24 24v17" stroke="url(#fbFilmC)" stroke-width="2.4"/><path d="M16.6 11.3 31.4 19.8M31.4 11.3 16.6 19.8M9.2 24l14.8 8.5 14.8-8.5" stroke="var(--rule-strong)" stroke-width="1.2"/><rect x="35" y="4" width="8" height="8" rx="2" fill="var(--data-gfx)"/></svg>
+            </div>
+            <canvas class="glass-canvas"></canvas>
+          </div>
+          <ol class="orb-captions" aria-hidden="true"><li data-form="grade" data-active>01 Grades</li><li data-form="sleep">02 Sleep</li><li data-form="code">03 Data</li></ol>
+          <div class="workbench" data-workbench data-selection="grade">
+            <div class="scene-hud" aria-hidden="true"><span data-hud-channel>CH 01 · GRADES</span><span data-hud-data>Ø 5.25 · 4 grades</span></div>
+            <!-- The front label opens its tool; back labels come forward. The dock is the accessible control; the object plays a finite effect. -->
+            <div class="scene" aria-hidden="true">
+              <div class="scene-stage">
+                <a class="module module-code" href="https://github.com/misterpfister8/spasstocsv" target="_blank" rel="noopener noreferrer" data-module="code" tabindex="-1"><span class="module-kicker">03 · SpasstoCSV</span><span class="file-badge">.spass</span><span class="file-route"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg><b>.csv</b></span><span class="module-foot">Local. In your format.</span></a>
+                <a class="module module-sleep" href="../sleepcalculator/" data-module="sleep" tabindex="-1"><span class="module-kicker">02 · Plan your sleep</span><span class="module-row"><span class="mini-clock" aria-hidden="true"><svg viewBox="0 0 160 160"><circle cx="80" cy="80" r="64" fill="none" stroke="currentColor" stroke-opacity=".16" stroke-width="11"/><circle cx="80" cy="80" r="64" fill="none" stroke="var(--sleep-gfx)" stroke-width="11" pathLength="100" stroke-dasharray="33.3333 66.6667" transform="rotate(-105 80 80)"/><circle cx="80" cy="80" r="64" fill="none" stroke="var(--data-gfx)" stroke-width="11" pathLength="1440" stroke-dasharray="10 1430" transform="rotate(-107.5 80 80)"/><circle cx="80" cy="80" r="49" fill="none" stroke="currentColor" stroke-opacity=".2" stroke-dasharray="1 9"/></svg><span class="mini-clock-read"><span>BEDTIME</span><b>22:50</b></span></span><span class="module-meta"><b>8 h sleep</b><span>up at 07:00</span></span></span></a>
+                <a class="module module-grade" href="../sechserrechner/" data-module="grade" tabindex="-1"><span class="module-kicker">01 · Calculate grades</span><span class="module-grade-label">Example · average</span><span class="module-score">5<span>.25</span></span><span class="mini-scale"><i></i><b></b></span><span class="module-foot">1.00 <span>6.00</span></span></a>
+              </div>
+            </div>
+            <div class="scene-dock glass">
+              <div class="scene-switches" role="group" aria-label="Choose tool preview">
+                <button type="button" data-select="grade" aria-pressed="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.34 17.66A8 8 0 1 1 17.66 17.66"/><path d="M12 12l5.2.4"/><circle cx="12" cy="12" r="1.2"/></svg> Grades</button>
+                <button type="button" data-select="sleep" aria-pressed="false"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path stroke-width="3" d="M9.8 3.79A8.5 8.5 0 0 1 20.21 14.2"/><path transform="translate(8 8) scale(.34)" stroke-width="4.7" d="M20 13a8.1 8.1 0 0 1-9-9 8.5 8.5 0 1 0 9 9Z"/></svg> Sleep</button>
+                <button type="button" data-select="code" aria-pressed="false"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 19.4 7.8v8.4L12 20.5l-7.4-4.3V7.8Z"/><path d="M4.6 7.8 12 12l7.4-4.2M12 12v8.5"/></svg> Data</button>
+              </div>
+              <a data-scene-link href="../sechserrechner/" aria-label="Open grade calculator"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a>
+            </div>
+            <p class="scene-note" data-scene-note>Example: (4.5 + 5.5 + 5 + 6) ÷ 4 = 5.25.</p>
+            <p class="object-hint" data-object-hint>Drag to rotate</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="discipline-strip" aria-hidden="true"><div class="wrap"><span>System engineering</span><b>+</b><span>Automation</span><b>+</b><span>Open source</span><b>+</b><span>Local first</span></div></div>
+    <section id="tools" class="tools-section" aria-labelledby="tools-title">
+      <div class="wrap">
+        <div class="section-heading reveal">
+          <div>
+            <p class="eyebrow">Fewer detours, more use</p>
+            <h2 id="tools-title">Your next<br> little helper.</h2>
+          </div>
+          <span class="section-note">Two calculators in your browser, in German.<br>The apps follow further down.</span>
+        </div>
+        <div class="tool-grid">
+          <a class="tool-card card-grade" data-transition-card="grade" data-spotlight href="../sechserrechner/">
+            <div class="card-heading">
+              <span class="tool-number">01 / Grades · Example</span>
+              <span class="round-arrow"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span>
+            </div>
+            <div class="card-reveal reveal grade-preview" aria-hidden="true">
+              <svg class="mini-gauge" viewBox="0 0 120 120" fill="none" stroke-linecap="round"><path stroke="var(--rule-strong)" stroke-width="2" d="M23.94 96.06L20.4 99.6M11.5 75.76L8.64 76.69M9.63 52.02L4.69 51.24M18.74 30.02L16.31 28.26M36.85 14.56L34.58 10.1M60 9L60 6M83.15 14.56L85.42 10.1M101.26 30.02L103.69 28.26M110.37 52.02L115.31 51.24M108.5 75.76L111.36 76.69M96.06 96.06L99.6 99.6"/><path stroke="var(--surface-3)" stroke-width="7" d="M27.47 92.53A46 46 0 1 1 92.53 92.53"/><path class="mg-fill" pathLength="1" stroke="var(--grade-gfx)" stroke-width="7" d="M27.47 92.53A46 46 0 1 1 92.53 92.53"/><circle cx="86.33" cy="8.32" r="2.4" fill="var(--muted)"/><g class="mg-needle"><path d="M60 60 89.91 62.35" stroke="var(--ink)" stroke-width="2.4"/><circle cx="105.86" cy="63.61" r="5.5" fill="var(--grade-gfx)" stroke="var(--surface)" stroke-width="3"/></g><circle cx="60" cy="60" r="4" fill="var(--ink)"/><text class="g-value" x="60" y="104" fill="var(--ink)" text-anchor="middle">5.25</text></svg>
+              <div class="preview-stats"><span>Your average<strong data-count-to="5.25" data-count-from="1">5.25</strong></span><span class="forecast">Next grade 6.0<strong data-count-to="5.40" data-count-from="1">5.40</strong></span></div>
+              <div class="preview-chart"><span style="--bar:.7">4.5</span><span style="--bar:.9">5.5</span><span style="--bar:.8">5.0</span><span style="--bar:1">6.0</span><span class="ghost-bar" style="--bar:1">6.0</span></div>
+            </div>
+            <div class="card-bottom card-reveal reveal">
+              <h3>Your next grade?<br>No guesswork.</h3>
+              <p>Weighted average, target grade and what-if, on the Swiss 1–6 scale. With subjects and local storage.</p>
+              <ul class="feature-chips" aria-label="Features"><li>Weighted</li><li>Target grade</li><li>What-if</li><li>Points</li></ul>
+              <span class="text-cta">Open grade calculator (German) <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            </div>
+          </a>
+          <a class="tool-card card-sleep" data-transition-card="sleep" data-spotlight href="../sleepcalculator/">
+            <div class="card-heading">
+              <span class="tool-number">02 / Sleep · Example</span>
+              <span class="round-arrow"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></span>
+            </div>
+            <div class="card-reveal reveal sleep-preview" aria-hidden="true">
+              <div class="mini-clock" aria-hidden="true"><svg viewBox="0 0 160 160"><circle cx="80" cy="80" r="64" fill="none" stroke="currentColor" stroke-opacity=".16" stroke-width="11"/><circle cx="80" cy="80" r="64" fill="none" stroke="var(--sleep-gfx)" stroke-width="11" pathLength="100" stroke-dasharray="33.3333 66.6667" transform="rotate(-105 80 80)"/><circle cx="80" cy="80" r="64" fill="none" stroke="var(--data-gfx)" stroke-width="11" pathLength="1440" stroke-dasharray="10 1430" transform="rotate(-107.5 80 80)"/><circle cx="80" cy="80" r="49" fill="none" stroke="currentColor" stroke-opacity=".2" stroke-dasharray="1 9"/></svg><div><span>BEDTIME</span><b>22:50</b></div></div>
+              <div class="sleep-preview-time"><span>WAKE UP</span><b>07:00</b><span>8 h sleep + 10 min to fall asleep.</span></div>
+            </div>
+            <div class="card-bottom card-reveal reveal">
+              <h3>Switch off.<br>At the right time.</h3>
+              <p>Your sleep schedule at a glance. Freely adjustable, calculated instantly and remembered.</p>
+              <ul class="feature-chips" aria-label="Features"><li>24-h clock</li><li>Presets</li><li>Bed now</li></ul>
+              <span class="text-cta">Open sleep calculator (German) <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            </div>
+          </a>
+        </div>
+        <p class="privacy-line"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></svg> What you enter in the calculators is never sent anywhere. It is stored only in this browser.</p>
+      </div>
+    </section>
+    <section class="project-story" aria-labelledby="story-title">
+      <div class="wrap">
+        <div class="story-slab panel tint-code">
+          <div class="story-copy reveal">
+            <p class="eyebrow">03 / Open Source · Python</p>
+            <h2 id="story-title">Your data.<br>A fresh start.</h2>
+            <p>SpasstoCSV helps you move from Samsung Pass to another password manager. The conversion runs locally on your computer.</p>
+            <a class="button secondary" data-magnetic href="https://github.com/misterpfister8/spasstocsv" target="_blank" rel="noopener noreferrer">Project on GitHub <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a>
+            <div class="story-glyph parallax" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none" stroke-linecap="round" stroke-linejoin="round" focusable="false"><defs><linearGradient id="storyFilm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--film-0)"/><stop offset=".36" style="stop-color:var(--film-1)"/><stop offset=".68" style="stop-color:var(--film-2)"/><stop offset="1" style="stop-color:var(--film-3)"/></linearGradient></defs><path d="M24 7 38.8 15.6v16.8L24 41 9.2 32.4V15.6Z" stroke="url(#storyFilm)" stroke-width="1.6"/><path d="M9.2 15.6 24 24l14.8-8.4M24 24v17" stroke="url(#storyFilm)" stroke-width="1.6"/><rect x="35" y="4" width="8" height="8" rx="2" fill="var(--data-gfx)"/></svg></div>
+          </div>
+          <div class="story-demo reveal" id="format-demo" data-conversion-demo data-conversion-stage="output" data-conversion-playing="false">
+            <div class="demo-top"><span class="demo-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="demo-title">spasstocsv · format example</span><span class="demo-tag"><span class="status-dot"></span> Made-up sample data</span></div>
+            <div class="conversion">
+              <span class="conversion-file">.spass<small>Your export</small></span>
+              <span class="conversion-line" aria-hidden="true"><i></i><svg viewBox="0 0 12 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4 5l7 7-7 7"/></svg></span>
+              <span class="conversion-file converted" data-conversion-format>.csv<small>Your format</small></span>
+            </div>
+            <ol class="conversion-progress" aria-label="Steps of the format example">
+              <li data-conversion-step="export" data-state="done"><span>01</span>Export</li>
+              <li data-conversion-step="mapping" data-state="done"><span>02</span>Map</li>
+              <li data-conversion-step="output" data-state="current" aria-current="step"><span>03</span>Output</li>
+            </ol>
+            <div class="conversion-flow" aria-hidden="true">
+              <div class="conversion-bays"><div class="conversion-bay"><span>Export fields</span></div><div class="conversion-bay conversion-bay-target"><span>Target fields</span></div></div>
+              <div class="conversion-fields">
+                <div class="conversion-field"><span class="conversion-field-key"><span>Title</span><span data-conversion-key="name">name</span></span><span class="conversion-field-value">Example 1</span></div>
+                <div class="conversion-field"><span class="conversion-field-key"><span>Address</span><span data-conversion-key="url">url</span></span><span class="conversion-field-value">example.com</span></div>
+                <div class="conversion-field"><span class="conversion-field-key"><span>Login</span><span data-conversion-key="username">username</span></span><span class="conversion-field-value">demo.01</span></div>
+              </div>
+            </div>
+            <div class="conversion-controls">
+              <div class="demo-tabs" role="group" aria-label="Sample output format">
+                <button type="button" data-format="csv" aria-pressed="true">CSV</button>
+                <button type="button" data-format="json" aria-pressed="false">Bitwarden JSON</button>
+              </div>
+              <button class="conversion-run" type="button" data-conversion-run aria-describedby="conversion-note">Play the example</button>
+            </div>
+            <p class="conversion-status" data-conversion-status role="status" aria-live="polite" aria-atomic="true">3 / Output · two sample records as CSV.</p>
+            <div class="conversion-output">
+              <pre class="code-example" data-conversion-example aria-label="Made-up sample output">name,url,username
+Example 1,https://example.com/1,demo.01
+Example 2,https://example.com/2,demo.02</pre>
+              <span class="conversion-pending" data-conversion-pending aria-hidden="true">Loading sample export …</span>
+            </div>
+            <p class="fineprint" id="conversion-note">Made-up, shortened data for illustration; passwords left out. The real converter runs locally on your computer. This website does not process any exports. Plain-text exports contain sensitive data.</p>
+          </div>
+          <details class="story-details disclosure">
+            <summary>What is behind the project <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+            <div class="story-steps">
+              <div>
+                <span>01 / THE PROBLEM</span>
+                <h3>An export is not yet a move.</h3>
+                <p>Samsung Pass exports come in the .spass format. Other password managers expect a different data format.</p>
+              </div>
+              <div>
+                <span>02 / THE APPROACH</span>
+                <h3>The data stays local.</h3>
+                <p>The Python tool decrypts the export locally. Target formats: raw CSV, Chrome CSV, Proton CSV and Bitwarden JSON. Details and limits are in the linked project README.</p>
+              </div>
+              <div>
+                <span>03 / IMPORTANT</span>
+                <h3>Handle plain text with care.</h3>
+                <p>CSV and JSON output contains sensitive data in plain text. Delete it after importing and never share it publicly.</p>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+    <section id="apps" class="app-teaser-section" aria-labelledby="wisper-teaser-title">
+      <div class="wrap">
+        <a class="app-teaser reveal" data-transition-card="wisper" data-spotlight href="./wisperpfister/">
+          <div class="teaser-copy">
+            <span class="tool-number">04 / App · Mac and iPhone · Coming soon</span>
+            <h2 id="wisper-teaser-title">Speak instead of typing.</h2>
+            <p>Wisperpfister: hold a key, speak, let go. The text lands in the field. Recognition and clean-up run on the device.</p>
+            <span class="text-cta">More about Wisperpfister <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          </div>
+          <span class="teaser-wave" aria-hidden="true"><i style="--h:.24"></i><i style="--h:.46"></i><i style="--h:.73"></i><i style="--h:1"></i><i style="--h:.73"></i><i style="--h:.46"></i><i style="--h:.24"></i></span>
+          <span class="round-arrow" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18 18 6M6 6h12v12"/></svg></span>
+        </a>
+      </div>
+    </section>
+    <section class="app-story" aria-labelledby="app-title">
+      <div class="wrap">
+        <a class="app-slab panel reveal" href="./pfisterkiste/">
+          <img class="app-icon" data-transition-card="kiste" src="../assets/pfisterkiste-icon.webp" width="112" height="112" alt="" loading="lazy">
+          <div class="app-slab-copy">
+            <p class="eyebrow">05 / iOS app · SwiftUI</p>
+            <h2 id="app-title">Pfisterkiste.</h2>
+            <p>Eleven games for iPhone and iPad, from chess and nine men’s morris to pool and mini golf. Free, no ads, no account.</p>
+          </div>
+          <span class="text-cta">See the app <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </a>
+      </div>
+    </section>
+    <section class="about-section" id="about" aria-labelledby="about-title">
+      <div class="wrap about-grid">
+        <div class="about-head reveal">
+          <p class="eyebrow">Behind the workshop</p>
+          <h2 id="about-title"><span class="w">Understand</span> <span class="w" style="--wi:1">technology.</span><br><span class="w" style="--wi:2">Build</span> <span class="w" style="--wi:3">things</span> <span class="w" style="--wi:4">myself.</span></h2>
+        </div>
+        <div class="about-copy reveal">
+          <p>I’m Kilian, from Switzerland. I work on system engineering, automation and software. This is where small fixes for real everyday problems end up – and projects where I learn something new.</p>
+          <a class="text-cta" href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">More from me on GitHub <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a>
+        </div>
+        <span class="about-signature parallax" aria-hidden="true">kp.</span>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap footer-row">
+      <span>© 2026 Kilian Pfister</span>
+      <span class="footer-note">Small tools. No detours.</span>
+      <a href="../" lang="de" hreflang="de">Deutsch</a>
+      <a href="https://github.com/misterpfister8" target="_blank" rel="noopener noreferrer">GitHub <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M6 6h12v12"/></svg></a>
+      <a class="footer-top" href="#main">Back to top <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></a>
+    </div>
+    <div class="wrap"><svg class="footer-mark" data-spotlight viewBox="0 0 1000 160" aria-hidden="true" focusable="false"><text class="mark-base" x="0" y="132" textLength="1000" lengthAdjust="spacingAndGlyphs">misterpfister</text><text class="mark-lit" x="0" y="132" textLength="1000" lengthAdjust="spacingAndGlyphs">misterpfister</text></svg></div>
+  </footer>
+</body>
+</html>

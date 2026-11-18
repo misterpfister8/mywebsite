@@ -4,6 +4,7 @@
   'use strict';
   const root = document.querySelector('[data-kiste-puzzle]');
   if (!root) return;
+  const EN = document.documentElement.lang.startsWith('en');
   const n = 3, solved = [1, 2, 3, 4, 5, 6, 7, 8, 0];
   const status = root.querySelector('[data-kiste-status]'), shuffleButton = root.querySelector('[data-kiste-shuffle]');
   const tiles = new Map([...root.querySelectorAll('[data-tile]')].map((el) => [Number(el.dataset.tile), el]));
@@ -19,7 +20,7 @@
       const el = tiles.get(v), x = i % n, y = Math.floor(i / n);
       el.style.setProperty('--x', x); el.style.setProperty('--y', y);
       el.disabled = done || (x !== gap % n && y !== Math.floor(gap / n));
-      el.setAttribute('aria-label', `${v}, Reihe ${y + 1}, Spalte ${x + 1}`);
+      el.setAttribute('aria-label', EN ? `${v}, row ${y + 1}, column ${x + 1}` : `${v}, Reihe ${y + 1}, Spalte ${x + 1}`);
     });
   }
 
@@ -40,10 +41,10 @@
     if (isSolved()) {
       root.dataset.solved = '';
       if (focused) shuffleButton.focus(); // the solved tiles are disabled now
-      say(`<strong>Gelöst!</strong> In ${moves} ${moves === 1 ? 'Zug' : 'Zügen'}. In der App gibt es dazu Bestwerte und eine Fanfare.`);
-      shuffleButton.textContent = 'Nochmal mischen';
+      say(EN ? `<strong>Solved!</strong> In ${moves} ${moves === 1 ? 'move' : 'moves'}. The app adds best scores and a fanfare.` : `<strong>Gelöst!</strong> In ${moves} ${moves === 1 ? 'Zug' : 'Zügen'}. In der App gibt es dazu Bestwerte und eine Fanfare.`);
+      shuffleButton.textContent = EN ? 'Shuffle again' : 'Nochmal mischen';
     } else {
-      say(`${moves} ${moves === 1 ? 'Zug' : 'Züge'}`);
+      say(EN ? `${moves} ${moves === 1 ? 'move' : 'moves'}` : `${moves} ${moves === 1 ? 'Zug' : 'Züge'}`);
     }
   }
 
@@ -60,9 +61,9 @@
     } while (isSolved());
     moves = 0;
     delete root.dataset.solved;
-    shuffleButton.textContent = 'Mischen';
+    shuffleButton.textContent = EN ? 'Shuffle' : 'Mischen';
     render();
-    say('Gemischt. Bring die Zahlen in die Reihenfolge 1 bis 8.');
+    say(EN ? 'Shuffled. Put the numbers in order, 1 to 8.' : 'Gemischt. Bring die Zahlen in die Reihenfolge 1 bis 8.');
   }
 
   root.addEventListener('click', (e) => {

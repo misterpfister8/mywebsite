@@ -3,6 +3,7 @@
   'use strict';
   const demo = document.querySelector('[data-conversion-demo]');
   if (!demo) return;
+  const EN = document.documentElement.lang.startsWith('en');
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const format = demo.querySelector('[data-conversion-format]');
@@ -13,8 +14,8 @@
   const steps = [...demo.querySelectorAll('[data-conversion-step]')];
   const pending = demo.querySelector('[data-conversion-pending]');
   const rows = [
-    { name: 'Beispiel 1', url: 'https://example.com/1', username: 'demo.01' },
-    { name: 'Beispiel 2', url: 'https://example.com/2', username: 'demo.02' },
+    { name: EN ? 'Example 1' : 'Beispiel 1', url: 'https://example.com/1', username: 'demo.01' },
+    { name: EN ? 'Example 2' : 'Beispiel 2', url: 'https://example.com/2', username: 'demo.02' },
   ];
   let selected = 'csv', playing = false, sequence = 0;
   const timers = new Set();
@@ -47,12 +48,16 @@
       if (i === index) step.setAttribute('aria-current', 'step');
       else step.removeAttribute('aria-current');
     });
-    const messages = {
+    const messages = EN ? {
+      export: '1 / Export · loading two made-up entries.',
+      mapping: '2 / Map · title, address and login become target fields.',
+      output: `3 / Output · two sample records as ${selected === 'json' ? 'Bitwarden JSON' : 'CSV'}.`,
+    } : {
       export: '1 / Export · zwei erfundene Einträge laden.',
       mapping: '2 / Zuordnen · Titel, Adresse und Anmeldung werden Zielfelder.',
       output: `3 / Ausgabe · zwei Beispieldatensätze als ${selected === 'json' ? 'Bitwarden JSON' : 'CSV'}.`,
     };
-    pending.textContent = name === 'export' ? 'Beispiel-Export laden …' : 'Felder neu zuordnen …';
+    pending.textContent = name === 'export' ? (EN ? 'Loading sample export …' : 'Beispiel-Export laden …') : (EN ? 'Mapping fields …' : 'Felder neu zuordnen …');
     example.setAttribute('aria-hidden', String(name !== 'output'));
     // Initial paint must not generate a live-region announcement.
     if (announce || document.hidden) status.textContent = messages[name];
@@ -60,7 +65,7 @@
   function complete(announce = true) {
     playing = false;
     demo.dataset.conversionPlaying = 'false';
-    run.textContent = 'Beispiel durchspielen';
+    run.textContent = EN ? 'Play the example' : 'Beispiel durchspielen';
     stage('output', announce);
   }
   function play() {

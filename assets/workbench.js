@@ -9,10 +9,17 @@
     const link = bench.querySelector('[data-scene-link]'), note = bench.querySelector('[data-scene-note]');
     const hud = [bench.querySelector('[data-hud-channel]'), bench.querySelector('[data-hud-data]')];
     const visual = bench.closest('.hero-visual');
-    const modules = {
-      grade: { href: './sechserrechner/', label: 'Notenrechner öffnen', note: 'Beispiel: (4.5 + 5.5 + 5 + 6) ÷ 4 = 5.25.', hud: ['CH 01 · NOTEN', 'Ø 5.25 · 4 Noten'] },
-      sleep: { href: './sleepcalculator/', label: 'Schlafrechner öffnen', note: 'Beispiel: 22:50 ins Bett, 10 min Einschlafen, 8 h Schlaf bis 07:00.', hud: ['CH 02 · SCHLAF', '22:50 → 07:00 · 8 h'] },
-      code: { href: 'https://github.com/misterpfister8/spasstocsv', label: 'SpasstoCSV auf GitHub öffnen', note: 'Formatbeispiel: .spass zu CSV oder Bitwarden JSON. Der Konverter läuft lokal.', hud: ['CH 03 · DATEN', '.spass → .csv · lokal'] },
+    const EN = document.documentElement.lang.startsWith('en');
+    // Links come from the labels, so they resolve from /en/ too.
+    const hrefOf = (name) => bench.querySelector(`[data-module="${name}"]`).getAttribute('href');
+    const modules = EN ? {
+      grade: { href: hrefOf('grade'), label: 'Open grade calculator', note: 'Example: (4.5 + 5.5 + 5 + 6) ÷ 4 = 5.25.', hud: ['CH 01 · GRADES', 'Ø 5.25 · 4 grades'] },
+      sleep: { href: hrefOf('sleep'), label: 'Open sleep calculator', note: 'Example: bed at 22:50, 10 min to fall asleep, 8 h sleep until 07:00.', hud: ['CH 02 · SLEEP', '22:50 → 07:00 · 8 h'] },
+      code: { href: hrefOf('code'), label: 'Open SpasstoCSV on GitHub', note: 'Format example: .spass to CSV or Bitwarden JSON. The converter runs locally.', hud: ['CH 03 · DATA', '.spass → .csv · local'] },
+    } : {
+      grade: { href: hrefOf('grade'), label: 'Notenrechner öffnen', note: 'Beispiel: (4.5 + 5.5 + 5 + 6) ÷ 4 = 5.25.', hud: ['CH 01 · NOTEN', 'Ø 5.25 · 4 Noten'] },
+      sleep: { href: hrefOf('sleep'), label: 'Schlafrechner öffnen', note: 'Beispiel: 22:50 ins Bett, 10 min Einschlafen, 8 h Schlaf bis 07:00.', hud: ['CH 02 · SCHLAF', '22:50 → 07:00 · 8 h'] },
+      code: { href: hrefOf('code'), label: 'SpasstoCSV auf GitHub öffnen', note: 'Formatbeispiel: .spass zu CSV oder Bitwarden JSON. Der Konverter läuft lokal.', hud: ['CH 03 · DATEN', '.spass → .csv · lokal'] },
     };
     let visible = true, frame = 0, selectionUntil = 0;
     let x = 0, y = 0, tx = 0, ty = 0;
