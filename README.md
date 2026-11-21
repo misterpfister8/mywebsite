@@ -4,7 +4,7 @@ Digitaler Werkplatz von Kilian Pfister: [Startseite](https://misterpfister.net/)
 [Notenrechner](https://misterpfister.net/sechserrechner/),
 [Schlafrechner](https://misterpfister.net/sleepcalculator/) und die Seiten zu den Apps
 [Wisperpfister](https://misterpfister.net/wisperpfister/) und
-[Pfisterkiste](https://misterpfister.net/pfisterkiste/).
+[Spielchischte](https://misterpfister.net/spielchischte/).
 
 Statisches HTML, CSS und JavaScript. Keine Laufzeitpakete, externen Schriftdateien,
 Konten oder Tracking-Skripte. GitHub Pages veröffentlicht `main` aus dem Repository-
@@ -64,12 +64,12 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
   Unterstützte Formate laut dessen öffentlicher README: Raw-, Chrome- und
   Proton-CSV sowie Bitwarden JSON. Die Website nimmt keine Passwortdateien an.
 
-- Pfisterkiste (`/pfisterkiste/`): Seite zur iOS-App (elf Spiele in drei
+- Spielchischte (`/spielchischte/`): Seite zur iOS-App (elf Spiele in drei
   Abteilungen: Knobeln, Brettspiele, Geschick), verlinkt über einen Teaser auf der Startseite, dessen Icon per View
   Transition ins Seiten-Icon übergeht. Ein spielbares 3 × 3-Schiebepuzzle startet
   in der Stellung des App-Icons (ein Zug bis zur Lösung); Steine sind Buttons,
   Pfeiltasten schieben den Nachbarn der Lücke. Status «Bald im App Store» (ohne Beta-Aufruf), dazu Looks, Support-Kontakt
-  (`pfisterkiste@misterpfister.net`) und unter `/pfisterkiste/datenschutz/` die
+  (`pfisterkiste@misterpfister.net`) und unter `/spielchischte/datenschutz/` die
   Datenschutzerklärung der App (Support- und Datenschutz-URL für den App Store).
 
 - Wisperpfister (`/wisperpfister/`): Kurzvorstellung der Diktier-App für Mac
@@ -88,7 +88,7 @@ Root. `CNAME` und die drei bestehenden URLs bleiben erhalten.
   ausgeliefert wird. `sitemap.xml` und `robots.txt` liegen im Root. Die
   Startseiten-Navigation führt zu Werkzeugen, Apps und «Über mich».
 
-- Englisch (`/en/`): Startseite, Pfisterkiste und Wisperpfister samt
+- Englisch (`/en/`): Startseite, Spielchischte und Wisperpfister samt
   Datenschutzerklärungen (`/en/…/privacy/`) gibt es auch auf Englisch. Deutsch
   bleibt Hauptsprache und `x-default`; die Rechner bleiben deutsch. Jedes Paar
   verweist per `hreflang` aufeinander und über «EN»/«DE» in der Navigation.
@@ -208,7 +208,7 @@ Backbuffer-Grösse, `HeroGL.render()` erzwingt ein Bild.
 | `assets/tool-math.js` | Reine Rechenfunktionen, inklusive Zifferblatt-Mathematik |
 | `assets/tool-storage.js` | Kapselt den Browser-Speicher |
 | `assets/grades.js`, `assets/sleep.js` | Steuern die beiden Rechner |
-| `assets/kiste.css`, `assets/kiste.js`, `assets/pfisterkiste-icon.webp` | Pfisterkiste-Seiten: Schiebepuzzle, Spiele, Looks, Support, Datenschutz |
+| `assets/kiste.css`, `assets/kiste.js`, `assets/spielchischte-icon.webp` | Spielchischte-Seiten: Schiebepuzzle, Spiele, Looks, Support, Datenschutz |
 | `assets/wisper.css`, `assets/wisper.js` | Wisperpfister-Seite: Beispielablauf, Plattformen, Datenschutz, Verfügbarkeit |
 
 Die Speicherschlüssel und -formate bleiben unverändert

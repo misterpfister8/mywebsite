@@ -11,7 +11,7 @@
       const { origin, pathname: p } = new URL(url, location.href);
       if (!url || origin !== location.origin) return null;
       return p.includes('/sechserrechner/') ? 'grade' : p.includes('/sleepcalculator/') ? 'sleep' : p.includes('/wisperpfister/') ? 'wisper'
-        : p.includes('/pfisterkiste/datenschutz/') ? 'privacy' : p.includes('/pfisterkiste/') ? 'kiste' : 'home';
+        : p.includes('/spielchischte/datenschutz/') ? 'privacy' : p.includes('/spielchischte/') ? 'kiste' : 'home';
     } catch { return null; }
   };
   const inView = (el) => {

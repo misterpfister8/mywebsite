@@ -451,7 +451,7 @@ def run(review):
         stylesheets(r)
     # Both motion modes, both themes and every relevant layout boundary (plus the hero without WebGL).
     small_targets = {}  # collected across the sweep, asserted once so every layout is still checked
-    for route, name in [('', 'home'), ('?gl=off', 'home-fallback'), ('sechserrechner/', 'grade'), ('sleepcalculator/', 'sleep'), ('wisperpfister/', 'wisper'), ('pfisterkiste/', 'kiste'), ('pfisterkiste/datenschutz/', 'privacy'), ('wisperpfister/datenschutz/', 'wisper-privacy'), ('en/', 'en-home'), ('en/wisperpfister/', 'en-wisper'), ('en/pfisterkiste/', 'en-kiste')]:
+    for route, name in [('', 'home'), ('?gl=off', 'home-fallback'), ('sechserrechner/', 'grade'), ('sleepcalculator/', 'sleep'), ('wisperpfister/', 'wisper'), ('spielchischte/', 'kiste'), ('spielchischte/datenschutz/', 'privacy'), ('wisperpfister/datenschutz/', 'wisper-privacy'), ('en/', 'en-home'), ('en/wisperpfister/', 'en-wisper'), ('en/spielchischte/', 'en-kiste')]:
         p = r.open(route)
         if name == 'grade':
             p.locator('#loadExample').click(); p.locator('#closeToast').click()
@@ -1194,7 +1194,7 @@ def wisper_page(r):
 
 def reveals(r):
     """Scroll reveals have settled once their block is fully in view (spec §4.4)."""
-    for route in ['', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/']:
+    for route in ['', 'sleepcalculator/', 'wisperpfister/', 'spielchischte/']:
         for viewport in [{'width': 1440, 'height': 900}, {'width': 390, 'height': 844}]:
             p = r.open(route, media={'reduced_motion': 'no-preference'}, viewport=viewport)
             count = p.evaluate("document.querySelectorAll('.reveal').length")
@@ -1203,10 +1203,10 @@ def reveals(r):
 
 
 def kiste(r):
-    """Pfisterkiste page: the home teaser links to it, the 3 x 3 puzzle starts one move from solved, slides, solves and shuffles."""
+    """Spielchischte page: the home teaser links to it, the 3 x 3 puzzle starts one move from solved, slides, solves and shuffles."""
     p = r.open()
-    r.check(p.locator('.app-slab').get_attribute('href') == './pfisterkiste/', 'The home teaser links to the Pfisterkiste page')
-    p = r.open('pfisterkiste/')
+    r.check(p.locator('.app-slab').get_attribute('href') == './spielchischte/', 'The home teaser links to the Spielchischte page')
+    p = r.open('spielchischte/')
     tiles = "[...document.querySelectorAll('[data-tile]')]"
     enabled = lambda: p.evaluate(f"{tiles}.filter(b => !b.disabled).map(b => b.textContent)")
     r.check(sorted(enabled()) == ['2', '5', '7', '8'], f'Only tiles in line with the gap can move: {enabled()}')
@@ -1224,7 +1224,7 @@ def kiste(r):
 
 def tab_order(r):
     """Every Tab stop is visible, at least 8x8 px and scrolled into view: no invisible focus targets (spec §9)."""
-    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/', 'pfisterkiste/datenschutz/', 'wisperpfister/datenschutz/']:
+    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'spielchischte/', 'spielchischte/datenschutz/', 'wisperpfister/datenschutz/']:
         for viewport in [{'width': 1440, 'height': 1000}, {'width': 390, 'height': 844}]:
             p = r.open(route, viewport=viewport)
             if route == 'sechserrechner/':
@@ -1238,13 +1238,13 @@ def tab_order(r):
                 stops += 1
                 if stop['bad']: bad.append(stop['name'])
             # Wisperpfister and the privacy policy have no form: 11 stops on phones (the back link is hidden there).
-            r.check(stops >= (10 if route in ('wisperpfister/', 'pfisterkiste/datenschutz/') else 6 if route == 'wisperpfister/datenschutz/' else 12) and not bad, f'Every Tab stop is visible: {route or "home"} {viewport["width"]}px, {stops} stops {bad}')
+            r.check(stops >= (10 if route in ('wisperpfister/', 'spielchischte/datenschutz/') else 6 if route == 'wisperpfister/datenschutz/' else 12) and not bad, f'Every Tab stop is visible: {route or "home"} {viewport["width"]}px, {stops} stops {bad}')
 
 
 def stylesheets(r):
     """Chromium accepts every declaration, selector and condition of the site's stylesheets (apart from deliberate cross-engine CSS)."""
     checked = set()
-    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/']:
+    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'spielchischte/']:
         p = r.open(route)
         items = []
         for href in p.evaluate("[...document.querySelectorAll('link[rel=stylesheet]')].map(link => link.href)"):

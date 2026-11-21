@@ -119,7 +119,7 @@ PAIRS = '''()=>{
   for (const [selector, label] of [['.wisper-demo', 'wisper demo'], ['.wisper-facts', 'wisper facts'], ['.platform-card', 'wisper platform'], ['.wisper-privacy', 'wisper privacy'], ['.wisper-soon', 'wisper availability']])
     for (const panel of document.querySelectorAll(selector))
       componentText(panel, 'h2, h3, p, li span, li b, .tag, .wisper-label, .wisper-step-num, kbd, del, .wisper-chips li, .button', label);
-  // Pfisterkiste pages: every text on its nearest opaque surface; the home teaser on its panel gradient.
+  // Spielchischte pages: every text on its nearest opaque surface; the home teaser on its panel gradient.
   const kiste = document.querySelector('.kiste-page main');
   if (kiste) componentText(kiste, ':is(h1, h2, h3, p, li, span, strong, a, dt, dd, button):not([aria-hidden="true"], [aria-hidden="true"] *, .film-text)', 'kiste text');
   const appSlab = document.querySelector('.app-slab');
@@ -149,7 +149,7 @@ seen = {}
 with sync_playwright() as w:
     b = w.chromium.launch()
     p = b.new_page(viewport={'width': 1440, 'height': 1000}, reduced_motion='reduce')
-    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'pfisterkiste/', 'pfisterkiste/datenschutz/', 'wisperpfister/datenschutz/']:
+    for route in ['', 'sechserrechner/', 'sleepcalculator/', 'wisperpfister/', 'spielchischte/', 'spielchischte/datenschutz/', 'wisperpfister/datenschutz/']:
         p.goto(BASE + route)
         states = ['grade', 'sleep', 'code-csv', 'code-json'] if route == '' else ['empty', 'example'] if route == 'sechserrechner/' else ['default']
         for state in states:
@@ -169,11 +169,11 @@ with sync_playwright() as w:
                 p.wait_for_timeout(100)
                 pairs = p.evaluate(PAIRS)
                 labels = {pair['label'] for pair in pairs}
-                expected = {'brand'} | ({'film-text stop'} if route not in ('pfisterkiste/datenschutz/', 'wisperpfister/datenschutz/') else set()) | ({'mini clock', 'grade card h3', 'sleep card cta', 'hud channel', 'hud data', 'grade', 'sleep', 'code', 'wisper teaser'} if route == '' else set())
+                expected = {'brand'} | ({'film-text stop'} if route not in ('spielchischte/datenschutz/', 'wisperpfister/datenschutz/') else set()) | ({'mini clock', 'grade card h3', 'sleep card cta', 'hud channel', 'hud data', 'grade', 'sleep', 'code', 'wisper teaser'} if route == '' else set())
                 expected |= {'result average', 'result averageDetail', 'result result-title'} if route == 'sechserrechner/' else set()
                 expected |= {'dial-tip', 'midnight', 'sleepResultTime'} if route == 'sleepcalculator/' else set()
                 expected |= {'wisper demo', 'wisper facts', 'wisper platform', 'wisper privacy', 'wisper availability'} if route == 'wisperpfister/' else set()
-                expected |= {'kiste text'} if route.startswith('pfisterkiste/') else set()
+                expected |= {'kiste text'} if route.startswith('spielchischte/') else set()
                 expected |= {'app teaser'} if route == '' else set()
                 if route == '':
                     expected |= {'hero sample heading', 'conversion title', 'conversion tag', 'conversion file', 'conversion file detail', 'conversion bay label', 'conversion source key', 'conversion target key', 'conversion field value', 'conversion format button', 'conversion play button', 'conversion status', 'conversion output', 'conversion pending', 'conversion note'}
